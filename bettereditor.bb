@@ -76,7 +76,7 @@ Field f7#
 Field f8#
 End Type
 
-AppTitle "Wonderland Adventures",""
+AppTitle "Wonderland Adventures [FEATURE BUILD #3]",""
 
 Global particlemesh
 Global particlesurface
@@ -936,8 +936,8 @@ Repeat
 		Else If (midnightvault=2 And (KeyDown(3))) Then
 			midnightvault=3
 		Else If (midnightvault=3 And (KeyDown(6))) Then
-			messagelinetext1="You wanna cheat?"
-			messagelinetext2="sure, go for it :D"
+			messagelinetext1="Sorry. I don't have the"
+			messagelinetext2="key to the Vault ;-)"
 			messagelinetimer=100
 			midnightvault=4
 		Else If ((((KeyDown(2) Or (KeyDown(4))) Or (KeyDown(5))) Or (KeyDown(8))) Or (KeyDown(10))) Then
@@ -1270,7 +1270,7 @@ Function updateadventuretitle()
 	If leveltimer=16 Then
 		ShowEntity adventuretitlestar
 	End If
-	addparticle(Rand(16,23),PickedX(),PickedY(),PickedZ()-0.011,0.0,0.01,Rnd(-0.005,0.005),Rnd(-0.004,0.008),0.0,5.0,0.001,0.0,0.0000-5,0.0,75,3)
+	addparticle(Rand(16,23),PickedX(),PickedY(),PickedZ()-0.011,0.0,0.01,Rnd(-0.005,0.005),Rnd(-0.004,0.008),0.0,5.0,0.001,0.0,-0.00005,0.0,75,3)
 	PositionEntity levelcursor,PickedX(),PickedY(),PickedZ(),0
 	ScaleEntity levelcursor,0.2,0.2,0.2,0
 	PointEntity levelcursor,camera,leveltimer*4 Mod 360
@@ -5752,7 +5752,7 @@ Function controlobjects()
 					v11=-1
 				End If
 				If Rand(0,100)<10 Then
-					addparticle(5,Rnd((-0.5)*objectxscale(v2),0.5*objectxscale(v2))*v10+objectx(v2)+Rnd(0.55,0.6)*v11,objectzadjust(v2),(Rnd((-0.5)*objectxscale(v2),0.5*objectxscale(v2))*v11+-objecty(v2))-(Rnd(0.55,0.6)*v10),0.0,0.11,Rnd(-0.005,0.005)*v10+Rnd(0.0,0.005)*v11,Rnd(0.01,0.03),Rnd(0.0,0.001)*(-v10)+Rnd(-0.005,0.005)*v11,0.0,0.0,0.0,0.000-4,0.0,100,3)
+					addparticle(5,Rnd((-0.5)*objectxscale(v2),0.5*objectxscale(v2))*v10+objectx(v2)+Rnd(0.55,0.6)*v11,objectzadjust(v2),(Rnd((-0.5)*objectxscale(v2),0.5*objectxscale(v2))*v11+-objecty(v2))-(Rnd(0.55,0.6)*v10),0.0,0.11,Rnd(-0.005,0.005)*v10+Rnd(0.0,0.005)*v11,Rnd(0.01,0.03),Rnd(0.0,0.001)*(-v10)+Rnd(-0.005,0.005)*v11,0.0,0.0,0.0,-0.0004,0.0,100,3)
 				End If
 				If Rand(0,100)<3 Then
 					addparticle(6,Rnd((-0.5)*objectxscale(v2),0.5*objectxscale(v2))*v10+objectx(v2)+Rnd(0.65,0.7)*v11,Rnd(objectzadjust(v2),objectzadjust(v2)+objectzscale(v2)/2.0),(Rnd((-0.5)*objectxscale(v2),0.5*objectxscale(v2))*v11+-objecty(v2))-(v10*0.6),0.0,0.5,v11*Rnd(0.0,0.005),Rnd(0.01,0.02),0.0,0.0,0.01,0.0,0.0,0.0,100,3)
@@ -8289,7 +8289,7 @@ Function controlnpc(a0)
 		objectexclamation(a0)=objectexclamation(a0)-100
 	End If
 	If ((objectexclamation(a0)>=0 And (objectexclamation(a0)<100)) And (v1<4)) Then
-		addparticle(objectexclamation(a0),objecttilex(a0)+0.5,1.3,(-objecttiley(a0))-0.5,0.0,0.5,0.0,0.0125,0.0,0.0,0.004,0.0,0.000-1,0.0,150,3)
+		addparticle(objectexclamation(a0),objecttilex(a0)+0.5,1.3,(-objecttiley(a0))-0.5,0.0,0.5,0.0,0.0125,0.0,0.0,0.004,0.0,-0.0001,0.0,150,3)
 		objectexclamation(a0)=objectexclamation(a0)+100
 	End If
 	If (((gamemode<>8 Or (dialogobject1<>a0)) And (objectlinked(a0)=-1)) And (objectdata10(a0)>=0)) Then
@@ -8655,7 +8655,7 @@ Function controlwisp(a0)
 		objectroll(a0)=20.0*Sin(leveltimer*2 Mod 360)
 	End If
 	If (Rand(0,100)<3 And (objectactive(a0)=1001)) Then
-		addparticle(Rand(16,23),objecttilex(a0)+0.5,0.7,(-objecttiley(a0))-0.5,Rand(0,360),0.16,Rnd(-0.015,0.015),0.03,Rnd(-0.015,0.015),0.0,0.001,0.0,0.000-25,0.0,100,3)
+		addparticle(Rand(16,23),objecttilex(a0)+0.5,0.7,(-objecttiley(a0))-0.5,Rand(0,360),0.16,Rnd(-0.015,0.015),0.03,Rnd(-0.015,0.015),0.0,0.001,0.0,-0.00025,0.0,100,3)
 	End If
 End Function
 
@@ -9999,7 +9999,7 @@ Function controlgoldstar(a0)
 	If leveltimer<1000000000 Then
 		v2=Rand(0,300)
 		If (((((v1<3 And (v2<50)) Or ((v1<4 And (v2<40)))) Or ((v1<5 And (v2<28)))) Or ((v1<6 And (v2<15)))) Or ((v1<7 And (v2<2)))) Then
-			addparticle(19,objecttilex(a0)+0.5,0.7,(-objecttiley(a0))-0.5,Rand(0,360),0.16,Rnd(-0.015,0.015),0.03,Rnd(-0.015,0.015),0.0,0.001,0.0,0.000-25,0.0,100,3)
+			addparticle(19,objecttilex(a0)+0.5,0.7,(-objecttiley(a0))-0.5,Rand(0,360),0.16,Rnd(-0.015,0.015),0.03,Rnd(-0.015,0.015),0.0,0.001,0.0,-0.00025,0.0,100,3)
 		End If
 	End If
 	If (objectmovementtimer(playerobject)=0 And (v1=0)) Then
@@ -12460,11 +12460,11 @@ Function activatecommand(a0,a1,a2,a3,a4)
 		Next
 	Case 64
 		If a1=-1 Then
-			addparticle(a2,objecttilex(playerobject)+0.5,1.3,(-objecttiley(playerobject))-0.5,0.0,0.5,0.0,0.0125,0.0,0.0,0.004,0.0,0.000-1,0.0,150,3)
+			addparticle(a2,objecttilex(playerobject)+0.5,1.3,(-objecttiley(playerobject))-0.5,0.0,0.5,0.0,0.0125,0.0,0.0,0.004,0.0,-0.0001,0.0,150,3)
 			If a3>1 Then
 				;v3=2
 				For v3=2 To a3
-					addparticle(a2,objecttilex(playerobject)+0.5,1.3,(-objecttiley(playerobject))-0.5,0.0,0.4,Rnd(-0.01,0.01),Rnd(0.01,0.014),Rnd(-0.01,0.01),0.0,0.004,0.0,Rnd(0.000-2,0.00005),0.0,Rand(50,150),3)
+					addparticle(a2,objecttilex(playerobject)+0.5,1.3,(-objecttiley(playerobject))-0.5,0.0,0.4,Rnd(-0.01,0.01),Rnd(0.01,0.014),Rnd(-0.01,0.01),0.0,0.004,0.0,Rnd(-0.0002,0.00005),0.0,Rand(50,150),3)
 					;v3=v3+1
 				Next
 			End If
@@ -12473,11 +12473,11 @@ Function activatecommand(a0,a1,a2,a3,a4)
 			For v2=0 To nofobjects-1
 				If objectexists(v2)=1 Then
 					If objectid(v2)=a1 Then
-						addparticle(a2,objecttilex(v2)+0.5,1.3,(-objecttiley(v2))-0.5,0.0,0.5,0.0,0.0125,0.0,0.0,0.004,0.0,0.000-1,0.0,150,3)
+						addparticle(a2,objecttilex(v2)+0.5,1.3,(-objecttiley(v2))-0.5,0.0,0.5,0.0,0.0125,0.0,0.0,0.004,0.0,-0.0001,0.0,150,3)
 						If a3>1 Then
 							;v3=2
 							For v3=2 To a3
-								addparticle(a2,objecttilex(v2)+0.5,1.3,(-objecttiley(v2))-0.5,0.0,0.4,Rnd(-0.01,0.01),Rnd(0.01,0.014),Rnd(-0.01,0.01),0.0,0.004,0.0,Rnd(0.000-2,0.00005),0.0,Rand(50,150),3)
+								addparticle(a2,objecttilex(v2)+0.5,1.3,(-objecttiley(v2))-0.5,0.0,0.4,Rnd(-0.01,0.01),Rnd(0.01,0.014),Rnd(-0.01,0.01),0.0,0.004,0.0,Rnd(-0.0002,0.00005),0.0,Rand(50,150),3)
 								;v3=v3+1
 							Next
 						End If
