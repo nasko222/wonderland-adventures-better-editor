@@ -76,7 +76,7 @@ Field f7#
 Field f8#
 End Type
 
-AppTitle "Wonderland Adventures [FEATURE BUILD #3]",""
+AppTitle "Wonderland Adventures [FEATURE BUILD #4]",""
 
 Global particlemesh
 Global particlesurface
@@ -493,6 +493,7 @@ Global rubberduckytexture
 Global springtexture
 Global voidtexture
 Global thwartmesh
+Global isthereaflipbridge
 Dim obstaclemesh(50)
 Dim obstacletexture(50)
 Global cylinder
@@ -3269,6 +3270,7 @@ End Function
 Function loadlevel(a0$,a1,a2)
 	
 	levelformat104=0
+	isthereaflipbridge=0
 	v1=ReadFile(a0$)
 	levelwidth=ReadInt(v1)
 	levelheight=ReadInt(v1)
@@ -5204,6 +5206,10 @@ Function loadobject(a0,a1,a2)
 			RotateMesh objectentity(v1),90.0,0.0,0.0
 			ScaleMesh objectentity(v1),1.1,1.1,1.1
 			EntityTexture objectentity(v1),springtexture,0,0
+		Case "!FlipBridge"
+			objectentity(v1)=createflipbridgemesh(objectdata(v1,0))
+			EntityTexture objectentity(v1),gatetexture,0,0
+			isthereaflipbridge=1
 		Case "!WaterFall"
 			objectentity(v1)=createwaterfallmesh()
 		Case "!Star"
@@ -5346,6 +5352,16 @@ Function loadobject(a0,a1,a2)
 		Else
 			createshadow(v1,0.9)
 		End If
+	Case "!FlipBridge"
+		v3=createnewobject()
+		objectentity(v3)=CreateCylinder(32,1,0)
+		objectxscale(v3)=0.35
+		objectyscale(v3)=0.35
+		objectzscale(v3)=0.35
+		objectx(v3)=objectx(v1)
+		objecty(v3)=objecty(v1)
+		objectz(v3)=-0.241
+		EntityTexture objectentity(v3),cagetexture,0,0
 	End Select
 End Function
 
@@ -5607,6 +5623,35 @@ Function adjustleveltilelogic(a0,a1,a2)
 			End If
 			leveltilelogic(a0,a1)=0
 		End If
+	Case 410
+		leveltilelogic(a0,a1)=0
+		If (objectactive(a2)>0 And (objectactive(a2) Mod 2=1)) Then
+			Select objectdata(a2,2)
+			Case 0,4
+				v4=0
+				v5=-1
+				v6=3
+			Case 1,5
+				v4=1
+				v5=-1
+				v6=2
+			Case 2,6
+				v4=1
+				v5=0
+				v6=3
+			Case 3,7
+				v4=1
+				v5=1
+				v6=2
+			End Select
+			;v7=1
+			For v7=1 To v6
+				objectdata(a2,3)=leveltilelogic(a0-(v7*v4),a1-(v7*v5))
+				leveltilelogic(a0-(v7*v4),a1-(v7*v5))=0
+				leveltilelogic(v7*v4+a0,v7*v5+a1)=0
+				;v7=v7+1
+			Next
+		End If
 	End Select
 End Function
 
@@ -5819,6 +5864,8 @@ Function controlobjects()
 				controlwisp(v2)
 			Case 370
 				controlcrab(v2)
+			Case 410
+				controlflipbridge(v2)
 			End Select
 			If objectentity(v2)>0 Then
 				ScaleEntity objectentity(v2),v5#,v7#,v6#,0
@@ -5942,7 +5989,11 @@ Function activateobject(a0)
 		End If
 	End If
 	If (objectactive(a0)<1001 And (objectactive(a0) Mod 2=0)) Then
-		objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
+		If objecttype(a0)=410 Then
+			activateflipbridge(a0)
+		Else
+			objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
+		End If
 		If objectactive(a0)>1001 Then
 			objectactive(a0)=1001
 		End If
@@ -5955,7 +6006,11 @@ Function deactivateobject(a0)
 		vacateobjecttile(a0)
 	End If
 	If (objectactive(a0)>0 And (objectactive(a0) Mod 2=1)) Then
-		objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
+		If objecttype(a0)=410 Then
+			deactivateflipbridge(a0)
+		Else
+			objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
+		End If
 	End If
 	If objectactive(a0)<0 Then
 		objectactive(a0)=0
@@ -5965,9 +6020,17 @@ End Function
 Function toggleobject(a0)
 	
 	If (objectactive(a0)<1001 And (objectactive(a0) Mod 2=0)) Then
-		objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
+		If objecttype(a0)=410 Then
+			activateflipbridge(a0)
+		Else
+			objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
+		End If
 	Else If (objectactive(a0)>0 And (objectactive(a0) Mod 2=1)) Then
-		objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
+		If objecttype(a0)=410 Then
+			deactivateflipbridge(a0)
+		Else
+			objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
+		End If
 	End If
 End Function
 
@@ -9488,6 +9551,11 @@ Function controlbutton(a0)
 							Else If objecttype(v5)=210 Then
 								objectid(v5)=objectdata(a0,v2+0)*5+500+objectdata(a0,v2+2)
 								redotransportertexture(v5)
+							Else If objecttype(v5)=410 Then
+								objectid(v5)=objectdata(a0,v2+1)*5+500+objectdata(a0,v2+3)
+								objectdata(v5,0)=objectdata(a0,v2+1)
+								objectdata(v5,1)=objectdata(a0,v2+3)
+								redoflipbridgetexture(v5)
 							Else If objecttype(v5)=40 Then
 								If (objectdata(a0,v2+0)>=8 And (objectdata(a0,v2+0)<12)) Then
 									objectid(v5)=objectdata(a0,v2+0)*5+500+objectdata(a0,v2+2)
@@ -9755,6 +9823,11 @@ Function activatebutton(a0)
 						Else If objecttype(v4)=210 Then
 							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
 							redotransportertexture(v4)
+						Else If objecttype(v4)=410 Then
+							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
+							objectdata(v4,0)=objectdata(a0,v3+1)
+							objectdata(v4,1)=objectdata(a0,v3+3)
+							redoflipbridgetexture(v4)
 						Else If objecttype(v4)=40 Then
 							If (objectdata(a0,v3+1)>=8 And (objectdata(a0,v3+1)<12)) Then
 								objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
@@ -9796,6 +9869,11 @@ Function activatebutton(a0)
 						Else If objecttype(v4)=210 Then
 							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
 							redotransportertexture(v4)
+						Else If objecttype(v4)=410 Then
+							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
+							objectdata(v4,0)=objectdata(a0,v3+1)
+							objectdata(v4,1)=objectdata(a0,v3+3)
+							redoflipbridgetexture(v4)
 						Else If objecttype(v4)=40 Then
 							If (objectdata(a0,v3+1)>=8 And (objectdata(a0,v3+1)<12)) Then
 								objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
@@ -9814,6 +9892,11 @@ Function activatebutton(a0)
 						Else If objecttype(v4)=210 Then
 							objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+2)
 							redotransportertexture(v4)
+						Else If objecttype(v4)=410 Then
+							objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+2)
+							objectdata(v4,0)=objectdata(a0,v3)
+							objectdata(v4,1)=objectdata(a0,v3+2)
+							redoflipbridgetexture(v4)
 						Else If objecttype(v4)=40 Then
 							If (objectdata(a0,v3)>=8 And (objectdata(a0,v3)<12)) Then
 								objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+2)
@@ -9855,6 +9938,11 @@ Function activatebutton(a0)
 						Else If objecttype(v4)=210 Then
 							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
 							redotransportertexture(v4)
+						Else If objecttype(v4)=410 Then
+								objectid(v4)=objectdata(a0,v3+0)*5+500+objectdata(a0,v3+2)
+								objectdata(v4,0)=objectdata(a0,v3)
+								objectdata(v4,1)=objectdata(a0,v3+2)
+								redoflipbridgetexture(v4)
 						Else If objecttype(v4)=40 Then
 							If (objectdata(a0,v3+1)>=8 And (objectdata(a0,v3+1)<12)) Then
 								objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
@@ -9891,6 +9979,9 @@ Function activatebutton(a0)
 						Else
 							objectdata(v4,2)=(objectdata(v4,2)+1) Mod 4
 						End If
+					End If
+					If objecttype(v4)=410 Then
+						turnflipbridge(v4,objectdata(a0,2))
 					End If
 				End If
 				;v4=v4+1
@@ -12155,6 +12246,308 @@ Function controlcrab(a0)
 	objectdata10(a0)=objectmovementtimer(a0)
 End Function
 
+Function createflipbridgemesh(a0)
+	
+	v1=3
+	v2=CreateMesh(0)
+	v3=CreateSurface(v2,0)
+	AddVertex(v3,-0.25,0.1,0.49,0.76,0.01,1.0)
+	AddVertex(v3,0.25,0.1,0.49,1.0,0.01,1.0)
+	AddVertex(v3,-0.25,0.1,-0.49,0.76,0.24,1.0)
+	AddVertex(v3,0.25,0.1,-0.49,1.0,0.24,1.0)
+	AddTriangle(v3,0,1,2)
+	AddTriangle(v3,1,3,2)
+	AddVertex(v3,-0.2,0.105,0.45,a0 Mod 8*0.125+0.01,a0/8*0.125+0.51,1.0)
+	AddVertex(v3,-0.1,0.105,0.45,a0 Mod 8*0.125+0.115,a0/8*0.125+0.51,1.0)
+	AddVertex(v3,-0.2,0.105,-0.45,a0 Mod 8*0.125+0.01,a0/8*0.125+0.51+0.115,1.0)
+	AddVertex(v3,-0.1,0.105,-0.45,a0 Mod 8*0.125+0.115,a0/8*0.125+0.51+0.115,1.0)
+	AddTriangle(v3,4,5,6)
+	AddTriangle(v3,5,7,6)
+	AddVertex(v3,0.1,0.105,0.45,a0 Mod 8*0.125+0.01,a0/8*0.125+0.51,1.0)
+	AddVertex(v3,0.2,0.105,0.45,a0 Mod 8*0.125+0.115,a0/8*0.125+0.51,1.0)
+	AddVertex(v3,0.1,0.105,-0.45,a0 Mod 8*0.125+0.01,a0/8*0.125+0.51+0.115,1.0)
+	AddVertex(v3,0.2,0.105,-0.45,a0 Mod 8*0.125+0.115,a0/8*0.125+0.51+0.115,1.0)
+	AddTriangle(v3,8,9,10)
+	AddTriangle(v3,9,11,10)
+	;v4=0
+	For v4=0 To 3
+		Select v4
+		Case 0
+			v6#=-0.25
+			v7#=0.25
+			v8#=-0.49
+			v9#=-0.49
+		Case 1
+			v6#=0.25
+			v7#=0.25
+			v8#=-0.49
+			v9#=0.49
+		Case 2
+			v6#=0.25
+			v7#=-0.25
+			v8#=0.49
+			v9#=0.49
+		Case 3
+			v6#=-0.25
+			v7#=-0.25
+			v8#=0.49
+			v9#=-0.49
+		End Select
+		AddVertex(v3,v6#,0.104,v8#,v1*0.25+0.01,0.01,1.0)
+		AddVertex(v3,v7#,0.104,v9#,v1*0.25+0.24,0.01,1.0)
+		AddVertex(v3,v6#,-0.4,v8#,v1*0.25+0.01,0.24,1.0)
+		AddVertex(v3,v7#,-0.4,v9#,v1*0.25+0.24,0.24,1.0)
+		AddTriangle(v3,v4*4+12,v4*4+13,v4*4+14)
+		AddTriangle(v3,v4*4+13,v4*4+15,v4*4+14)
+		;v4=v4+1
+	Next
+	UpdateNormals v2
+	EntityTexture v2,gatetexture,0,0
+	Return v2
+End Function
+
+Function redoflipbridgetexture(a0)
+	
+	v1=GetSurface(objectentity(a0),1)
+	v2=(objectid(a0)-500)/5
+	;v3=0
+	For v3=0 To 1
+		VertexTexCoords v1,v3*4+4,v2 Mod 8*0.125+0.01,v2/8*0.125+0.51,1.0,0
+		VertexTexCoords v1,v3*4+5,v2 Mod 8*0.125+0.115,v2/8*0.125+0.51,1.0,0
+		VertexTexCoords v1,v3*4+6,v2 Mod 8*0.125+0.01,v2/8*0.125+0.51+0.115,1.0,0
+		VertexTexCoords v1,v3*4+7,v2 Mod 8*0.125+0.115,v2/8*0.125+0.51+0.115,1.0,0
+		;v3=v3+1
+	Next
+	UpdateNormals objectentity(a0)
+End Function
+
+Function controlflipbridge(a0)
+	
+	objectyawadjust(a0)=0.0
+	If objectid(a0)=-1 Then
+		objectid(a0)=objectdata(a0,0)*5+500+objectdata(a0,1)
+	End If
+	objectscaleyadjust(a0)=1.0+5.6*objectactive(a0)/1001.0
+	Select objectdata(a0,2)
+	Case 0
+		v2=0
+		v3=-1
+	Case 1
+		v2=1
+		v3=-1
+	Case 2
+		v2=1
+		v3=0
+	Case 3
+		v2=1
+		v3=1
+	Case 4
+		v2=0
+		v3=1
+	Case 5
+		v2=-1
+		v3=1
+	Case 6
+		v2=-1
+		v3=0
+	Case 7
+		v2=-1
+		v3=-1
+	End Select
+	turnobjecttowarddirection(a0,v2,v3,2,0)
+End Function
+
+Function activateflipbridge(a0)
+	
+	v1=1
+	v2=Floor(objectx(a0))
+	v3=Floor(objecty(a0))
+	Select objectdata(a0,2)
+	Case 0,4
+		v5=0
+		v6=-1
+		v7=3
+	Case 1,5
+		v5=1
+		v6=-1
+		v7=2
+	Case 2,6
+		v5=1
+		v6=0
+		v7=3
+	Case 3,7
+		v5=1
+		v6=1
+		v7=2
+	End Select
+	;v8=1
+	For v8=1 To v7
+		If (leveltilelogic(v8*v5+v2,v8*v6+v3)<>2 And (leveltilelogic(v8*v5+v2,v8*v6+v3)<>5)) Then
+			v1=0
+		Else If (leveltilelogic(v2-(v8*v5),v3-(v8*v6))<>2 And (leveltilelogic(v2-(v8*v5),v3-(v8*v6))<>5)) Then
+			v1=0
+		Else If ((objecttilelogic(v8*v5+v2,v8*v6+v3)>0 And (objecttilelogic(v8*v5+v2,v8*v6+v3)<>1024.0)) Or ((objecttilelogic(v2-(v8*v5),v3-(v8*v6))>0 And (objecttilelogic(v2-(v8*v5),v3-(v8*v6))<>1024.0)))) Then
+			v1=0
+		End If
+		;v8=v8+1
+	Next
+	If v1=0 Then
+		objectactive(a0)=200
+	Else
+		objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
+		If objectactive(a0)>1001 Then
+			objectactive(a0)=1001
+		End If
+		;v8=1
+		For v8=1 To v7
+			objectdata(a0,3)=leveltilelogic(v2-(v8*v5),v3-(v8*v6))
+			leveltilelogic(v2-(v8*v5),v3-(v8*v6))=0
+			leveltilelogic(v8*v5+v2,v8*v6+v3)=0
+			;v8=v8+1
+		Next
+	End If
+End Function
+
+Function deactivateflipbridge(a0)
+	
+	v1=Floor(objectx(a0))
+	v2=Floor(objecty(a0))
+	Select objectdata(a0,2)
+	Case 0,4
+		v4=0
+		v5=-1
+		v6=3
+	Case 1,5
+		v4=1
+		v5=-1
+		v6=2
+	Case 2,6
+		v4=1
+		v5=0
+		v6=3
+	Case 3,7
+		v4=1
+		v5=1
+		v6=2
+	End Select
+	objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
+	If objectactive(a0)<0 Then
+		objectactive(a0)=0
+	End If
+	;v7=1
+	For v7=1 To v6
+		leveltilelogic(v1-(v7*v4),v2-(v7*v5))=objectdata(a0,3)
+		leveltilelogic(v7*v4+v1,v7*v5+v2)=objectdata(a0,3)
+		;v7=v7+1
+	Next
+End Function
+
+Function turnflipbridge(a0,a1)
+	
+	v1=0
+	v2=Floor(objectx(a0))
+	v3=Floor(objecty(a0))
+	v4=objectdata(a0,2)
+	v5=1
+	Select a1
+	Case 1
+		Select v4
+		Case 0,4
+			v8=1
+			If ((checkflipbridgedestination(v5*1*v8+v2,v3-(3*v8)) And (checkflipbridgedestination(v5*2*v8+v2,v3-(3*v8)))) And (checkflipbridgedestination(v5*1*v8+v2,v3-(v8*2)))) Then
+				v8=-1
+				If ((checkflipbridgedestination(v5*1*v8+v2,v3-(3*v8)) And (checkflipbridgedestination(v5*2*v8+v2,v3-(3*v8)))) And (checkflipbridgedestination(v5*1*v8+v2,v3-(v8*2)))) Then
+					v1=1
+				End If
+			End If
+		Case 1,5
+			v8=1
+			If ((checkflipbridgedestination(3*v5*v8+v2,v3-(v8*2)) And (checkflipbridgedestination(v5*2*v8+v2,v3-(v8*1)))) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*1)))) Then
+				v8=-1
+				If ((checkflipbridgedestination(3*v5*v8+v2,v3-(v8*2)) And (checkflipbridgedestination(v5*2*v8+v2,v3-(v8*1)))) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*1)))) Then
+					v1=1
+				End If
+			End If
+		Case 2,6
+			v8=1
+			If ((checkflipbridgedestination(v5*2*v8+v2,v8*1+v3) And (checkflipbridgedestination(3*v5*v8+v2,v8*1+v3))) And (checkflipbridgedestination(3*v5*v8+v2,v8*2+v3))) Then
+				v8=-1
+				If ((checkflipbridgedestination(v5*2*v8+v2,v8*1+v3) And (checkflipbridgedestination(3*v5*v8+v2,v8*1+v3))) And (checkflipbridgedestination(3*v5*v8+v2,v8*2+v3))) Then
+					v1=1
+				End If
+			End If
+		Case 3,7
+			v8=1
+			If ((checkflipbridgedestination(v5*1*v8+v2,3*v8+v3) And (checkflipbridgedestination(v5*2*v8+v2,3*v8+v3))) And (checkflipbridgedestination(v5*1*v8+v2,v8*2+v3))) Then
+				v8=-1
+				If ((checkflipbridgedestination(v5*1*v8+v2,3*v8+v3) And (checkflipbridgedestination(v5*2*v8+v2,3*v8+v3))) And (checkflipbridgedestination(v5*1*v8+v2,v8*2+v3))) Then
+					v1=1
+				End If
+			End If
+		End Select
+	Case 0
+		Select v4
+		Case 0,4
+			v8=1
+			If ((checkflipbridgedestination(v2-(v5*1*v8),v3-(3*v8)) And (checkflipbridgedestination(v2-(v5*2*v8),v3-(3*v8)))) And (checkflipbridgedestination(v2-(v5*1*v8),v3-(v8*2)))) Then
+				v8=-1
+				If ((checkflipbridgedestination(v2-(v5*1*v8),v3-(3*v8)) And (checkflipbridgedestination(v2-(v5*2*v8),v3-(3*v8)))) And (checkflipbridgedestination(v2-(v5*1*v8),v3-(v8*2)))) Then
+					v1=1
+				End If
+			End If
+		Case 1,5
+			v8=1
+			If ((checkflipbridgedestination(v5*2*v8+v2,v3-(3*v8)) And (checkflipbridgedestination(v5*1*v8+v2,v3-(v8*2)))) And (checkflipbridgedestination(v5*1*v8+v2,v3-(3*v8)))) Then
+				v8=-1
+				If ((checkflipbridgedestination(v5*2*v8+v2,v3-(3*v8)) And (checkflipbridgedestination(v5*1*v8+v2,v3-(v8*2)))) And (checkflipbridgedestination(v5*1*v8+v2,v3-(3*v8)))) Then
+					v1=1
+				End If
+			End If
+		Case 2,6
+			v8=1
+			If ((checkflipbridgedestination(v5*2*v8+v2,v3-(v8*1)) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*1)))) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*2)))) Then
+				v8=-1
+				If ((checkflipbridgedestination(v5*2*v8+v2,v3-(v8*1)) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*1)))) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*2)))) Then
+					v1=1
+				End If
+			End If
+		Case 3,7
+			v8=1
+			If ((checkflipbridgedestination(3*v5*v8+v2,v8*1+v3) And (checkflipbridgedestination(3*v5*v8+v2,v8*2+v3))) And (checkflipbridgedestination(v5*2*v8+v2,v8*1+v3))) Then
+				v8=-1
+				If ((checkflipbridgedestination(3*v5*v8+v2,v8*1+v3) And (checkflipbridgedestination(3*v5*v8+v2,v8*2+v3))) And (checkflipbridgedestination(v5*2*v8+v2,v8*1+v3))) Then
+					v1=1
+				End If
+			End If
+		End Select
+	End Select
+	v10=0
+	If (objectactive(a0)>0 And (objectactive(a0) Mod 2=1)) Then
+		v10=1
+	End If
+	If v10=1 Then
+		deactivateflipbridge(a0)
+	End If
+	If a1=0 Then
+		objectdata(a0,2)=(objectdata(a0,2)-1+8) Mod 8
+	Else
+		objectdata(a0,2)=(objectdata(a0,2)+1) Mod 8
+	End If
+	If v1=1 Then
+		If v10=1 Then
+			activateflipbridge(a0)
+		End If
+	End If
+End Function
+
+Function checkflipbridgedestination(a0,a1)
+	
+	If ((leveltilelogic(a0,a1)=2 Or (leveltilelogic(a0,a1)=5)) And (objecttilelogic(a0,a1)=0)) Then
+		Return 1
+	End If
+	Return 0
+End Function
+
 Function activatecommand(a0,a1,a2,a3,a4)
 	
 	Select a0
@@ -12702,6 +13095,10 @@ End Function
 
 Function astar(a0,a1,a2,a3,a4,a5,a6,a7)
 	
+	If isthereaflipbridge=1 Then
+		astaralt(a0,a1,a2,a3,a4,a5,a6,a7)
+		Return 0
+	End If
 	If a5<3 Then
 		a5=3
 	End If
@@ -12802,6 +13199,139 @@ Function astar(a0,a1,a2,a3,a4,a5,a6,a7)
 		For v6=a5 To 2 Step -1
 			astarpathnode(v6)=astarpathnode((v6-1))
 			;v6=v6+-1
+		Next
+		astarpathnode(1)=astarparent(astarpathnode(1))
+	Until (astarx(astarparent(astarpathnode(1)))=a1 And (astary(astarparent(astarpathnode(1)))=a2))
+End Function
+
+Function astaralt(a0,a1,a2,a3,a4,a5,a6,a7)
+	
+	If a5<3 Then
+		a5=3
+	End If
+	If a5>100 Then
+		a5=100
+	End If
+	v1=1
+	astarparent(1)=1
+	astarx(1)=a1
+	astary(1)=a2
+	astaropen(1)=1
+	astarh(1)=(Abs(a3-v2)+Abs(a4-v3))*9
+	astarg(1)=0
+	astarf(1)=astarg(1)+astarh(1)
+	astargrid(a1,a2)=1
+	v4=0
+	v5=0
+	v6=objecttilex(a0)
+	v7=objecttiley(a0)
+	Repeat
+		v8=99999
+		v9=-1
+		;v10=1
+		For v10=1 To v1
+			If (astaropen(v10)=1 And (astarf(v10)<v8)) Then
+				v9=v10
+				v8=astarf(v10)
+			End If
+			;v10=v10+1
+		Next
+		If (v9=-1 Or (v1>=a6)) Then
+			v5=1
+			Exit
+		End If
+		astaropen(v9)=2
+		astargrid(astarx(v9),astary(v9))=9999
+		;v10=1
+		For v10=1 To 8
+			Select v10
+			Case 1
+				v2=astarx(v9)+1
+				v3=astary(v9)
+			Case 2
+				v2=astarx(v9)-1
+				v3=astary(v9)
+			Case 3
+				v2=astarx(v9)
+				v3=astary(v9)+1
+			Case 4
+				v2=astarx(v9)
+				v3=astary(v9)-1
+			Case 5
+				v2=astarx(v9)+1
+				v3=astary(v9)-1
+			Case 6
+				v2=astarx(v9)-1
+				v3=astary(v9)-1
+			Case 7
+				v2=astarx(v9)+1
+				v3=astary(v9)+1
+			Case 8
+				v2=astarx(v9)-1
+				v3=astary(v9)+1
+			End Select
+			If (((v2>=0 And (v2<100)) And (v3>=0)) And (v3<100)) Then
+				objecttilex(a0)=astarx(v9)
+				objecttiley(a0)=astary(v9)
+				If (canobjectmovetotile(a0,v2,v3,1,0)=1 Or ((v2=a3 And (v3=a4)))) Then
+					If astargrid(v2,v3)=0 Then
+						v1=v1+1
+						astarparent(v1)=v9
+						astarx(v1)=v2
+						astary(v1)=v3
+						astaropen(v1)=1
+						astarh(v1)=(Abs(a3-v2)+Abs(a4-v3))*9
+						If v10<5 Then
+							astarg(v1)=astarg(v9)+10
+						Else
+							astarg(v1)=astarg(v9)+14
+						End If
+						astarf(v1)=astarg(v1)+astarh(v1)
+						astargrid(v2,v3)=1
+					Else If astaropen(astargrid(v2,v3))=1 Then
+						v12=(Abs(a3-v2)+Abs(a4-v3))*9
+						If v10<5 Then
+							v13=astarg(v9)+10
+						Else
+							v13=astarg(v9)+14
+						End If
+						If v13+v12<astarf(astargrid(v2,v3)) Then
+							astarg(astargrid(v2,v3))=v13
+							astarh(astargrid(v2,v3))=v12
+							astarf(astargrid(v2,v3))=v13+v12
+							astarparent(astargrid(v2,v3))=v9
+						End If
+					End If
+					If (Abs(v2-a3)<=a7 And (Abs(v3-a4)<=a7)) Then
+						v4=1
+						v10=8
+					End If
+				End If
+			End If
+			;v10=v10+1
+		Next
+	Until (v4=1 Or (v5=1))
+	objecttilex(a0)=v6
+	objecttiley(a0)=v7
+	;v10=1
+	For v10=1 To v1
+		astargrid(astarx(v10),astary(v10))=0
+		;v10=v10+1
+	Next
+	If v5=1 Then
+		astarpathnode(1)=-1
+		Return 0
+	End If
+	;v10=1
+	For v10=1 To a5
+		astarpathnode(v10)=v1
+		;v10=v10+1
+	Next
+	Repeat
+		;v10=a5
+		For v10=a5 To 2 Step -1
+			astarpathnode(v10)=astarpathnode((v10-1))
+			;v10=v10+-1
 		Next
 		astarpathnode(1)=astarparent(astarpathnode(1))
 	Until (astarx(astarparent(astarpathnode(1)))=a1 And (astary(astarparent(astarpathnode(1)))=a2))
