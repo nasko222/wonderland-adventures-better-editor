@@ -5292,6 +5292,7 @@ Function loadobject(a0,a1,a2)
 		EntityTexture objectentity(v1),glovetex,0,0
 	Else If objecttexturename(v1)="!FireTrap" Then
 		EntityTexture objectentity(v1),firetraptexture,0,0
+	Else If (((objecttexturename(v1)<>"" And ((objecttexturename(v1)<>"")<>"!None")) And (Left$(objecttexturename(v1),1)<>"!")) And (objectmodelname(v1)<>"!Button")) Then
 	objecttexture(v1)=myloadtexture(objecttexturename(v1),4)
 		EntityTexture objectentity(v1),objecttexture(v1),0,0
 		;v3=1
