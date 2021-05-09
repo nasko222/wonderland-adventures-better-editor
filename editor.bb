@@ -677,6 +677,12 @@ Global CrabTexture2=myLoadTexture("data\models\crab\crab03b.jpg",1)
 EntityTexture CrabMesh,CrabTexture1
 HideEntity CrabMesh
 
+; Kaboom
+Global KaboomMesh=myLoadMD2("data\models\kaboom\kaboom.md2")
+Global KaboomTexture=myLoadTexture("data\models\kaboom\kaboom01.jpg",1)
+EntityTexture KaboomMesh,KaboomTexture
+HideEntity KaboomMesh
+
 ; Turtles
 Global TurtleMesh=MyLoadMesh("data\models\turtle\dragonturtle2.3ds",0)
 RotateMesh TurtleMesh,-90,0,0
@@ -1830,6 +1836,18 @@ Function EditorControls()
 		Text 715,115,"Cave/Woods"
 	Case 6
 		Text 715,115,"Scary/Void"
+	Case 7
+		Text 715,115,"WondrFalls"
+	Case 8
+		Text 715,115,"  Jungle  "
+	Case 9
+		Text 715,115,"KaboomTown"
+	Case 10
+		Text 715,115,"Acid Pools"
+	Case 11
+		Text 719,115,"  Retro  "
+	Case 12
+		Text 719,115,"  Cave  "
 	Default
 		Text 719-5,115,"Custom:" + LevelMusic
 
@@ -4424,6 +4442,25 @@ Function DisplayObjectAdjuster(i)
 				
 			
 		EndIf
+		
+		If CurrentObjectModelName$="!Kaboom"
+			tex2$="Texture"
+			
+			Select CurrentObjectData(0)
+			Case 1
+				tex$="Blue"
+			Case 2
+				tex$="Purple"
+			Case 3
+				tex$="Red"
+			Case 4
+				tex$="Gold"
+			Case 5
+				tex$="Dark"
+			End Select
+				
+			
+		EndIf
 
 		If CurrentObjectModelName$="!Rubberducky"
 			tex2$="Move"
@@ -5351,7 +5388,7 @@ Function DisplayObjectAdjuster(i)
 				
 			EndIf
 		EndIf
-		If CurrentObjectModelName$="!NPC"
+		If CurrentObjectModelName$="!NPC" Or CurrentObjectModelName$="!Kaboom"
 		
 			tex2$="Turn"
 			If (CurrentObjectData(7) Mod 10)=0 tex$="Fixed"
@@ -5402,6 +5439,31 @@ Function DisplayObjectAdjuster(i)
 			
 			
 		EndIf
+		
+		If CurrentObjectModelName$="!Kaboom"
+			
+			tex2$="Anim"
+			If CurrentObjectData(8)=0 tex$="Stand"
+			If CurrentObjectData(8)=1 tex$="Sit"
+			If CurrentObjectData(8)=2 tex$="Sit/Stand"
+			If CurrentObjectData(8)=3 tex$="Shiver Some"
+			If CurrentObjectData(8)=4 tex$="Shiver Constant"
+			If CurrentObjectData(8)=5 tex$="Exercise"
+	
+			
+			
+		EndIf
+		
+		If CurrentObjectModelName$="!BabyBoomer"
+			
+			tex2$="Boom"
+			If CurrentObjectData(8)=0 tex$="No"
+			If CurrentObjectData(8)=1 tex$="Yes"
+				
+			
+			
+		EndIf
+		
 		If CurrentObjectModelName$="!StinkerWee"
 			
 			tex2$="Type"
@@ -5834,7 +5896,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(0)<0 CurrentObjectData(0)=3
 		EndIf
 		
-		If CurrentObjectModelName$="!NPC"
+		If CurrentObjectModelName$="!NPC" Or CurrentObjectModelName="!Kaboom"
 
 			If CurrentObjectData(0)>5 CurrentObjectData(0)=1
 			If CurrentObjectData(0)<1 CurrentObjectData(0)=5
@@ -6310,7 +6372,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentobjectData(7)=19 CurrentObjectData(7)=15
 
 		EndIf
-		If CurrentObjectModelName$="!NPC"
+		If CurrentObjectModelName$="!NPC" Or CurrentObjectModelName="!Kaboom"
 
 			If CurrentobjectData(7)=-2 CurrentObjectData(7)=25
 			If CurrentobjectData(7)=26 CurrentObjectData(7)=-1
@@ -6350,6 +6412,19 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(8)<0 CurrentObjectData(8)=10
 			
 
+		EndIf
+		
+		If CurrentObjectModelName$="!Kaboom"
+			If CurrentObjectData(8)>5 CurrentObjectData(8)=0
+			If CurrentObjectData(8)<0 CurrentObjectData(8)=5
+			
+
+		EndIf
+		
+		If CurrentObjectModelName$="!BabyBoomer"
+
+			If CurrentObjectData(8)>1 CurrentObjectData(8)=0
+			If CurrentObjectData(8)<0 CurrentObjectData(8)=1
 		EndIf
 		
 		If CurrentObjectModelName$="!StinkerWee"
@@ -6886,6 +6961,10 @@ Function BuildCurrentObjectModel()
 	Else If CurrentObjectModelName$="!Crab"
 		CurrentObjectModel=CopyEntity(CrabMesh)
 		If CurrentObjectSubType=0 Then EntityTexture CurrentObjectModel,CrabTexture2
+	Else If CurrentObjectModelName$="!Kaboom"
+		CurrentObjectModel=CopyEntity(KaboomMesh)
+	Else If CurrentObjectModelName$="!BabyBoomer"
+		CurrentObjectModel=CopyEntity(KaboomMesh)
 	Else If CurrentObjectModelName$="!Retrolasergate"
 		CurrentObjectModel=CreateretrolasergateMesh(Currentobjectdata(0))
 	Else If CurrentObjectModelName$="!FireFlower"
@@ -7084,6 +7163,8 @@ Function BuildCurrentObjectModel()
 		RotateEntity CurrentObjectModel,0,0,0
 		TurnEntity CurrentObjectModel,CurrentObjectPitchAdjust,0,CurrentObjectRollAdjust
 		TurnEntity CurrentObjectModel,0,CurrentObjectYawAdjust,0
+		
+		If CurrentObjectModelName$="!Kaboom" Or CurrentObjectModelName$="!Crab" Then TurnEntity CurrentObjectModel,0,90,0
 
 
 	;	PositionEntity CurrentObjectModel,CurrentObjectXAdjust,CurrentObjectZAdjust+CurrentObjectZ,-CurrentObjectYAdjust
@@ -8134,6 +8215,13 @@ Function LoadLevel(levelnumber)
 		Else If ObjectModelName$(Dest)="!Rubberducky"
 			ObjectEntity(Dest)=CopyEntity(rubberduckymesh)
 			
+		Else If ObjectModelName$(Dest)="!Kaboom"
+			ObjectEntity(Dest)=CopyEntity(KaboomMesh)
+			
+
+		Else If ObjectModelName$(Dest)="!BabyBoomer"
+			ObjectEntity(Dest)=CopyEntity(KaboomMesh)
+			
 		Else If ObjectModelName$(Dest)="!GlowWorm"  Or ObjectModelName$(Dest)="!Zipper"
 			ObjectEntity(Dest)=CreateSphere(12)
 			ScaleMesh ObjectEntity(Dest),.1,.1,.1
@@ -8357,6 +8445,8 @@ Function LoadLevel(levelnumber)
 	
 			TurnEntity ObjectEntity(Dest),ObjectPitchAdjust(Dest),0,ObjectRollAdjust(Dest)
 			TurnEntity ObjectEntity(Dest),0,ObjectYawAdjust(Dest),0
+			
+			If ObjectModelName$(Dest)="!Kaboom" Or ObjectModelName$(Dest)="!Crab" Then TurnEntity ObjectEntity(Dest),0,90,0
 			
 			EndIf
 		EndIf
@@ -12086,7 +12176,7 @@ Include "particles.bb"
 
 
 .winning
-Data "None (e.g. collect star)","Rescue All Stinkers","Capture/Destroy Scritters","Collect All Gems","Destroy All Bricks","Destroy FireFlowers","Race","Capture All Crabs"
+Data "None (e.g. collect star)","Rescue All Stinkers","Capture/Destroy Scritters","Collect All Gems","Destroy All Bricks","Destroy FireFlowers","Race","Capture/Destroy Crabs","Rescue All BabyBoomers"
 Data "Done"
 	
 .Commands
