@@ -76,7 +76,7 @@ Field f7#
 Field f8#
 End Type
 
-AppTitle "Wonderland Adventures [FEATURE BUILD #4]",""
+AppTitle "Wonderland Adventures [FEATURE BUILD #3]",""
 
 Global particlemesh
 Global particlesurface
@@ -474,10 +474,6 @@ Global crabmesh
 Global crabtexture1
 Global crabtexture2
 Global nofcrabsinadventure
-Global kaboommesh
-Global kaboomtexturesquint
-Dim kaboomtexture(5)
-Global nofbabyboomersinadventure
 Global fireflowermesh
 Global fireflowertexture
 Global noffireflowersinadventure
@@ -497,7 +493,6 @@ Global rubberduckytexture
 Global springtexture
 Global voidtexture
 Global thwartmesh
-Global isthereaflipbridge
 Dim obstaclemesh(50)
 Dim obstacletexture(50)
 Global cylinder
@@ -1112,10 +1107,6 @@ Function updategame()
 		Case 6
 		Case 7
 			If nofcrabsinadventure=0 Then
-				v1=1
-			End If
-		Case 8
-			If nofbabyboomersinadventure=0 Then
 				v1=1
 			End If
 		End Select
@@ -3278,7 +3269,6 @@ End Function
 Function loadlevel(a0$,a1,a2)
 	
 	levelformat104=0
-	isthereaflipbridge=0
 	v1=ReadFile(a0$)
 	levelwidth=ReadInt(v1)
 	levelheight=ReadInt(v1)
@@ -3719,7 +3709,6 @@ Function loadplayer(a0$)
 	nofbricksinadventure=ReadInt(v1)
 	noffireflowersinadventure=ReadInt(v1)
 	nofcrabsinadventure=ReadInt(v1)
-	nofbabyboomersinadventure=ReadInt(v1)
 	v3=ReadInt(v1)
 	v3=ReadInt(v1)
 	v3=ReadInt(v1)
@@ -3898,7 +3887,6 @@ Function saveplayer(a0$)
 	WriteInt(v1,nofbricksinadventure)
 	WriteInt(v1,noffireflowersinadventure)
 	WriteInt(v1,nofcrabsinadventure)
-	WriteInt(v1,nofbabyboomersinadventure)
 	WriteInt(v1,v3)
 	WriteInt(v1,v3)
 	WriteInt(v1,v3)
@@ -4286,7 +4274,6 @@ Function analyzeadventure()
 	nofbricksinadventure=0
 	noffireflowersinadventure=0
 	nofcrabsinadventure=0
-	nofbabyboomersinadventure=0
 	adventurecompletedcoinstotal(adventurecurrentnumber)=0
 	adventurecompletedgemstotal(adventurecurrentnumber)=0
 	;v1=1
@@ -4412,8 +4399,6 @@ Function analyzeadventure()
 					nofbricksinadventure=nofbricksinadventure+1
 				Case 370
 					nofcrabsinadventure=nofcrabsinadventure+1
-				Case 400
-					nofbabyboomersinadventure=nofbabyboomersinadventure+1
 				End Select
 				;v6=v6+1
 			Next
@@ -4934,6 +4919,9 @@ Function createnewobject()
 		;v2=v2+1
 	Next
 	objecttalkable(v1)=0
+	If (objecttype(v1)<>370 Or (objectstatus(v1)<>2)) Then
+		objectcurrentanim(v1)=0
+	End If
 	objectstandardanim(v1)=0
 	objecttilex(v1)=0
 	objecttiley(v1)=0
@@ -5050,9 +5038,7 @@ Function loadobject(a0,a1,a2)
 	Next
 	objecttalkable(v1)=ReadInt(a0)
 	objectcurrentanim(v1)=ReadInt(a0)
-	If (objecttype(v1)<>370 Or (objectstatus(v1)<>2)) Then
-		objectcurrentanim(v1)=0
-	End If
+	objectcurrentanim(v1)=0
 	objectstandardanim(v1)=ReadInt(a0)
 	objecttilex(v1)=ReadInt(a0)
 	objecttiley(v1)=ReadInt(a0)
@@ -5102,9 +5088,6 @@ Function loadobject(a0,a1,a2)
 		End If
 	Else If objecttype(v1)<>1 Then
 		adjustleveltilelogic(Floor(objectx(v1)),Floor(objecty(v1)),v1)
-	End If
-	If objectmodelname(v1)="" Then
-		Return 0
 	End If
 	If a2=0 Then
 		nofobjects=nofobjects+1
@@ -5194,14 +5177,6 @@ Function loadobject(a0,a1,a2)
 				objectz(v1)=-0.1
 				AnimateMD2 objectentity(v1),3,1.0,46,49,0.0
 			End If
-		Case "!Kaboom"
-			objectentity(v1)=CopyEntity(kaboommesh,0)
-			EntityTexture objectentity(v1),kaboomtexture(objectdata(v1,0)),0,0
-			TurnEntity objectentity(v1),0.0,90.0,0.0,0
-		Case "!BabyBoomer"
-			objectentity(v1)=CopyEntity(kaboommesh,0)
-			EntityTexture objectentity(v1),kaboomtexture(1),0,0
-			TurnEntity objectentity(v1),0.0,90.0,0.0,0
 		Case "!FireFlower"
 			objectentity(v1)=CopyEntity(fireflowermesh,0)
 		Case "!Chomper"
@@ -5229,10 +5204,6 @@ Function loadobject(a0,a1,a2)
 			RotateMesh objectentity(v1),90.0,0.0,0.0
 			ScaleMesh objectentity(v1),1.1,1.1,1.1
 			EntityTexture objectentity(v1),springtexture,0,0
-		Case "!FlipBridge"
-			objectentity(v1)=createflipbridgemesh(objectdata(v1,0))
-			EntityTexture objectentity(v1),gatetexture,0,0
-			isthereaflipbridge=1
 		Case "!WaterFall"
 			objectentity(v1)=createwaterfallmesh()
 		Case "!Star"
@@ -5308,8 +5279,6 @@ Function loadobject(a0,a1,a2)
 			objectentity(v1)=CopyEntity(cylinder,0)
 		Case "!Square"
 			objectentity(v1)=CopyMesh(square,0)
-		Case "!Retrolasergate"
-			objectentity(v1)=createretrolasergatemesh(objectdata(v1,0))
 		Case "!None"
 			objectentity(v1)=CreatePivot(0)
 		Default
@@ -5365,11 +5334,11 @@ Function loadobject(a0,a1,a2)
 	End If
 	nofobjects=nofobjects+1
 	Select objectmodelname(v1)
-	Case "!StinkerWee","!Scritter","!BabyBoomer"
+	Case "!StinkerWee","!Scritter"
 		createshadow(v1,0.5)
 	Case "!Turtle","!Thwart"
 		createshadow(v1,0.9)
-	Case "!Chomper","!Bowler","!Kaboom"
+	Case "!Chomper","!Bowler"
 		createshadow(v1,0.6)
 	Case "!Crab"
 		If objectsubtype(v1)=0 Then
@@ -5377,16 +5346,6 @@ Function loadobject(a0,a1,a2)
 		Else
 			createshadow(v1,0.9)
 		End If
-	Case "!FlipBridge"
-		v3=createnewobject()
-		objectentity(v3)=CreateCylinder(32,1,0)
-		objectxscale(v3)=0.35
-		objectyscale(v3)=0.35
-		objectzscale(v3)=0.35
-		objectx(v3)=objectx(v1)
-		objecty(v3)=objecty(v1)
-		objectz(v3)=-0.241
-		EntityTexture objectentity(v3),cagetexture,0,0
 	End Select
 End Function
 
@@ -5541,7 +5500,7 @@ Function adjustleveltilelogic(a0,a1,a2)
 	
 	If objectfrozen(a2)>0 Then
 		Select objecttype(a2)
-		Case 1,110,120,150,220,230,250,260,290,370,390,400
+		Case 1,110,120,150,220,230,250,260,290,370
 			If (objecttilelogic(a0,a1) And (1024))=0 Then
 				objecttilelogic(a0,a1)=objecttilelogic(a0,a1)+1024.0
 			End If
@@ -5575,7 +5534,7 @@ Function adjustleveltilelogic(a0,a1,a2)
 		If objecttype(a2)=180 Then
 			leveltilelogic(a0,a1)=1
 		End If
-	Case 120,400
+	Case 120
 		If (((objecttilelogic(a0,a1) And (8)))=0 And (objectactive(a2)=1001)) Then
 			objecttilelogic(a0,a1)=objecttilelogic(a0,a1)+8.0
 		End If
@@ -5617,7 +5576,7 @@ Function adjustleveltilelogic(a0,a1,a2)
 		If (((objecttilelogic(a0,a1) And (128)))=0 And (objectactive(a2)>0)) Then
 			objecttilelogic(a0,a1)=objecttilelogic(a0,a1)+128.0
 		End If
-	Case 290,390
+	Case 290
 		If objecttalkable(a2)>0 Then
 			If (((objecttilelogic(a0,a1) And (4)))=0 And (objectactive(a2)>0)) Then
 				objecttilelogic(a0,a1)=objecttilelogic(a0,a1)+4.0
@@ -5648,35 +5607,6 @@ Function adjustleveltilelogic(a0,a1,a2)
 			End If
 			leveltilelogic(a0,a1)=0
 		End If
-	Case 410
-		leveltilelogic(a0,a1)=0
-		If (objectactive(a2)>0 And (objectactive(a2) Mod 2=1)) Then
-			Select objectdata(a2,2)
-			Case 0,4
-				v4=0
-				v5=-1
-				v6=3
-			Case 1,5
-				v4=1
-				v5=-1
-				v6=2
-			Case 2,6
-				v4=1
-				v5=0
-				v6=3
-			Case 3,7
-				v4=1
-				v5=1
-				v6=2
-			End Select
-			;v7=1
-			For v7=1 To v6
-				objectdata(a2,3)=leveltilelogic(a0-(v7*v4),a1-(v7*v5))
-				leveltilelogic(a0-(v7*v4),a1-(v7*v5))=0
-				leveltilelogic(v7*v4+a0,v7*v5+a1)=0
-				;v7=v7+1
-			Next
-		End If
 	End Select
 End Function
 
@@ -5704,7 +5634,7 @@ Function controlobjects()
 				objectactive(v2)=1001
 			End If
 			If (objectlastactive(v2)=0 And (objectactive(v2)>0)) Then
-				If (((objecttype(v2)=110 Or (objecttype(v2)=290)) Or (objecttype(v2)=60)) Or (objecttype(v2)=230) Or (objecttype(v4)=390)) Then
+				If (((objecttype(v2)=110 Or (objecttype(v2)=290)) Or (objecttype(v2)=60)) Or (objecttype(v2)=230)) Then
 					occupyobjecttile(v2,objecttilex(v2),objecttiley(v2))
 				End If
 			End If
@@ -5889,14 +5819,6 @@ Function controlobjects()
 				controlwisp(v2)
 			Case 370
 				controlcrab(v2)
-			Case 390
-				controlkaboom(v2)
-			Case 400
-				controlbabyboomer(v2)
-			Case 410
-				controlflipbridge(v2)
-			Case 424
-				controlretrolasergate(v2)
 			End Select
 			If objectentity(v2)>0 Then
 				ScaleEntity objectentity(v2),v5#,v7#,v6#,0
@@ -5934,9 +5856,6 @@ Function controlobjects()
 					TurnEntity objectentity(v2),objectpitch2(v2),objectyaw2(v2),objectroll2(v2),0
 					If (objectmodelname(v2)="!Crab") Then
 						TurnEntity objectentity(v2),0.0,-90.0,0.0,0
-					End If
-					If (objectmodelname(v2)="!Kaboom" Or (objectmodelname(v2)="!BabyBoomer")) Then
-						TurnEntity objectentity(v2),0.0,90.0,0.0,0
 					End If
 				End If
 			End If
@@ -6023,11 +5942,7 @@ Function activateobject(a0)
 		End If
 	End If
 	If (objectactive(a0)<1001 And (objectactive(a0) Mod 2=0)) Then
-		If objecttype(a0)=410 Then
-			activateflipbridge(a0)
-		Else
-			objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
-		End If
+		objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
 		If objectactive(a0)>1001 Then
 			objectactive(a0)=1001
 		End If
@@ -6040,11 +5955,7 @@ Function deactivateobject(a0)
 		vacateobjecttile(a0)
 	End If
 	If (objectactive(a0)>0 And (objectactive(a0) Mod 2=1)) Then
-		If objecttype(a0)=410 Then
-			deactivateflipbridge(a0)
-		Else
-			objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
-		End If
+		objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
 	End If
 	If objectactive(a0)<0 Then
 		objectactive(a0)=0
@@ -6054,17 +5965,9 @@ End Function
 Function toggleobject(a0)
 	
 	If (objectactive(a0)<1001 And (objectactive(a0) Mod 2=0)) Then
-		If objecttype(a0)=410 Then
-			activateflipbridge(a0)
-		Else
-			objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
-		End If
+		objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
 	Else If (objectactive(a0)>0 And (objectactive(a0) Mod 2=1)) Then
-		If objecttype(a0)=410 Then
-			deactivateflipbridge(a0)
-		Else
-			objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
-		End If
+		objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
 	End If
 End Function
 
@@ -6165,7 +6068,6 @@ Function destroyobject(a0,a1)
 		adventurelostcamerax=objectx(a0)
 		adventurelostcameray=-objecty(a0)
 		adventurelost()
-		nofweestinkersinadventure=nofweestinkersinadventure-1
 		If objectfrozen(a0)=0 Then
 			If a1=2 Then
 				playsoundfx(67,-1,-1)
@@ -6210,45 +6112,6 @@ Function destroyobject(a0,a1)
 		End If
 	Case 370
 		nofcrabsinadventure=nofcrabsinadventure-1
-	Case 390
-		playsoundfx(Rand(150,151),-1,-1)
-		adventurelostreason="You Must Protect All Kaboom!s From Harm!"
-		adventurelostcamerax=objectx(a0)
-		adventurelostcameray=-objecty(a0)
-		adventurelost()
-		;v3=0
-		For v3=0 To nofobjects-1
-			If (objectparent(v3)=a0 And (objecttype(v3)=100)) Then
-				destroyobject(v3,0)
-			End If
-			;v3=v3+1
-		Next
-	Case 400
-		playsoundfx(Rand(150,151),-1,-1)
-		adventurelostreason="You Must Protect All Kaboom!s From Harm!"
-		adventurelostcamerax=objectx(a0)
-		adventurelostcameray=-objecty(a0)
-		adventurelost()
-		nofbabyboomersinadventure=nofbabyboomersinadventure-1
-		If objectfrozen(a0)=0 Then
-			If a1=2 Then
-				AnimateMD2 objectentity(a0),1,4.0,1,30,0.0
-				objectdead(a0)=3
-				objectdeadtimer(a0)=0
-				addparticle(4,objectx(a0),-0.2,-objecty(a0),0.0,0.8,0.0,0.0,0.0,0.0,0.01,0.0,0.0,0.0,200,3)
-			Else
-				AnimateMD2 objectentity(a0),0,1.0,1,3,1.0
-				objectdead(a0)=1
-				objectdeadtimer(a0)=0
-				;v3=0
-				For v3=0 To 360 Step 2
-					v5#=Rnd(0.7,1.5)
-					addparticle(Rand(16,23),objectx(a0),objectz(a0)+0.5,-objecty(a0),0.0,0.4,v5#*0.12*Sin(v3),0.0,v5#*0.12*Cos(v3),5.0,0.001,(-v5#)*0.0021*Sin(v3),0.0,(-v5#)*0.0021*Cos(v3),75,3)
-					;v3=v3+2
-				Next
-			End If
-			Return 0
-		End If
 	End Select
 	objectexists(a0)=0
 	Select objectdestructiontype(a0)
@@ -6419,7 +6282,7 @@ Function controlmoveobject(a0)
 				Else
 					astar(a0,objecttilex(a0),objecttiley(a0),objectmovexgoal(a0),objectmoveygoal(a0),3,75,objectmovementtype(a0)-16)
 				End If
-				If (astarpathnode(1)=-1 And (objecttype(a0)=120) Or (objecttype(a0)=400)) Then
+				If (astarpathnode(1)=-1 And (objecttype(a0)=120)) Then
 					objectobjecttypecollision(a0)=objectobjecttypecollision(a0)+8.0
 					astar(a0,objecttilex(a0),objecttiley(a0),objectmovexgoal(a0),objectmoveygoal(a0),3,200,1)
 					objectobjecttypecollision(a0)=objectobjecttypecollision(a0)-8.0
@@ -6793,7 +6656,7 @@ Function occupyobjecttile(a0,a1,a2)
 	
 	If objectfrozen(a0)>0 Then
 		Select objecttype(a0)
-		Case 1,110,120,150,220,230,250,260,290,370,390,400
+		Case 1,110,120,150,220,230,250,260,290,370
 			If (objecttilelogic(a1,a2) And (1024))=0 Then
 				objecttilelogic(a1,a2)=objecttilelogic(a1,a2)+1024.0
 			End If
@@ -6805,11 +6668,11 @@ Function occupyobjecttile(a0,a1,a2)
 		If (objecttilelogic(a1,a2) And (2))=0 Then
 			objecttilelogic(a1,a2)=objecttilelogic(a1,a2)+2.0
 		End If
-	Case 110,330,390
+	Case 110,330
 		If (((objecttilelogic(a1,a2) And (4)))=0 And (objectactive(a0)>0)) Then
 			objecttilelogic(a1,a2)=objecttilelogic(a1,a2)+4.0
 		End If
-	Case 120,400
+	Case 120
 		If (objecttilelogic(a1,a2) And (8))=0 Then
 			objecttilelogic(a1,a2)=objecttilelogic(a1,a2)+8.0
 		End If
@@ -6891,7 +6754,7 @@ Function vacateobjecttile(a0)
 	v2=objecttiley(a0)
 	If objectfrozen(a0)>0 Then
 		Select objecttype(a0)
-		Case 1,110,120,150,220,230,250,260,290,370,390,400
+		Case 1,110,120,150,220,230,250,260,290,370
 			If (objecttilelogic(v1,v2) And (1024))>0 Then
 				objecttilelogic(v1,v2)=objecttilelogic(v1,v2)-1024.0
 			End If
@@ -6903,11 +6766,11 @@ Function vacateobjecttile(a0)
 		If (objecttilelogic(v1,v2) And (2))>0 Then
 			objecttilelogic(v1,v2)=objecttilelogic(v1,v2)-2.0
 		End If
-	Case 110,330,390
+	Case 110,330
 		If (objecttilelogic(v1,v2) And (4))>0 Then
 			objecttilelogic(v1,v2)=objecttilelogic(v1,v2)-4.0
 		End If
-	Case 120,400
+	Case 120
 		If (objecttilelogic(v1,v2) And (8))>0 Then
 			objecttilelogic(v1,v2)=objecttilelogic(v1,v2)-8.0
 		End If
@@ -6962,7 +6825,7 @@ Function endmovetilecheck(a0,a1,a2)
 	Select leveltilelogic(objecttilex(a0),objecttiley(a0))
 	Case 0
 	Case 1
-		If (((((((((objecttype(a0)=1 Or (objecttype(a0)=110)) Or (objecttype(a0)=120)) Or (objecttype(a0)=150)) Or (objecttype(a0)=220)) Or (objecttype(a0)=250)) Or (objecttype(a0)=260)) Or (objecttype(a0)=290)) Or (objecttype(a0)=390)) Or (objecttype(a0)=400)) Then
+		If (((((((objecttype(a0)=1 Or (objecttype(a0)=110)) Or (objecttype(a0)=120)) Or (objecttype(a0)=150)) Or (objecttype(a0)=220)) Or (objecttype(a0)=250)) Or (objecttype(a0)=260)) Or (objecttype(a0)=290)) Then
 			destroyobject(a0,0)
 		End If
 		If (objecttype(a0)=370) Then
@@ -6982,7 +6845,7 @@ Function endmovetilecheck(a0,a1,a2)
 		End If
 	Case 2
 		If (objectflying(a0)=0 Or (objectflying(a0)>=20)) Then
-			If ((((((((objecttype(a0)=1 Or (objecttype(a0)=110)) Or (objecttype(a0)=120)) Or (objecttype(a0)=150)) Or ((objecttype(a0)=250 And (objectdata(a0,1)<>1)))) Or (objecttype(a0)=260)) Or (objecttype(a0)=290)) Or (objecttype(a0)=390)) Or (objecttype(a0)=400)) Then
+			If ((((((objecttype(a0)=1 Or (objecttype(a0)=110)) Or (objecttype(a0)=120)) Or (objecttype(a0)=150)) Or ((objecttype(a0)=250 And (objectdata(a0,1)<>1)))) Or (objecttype(a0)=260)) Or (objecttype(a0)=290)) Then
 				destroyobject(a0,2)
 			End If
 			If ((objecttype(a0)=220 Or (objecttype(a0)=370)) And (objectstatus(a0)=0)) Then
@@ -7081,19 +6944,6 @@ Function endmovetilecheck(a0,a1,a2)
 			objectmovementtype(a0)=0
 			vacateobjecttile(a0)
 			nofweestinkersinadventure=nofweestinkersinadventure-1
-			addparticle(14,objecttilex(a0)+0.5,2.0,(-objecttiley(a0))-0.5,0.0,1.0,0.0,0.01,0.0,0.0,0.01,0.0,0.0,0.0,50,3)
-			playerscore=playerscore+100
-			currentadventurescore=currentadventurescore+100
-		End If
-		If (objecttype(a0)=400 And (objectactive(a0)=1001)) Then
-			playsoundfx(Rand(75,76),objecttilex(a0),objecttiley(a0))
-			objectactive(a0)=1000
-			objectactivationtype(a0)=2
-			objectactivationspeed(a0)=10
-			objectsubtype(a0)=-1
-			objectmovementtype(a0)=0
-			vacateobjecttile(a0)
-			nofbabyboomersinadventure=nofbabyboomersinadventure-1
 			addparticle(14,objecttilex(a0)+0.5,2.0,(-objecttiley(a0))-0.5,0.0,1.0,0.0,0.01,0.0,0.0,0.01,0.0,0.0,0.0,50,3)
 			playerscore=playerscore+100
 			currentadventurescore=currentadventurescore+100
@@ -7763,7 +7613,7 @@ Function controlplayeringame(a0)
 				If (objecttilelogic(v7,v8) And (8))>0 Then
 					;v1=0
 					For v1=0 To nofobjects-1
-						If (objectexists(v1)=1 And (objecttype(v1)=120 Or (objecttype(v1)=400))) Then
+						If (objectexists(v1)=1 And (objecttype(v1)=120)) Then
 							If (((objectsubtype(v1)=1 Or (objectsubtype(v1)=2)) And (objectmovementtimer(v1)=0)) And (objectcurrentanim(v1)<>7)) Then
 								If (objecttilex(v1)=v7 And (objecttiley(v1)=v8)) Then
 									PositionEntity levelcursor,v7+0.5,0.05,(-v8)-0.5,0
@@ -7777,11 +7627,7 @@ Function controlplayeringame(a0)
 									If mouse1 Then
 										playercontrolmode=3
 										stinkerobject=v1
-										If objecttype(v1)=400 Then
-											playsoundfx(74,-1,-1)
-										Else
-											playsoundfx(Rand(55,58),-1,-1)
-										End If
+										playsoundfx(Rand(55,58),-1,-1)
 										turnofficons()
 									End If
 									Goto endofplayercontrol
@@ -7794,7 +7640,7 @@ Function controlplayeringame(a0)
 				If (((objecttilelogic(v7,v8) And (4)))>0 And (objectmovementtimer(a0)=0)) Then
 					;v1=0
 					For v1=0 To nofobjects-1
-						If (objectexists(v1)=1 And ((((objecttype(v1)=110 Or (objecttype(v1)=180)) Or (objecttype(v1)=290)) Or (objecttype(v1)=330) Or (objecttype(v1)=390)))) Then
+						If (objectexists(v1)=1 And ((((objecttype(v1)=110 Or (objecttype(v1)=180)) Or (objecttype(v1)=290)) Or (objecttype(v1)=330)))) Then
 							If ((objectmovementtimer(v1)=0 And (objecttalkable(v1)>0)) And (objectactive(v1)=1001)) Then
 								If (objecttilex(v1)=v7 And (objecttiley(v1)=v8)) Then
 									PositionEntity levelcursor,v7+0.5,0.5,-v8,0
@@ -7911,23 +7757,14 @@ Function controlplayeringame(a0)
 			VertexTexCoords GetSurface(levelcursor,1),3,0.25,0.25,1.0,0
 			If mouse1=0 Then
 				If (v7=objecttilex(stinkerobject) And (v8=objecttiley(stinkerobject))) Then
-					If (objecttype(stinkerobject)<>400 Or (objectdata(stinkerobject,8)<50)) Then
-						objectmovexgoal(a0)=v7
-						objectmoveygoal(a0)=v8
-					Else
-						objectmovexgoal(a0)=objecttilex(a0)
-						objectmoveygoal(a0)=objecttiley(a0)
-					End If
+					objectmovexgoal(a0)=v7
+					objectmoveygoal(a0)=v8
 					movecursornewtarget=36
 					EntityColor levelcursor,100.0,255.0,100.0
 					playercontrolmode=1
 					objectmovementtypedata(a0)=0
 				Else If ((objectmovementtimer(playerobject)=0 And (v7=objecttilex(playerobject))) And (v8=objecttiley(playerobject))) Then
-					If objecttype(stinkerobject)=400 Then
-						playsoundfx(Rand(75,76),-1,-1)
-					Else
-						playsoundfx(Rand(60,64),-1,-1)
-					End If
+					playsoundfx(Rand(60,64),-1,-1)
 					objectsubtype(stinkerobject)=1
 					playercontrolmode=4
 					movecursornewtarget=18
@@ -7935,43 +7772,13 @@ Function controlplayeringame(a0)
 					objectmoveygoal(stinkerobject)=v8
 					objectmovementtype(stinkerobject)=14
 				Else
-					If objecttype(stinkerobject)=400 Then
-						playsoundfx(Rand(75,76),-1,-1)
-					Else
-						playsoundfx(Rand(60,64),-1,-1)
-					End If
+					playsoundfx(Rand(60,64),-1,-1)
 					playercontrolmode=4
 					movecursornewtarget=18
 					objectmovexgoal(stinkerobject)=v7
 					objectmoveygoal(stinkerobject)=v8
 					objectmovementtype(stinkerobject)=13
 					objectsubtype(stinkerobject)=2
-				End If
-				If (objecttype(stinkerobject)=400 And (objectdata(stinkerobject,8)>0)) Then
-					objectdata(stinkerobject,8)=1
-				End If
-			Else If (objecttype(stinkerobject)=400 And (objectdata(stinkerobject,8)>0)) Then
-				If (v7=objecttilex(stinkerobject) And (v8=objecttiley(stinkerobject))) Then
-					objectdata(stinkerobject,8)=objectdata(stinkerobject,8)+1
-					If objectdata(stinkerobject,8)=120 Then
-						objectdata(stinkerobject,8)=0
-						;v18=0
-						For v18=0 To 7
-							createspellball(objectx(stinkerobject)+0.7*Sin(v18*45),objecty(stinkerobject)+0.7*Cos(v18*45),0.7,0.02*Sin(v18*45),0.02*Cos(v18*45),1,-1,-1,0,50)
-							;v18=v18+1
-						Next
-						;v18=0
-						For v18=0 To 50
-							addparticle(Rand(16,18),objectx(stinkerobject),Rnd(0.7,0.8),-objecty(stinkerobject),0.0,0.4,Rnd(-0.05,0.05),Rnd(0.0,0.05),Rnd(-0.05,0.05),0.0,0.004,0.0,-0.0001,0.0,50,3)
-							;v18=v18+1
-						Next
-						playsoundfx(78,-1,-1)
-						camerashaketimer=30
-						playercontrolmode=7
-						movecursornewtarget=18
-					End If
-				Else
-					objectdata(stinkerobject,8)=1
 				End If
 			End If
 		Case 4
@@ -8429,7 +8236,7 @@ Function controlstinkerweeexit(a0)
 	End If
 	;v1=0
 	For v1=0 To nofobjects-1
-		If (((objectexists(v1)=1 And ((objecttype(v1)=120 Or (objecttype(v1)=400)))) And (objectmovementtimer(v1)=0)) And (objectsubtype(v1)=1)) Then
+		If (((objectexists(v1)=1 And (objecttype(v1)=120)) And (objectmovementtimer(v1)=0)) And (objectsubtype(v1)=1)) Then
 			If (Abs(objecttilex(v1)-objecttilex(a0))<=3 And (Abs(objecttiley(v1)-objecttiley(a0))<=3)) Then
 				objectmovexgoal(v1)=objecttilex(a0)
 				objectmoveygoal(v1)=objecttiley(a0)
@@ -9550,7 +9357,7 @@ Function controlbutton(a0)
 										;v5=0
 										For v5=0 To nofobjects-1
 											If (objectexists(v5)=1 And (objectid(v5)=(objectdata(a0,v2)-16)*5+500+objectdata(a0,v2+4))) Then
-												If ((objecttype(v5)=10 Or (objecttype(v5)=140)) Or (objecttype(v5)=20)) Or (objecttype(v5)=424) Then
+												If ((objecttype(v5)=10 Or (objecttype(v5)=140)) Or (objecttype(v5)=20)) Then
 													activateobject(v5)
 												Else If objecttype(v5)=210 Then
 												Else
@@ -9608,7 +9415,7 @@ Function controlbutton(a0)
 									;v5=0
 									For v5=0 To nofobjects-1
 										If (objectexists(v5)=1 And (objectid(v5)=(objectdata(a0,v2)-16)*5+500+objectdata(a0,v2+4))) Then
-											If ((objecttype(v5)=10 Or (objecttype(v5)=140)) Or (objecttype(v5)=20)) Or (objecttype(v5)=424) Then
+											If ((objecttype(v5)=10 Or (objecttype(v5)=140)) Or (objecttype(v5)=20)) Then
 												activateobject(v5)
 											Else If objecttype(v5)=210 Then
 											Else
@@ -9681,11 +9488,6 @@ Function controlbutton(a0)
 							Else If objecttype(v5)=210 Then
 								objectid(v5)=objectdata(a0,v2+0)*5+500+objectdata(a0,v2+2)
 								redotransportertexture(v5)
-							Else If objecttype(v5)=410 Then
-								objectid(v5)=objectdata(a0,v2+0)*5+500+objectdata(a0,v2+2)
-								objectdata(v5,0)=objectdata(a0,v2)
-								objectdata(v5,1)=objectdata(a0,v2+2)
-								redoflipbridgetexture(v5)
 							Else If objecttype(v5)=40 Then
 								If (objectdata(a0,v2+0)>=8 And (objectdata(a0,v2+0)<12)) Then
 									objectid(v5)=objectdata(a0,v2+0)*5+500+objectdata(a0,v2+2)
@@ -9786,7 +9588,7 @@ Function activatebutton(a0)
 					;v4=0
 					For v4=0 To nofobjects-1
 						If (objectexists(v4)=1 And (objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+4))) Then
-							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Or (objecttype(v4)=424) Then
+							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Then
 								deactivateobject(v4)
 							Else If objecttype(v4)=210 Then
 								activatetransporter(v4)
@@ -9816,7 +9618,7 @@ Function activatebutton(a0)
 					;v4=0
 					For v4=0 To nofobjects-1
 						If (objectexists(v4)=1 And (objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+4))) Then
-							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Or (objecttype(v4)=424) Then
+							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Then
 								deactivateobject(v4)
 							Else If objecttype(v4)=210 Then
 								activatetransporter(v4)
@@ -9915,7 +9717,7 @@ Function activatebutton(a0)
 					;v4=0
 					For v4=0 To nofobjects-1
 						If (objectexists(v4)=1 And (objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+4))) Then
-							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Or (objecttype(v4)=424) Then
+							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Then
 								deactivateobject(v4)
 							Else If objecttype(v4)=210 Then
 								activatetransporter(v4)
@@ -9953,11 +9755,6 @@ Function activatebutton(a0)
 						Else If objecttype(v4)=210 Then
 							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
 							redotransportertexture(v4)
-						Else If objecttype(v4)=410 Then
-							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
-							objectdata(v4,0)=objectdata(a0,v3+1)
-							objectdata(v4,1)=objectdata(a0,v3+3)
-							redoflipbridgetexture(v4)
 						Else If objecttype(v4)=40 Then
 							If (objectdata(a0,v3+1)>=8 And (objectdata(a0,v3+1)<12)) Then
 								objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
@@ -9999,11 +9796,6 @@ Function activatebutton(a0)
 						Else If objecttype(v4)=210 Then
 							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
 							redotransportertexture(v4)
-						Else If objecttype(v4)=410 Then
-							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
-							objectdata(v4,0)=objectdata(a0,v3+1)
-							objectdata(v4,1)=objectdata(a0,v3+3)
-							redoflipbridgetexture(v4)
 						Else If objecttype(v4)=40 Then
 							If (objectdata(a0,v3+1)>=8 And (objectdata(a0,v3+1)<12)) Then
 								objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
@@ -10022,11 +9814,6 @@ Function activatebutton(a0)
 						Else If objecttype(v4)=210 Then
 							objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+2)
 							redotransportertexture(v4)
-						Else If objecttype(v4)=410 Then
-							objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+2)
-							objectdata(v4,0)=objectdata(a0,v3)
-							objectdata(v4,1)=objectdata(a0,v3+2)
-							redoflipbridgetexture(v4)
 						Else If objecttype(v4)=40 Then
 							If (objectdata(a0,v3)>=8 And (objectdata(a0,v3)<12)) Then
 								objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+2)
@@ -10068,11 +9855,6 @@ Function activatebutton(a0)
 						Else If objecttype(v4)=210 Then
 							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
 							redotransportertexture(v4)
-						Else If objecttype(v4)=410 Then
-							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
-							objectdata(v4,0)=objectdata(a0,v3+1)
-							objectdata(v4,1)=objectdata(a0,v3+3)
-							redoflipbridgetexture(v4)
 						Else If objecttype(v4)=40 Then
 							If (objectdata(a0,v3+1)>=8 And (objectdata(a0,v3+1)<12)) Then
 								objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
@@ -10109,9 +9891,6 @@ Function activatebutton(a0)
 						Else
 							objectdata(v4,2)=(objectdata(v4,2)+1) Mod 4
 						End If
-					End If
-					If objecttype(v4)=410 Then
-						turnflipbridge(v4,objectdata(a0,2))
 					End If
 				End If
 				;v4=v4+1
@@ -11303,7 +11082,7 @@ Function controlbowler(a0)
 	
 	;v1=0
 	For v1=0 To nofobjects-1
-		If (((((objecttype(v1)=1 Or (objecttype(v1)=120)) Or (objecttype(v1)=110)) Or (Floor(objecttype(v1)/10)=24.0)) Or (objecttype(v1)=400)) Or (objecttype(v1)=390)) Then
+		If (((objecttype(v1)=1 Or (objecttype(v1)=120)) Or (objecttype(v1)=110)) Or (Floor(objecttype(v1)/10)=24.0)) Then
 			If (objectx(a0)-objectx(v1))^2.0+(objecty(a0)-objecty(v1))^2.0<0.5 Then
 				destroyobject(v1,0)
 			End If
@@ -11715,7 +11494,7 @@ Function controlspellball(a0)
 					destroyobject(v5,1)
 				End If
 				v9=1
-			Case 110,390,400
+			Case 110
 				If objectsubtype(a0)<2 Then
 					destroyobject(v5,1)
 				End If
@@ -12376,741 +12155,6 @@ Function controlcrab(a0)
 	objectdata10(a0)=objectmovementtimer(a0)
 End Function
 
-Function controlkaboom(a0)
-	
-	If ((objectfrozen(a0)=1 Or (objectfrozen(a0)=10001)) Or (objectfrozen(a0)=-1)) Then
-		If objectfrozen(a0)=10001 Then
-			objectfrozen(a0)=objectfrozen(a0)+999
-		Else
-			objectfrozen(a0)=objectfrozen(a0)*1000
-		End If
-		objectcurrentanim(a0)=11
-		AnimateMD2 objectentity(a0),3,2.0,31,50,0.0
-	End If
-	If (objectfrozen(a0)=2 Or (objectfrozen(a0)=10002)) Then
-		objectfrozen(a0)=0
-		objectcurrentanim(a0)=10
-		AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-	End If
-	If (objectfrozen(a0)>2 Or (objectfrozen(a0)<0)) Then
-		objectfrozen(a0)=objectfrozen(a0)-1
-		Return 0
-	End If
-	If objecttiletypecollision(a0)=0 Then
-		objectdata10(a0)=-1
-		objecttiletypecollision(a0)=23065
-		objectobjecttypecollision(a0)=64
-		objecttilex(a0)=Floor(objectx(a0))
-		objecttiley(a0)=Floor(objecty(a0))
-		objecttilex2(a0)=Floor(objectx(a0))
-		objecttiley2(a0)=Floor(objecty(a0))
-		objectactivationspeed(a0)=50
-		If (objectmovexgoal(a0)=0 And (objectmoveygoal(a0)=0)) Then
-			objectmovexgoal(a0)=Floor(objectx(a0))
-			objectmoveygoal(a0)=Floor(objecty(a0))
-			objectcurrentanim(a0)=10
-			AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-		End If
-	End If
-	If objectdead(a0)=1 Then
-		objectyaw(a0)=(objectyaw(a0)+10.0) Mod 360.0
-		objectz(a0)=objectz(a0)+0.01
-		Return 0
-	End If
-	If objectdead(a0)=3 Then
-		objectyaw(a0)=0.0
-		objectz(a0)=objectz(a0)-0.005
-		Return 0
-	End If
-	If objectactive(a0)=0 Then
-		HideEntity objectentity(a0)
-	Else
-		ShowEntity objectentity(a0)
-	End If
-	v1=maximum2(Abs(objecttilex(a0)-objecttilex(playerobject)),Abs(objecttiley(a0)-objecttiley(playerobject)))
-	If ((objectexclamation(a0)>=100 And (objectexclamation(a0)<200)) And (v1>4)) Then
-		objectexclamation(a0)=objectexclamation(a0)-100
-	End If
-	If ((objectexclamation(a0)>=0 And (objectexclamation(a0)<100)) And (v1<4)) Then
-		addparticle(objectexclamation(a0),objecttilex(a0)+0.5,1.3,(-objecttiley(a0))-0.5,0.0,0.5,0.0,0.0125,0.0,0.0,0.004,0.0,-0.0001,0.0,150,3)
-		objectexclamation(a0)=objectexclamation(a0)+100
-	End If
-	If (((gamemode<>8 Or (dialogobject1<>a0)) And (objectlinked(a0)=-1)) And (objectdata10(a0)>=0)) Then
-		objectmovexgoal(a0)=objectdata10(a0) Mod 200
-		objectmoveygoal(a0)=objectdata10(a0)/200
-		objectmovementtype(a0)=10
-		objectdata10(a0)=-1
-	End If
-	If (gamemode=8 And (dialogobject1=a0)) Then
-		If (objectcurrentanim(a0)<>10 And (objectcurrentanim(a0)<>16)) Then
-			objectcurrentanim(a0)=10
-			AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-		End If
-		objectz(a0)=0.0
-	Else If objectmovementtype(a0)>0 Then
-		If objectmovementtimer(a0)=0 Then
-			objectdata(a0,9)=objectdata(a0,9)+1
-		End If
-		If objectmovementtimer(a0)>0 Then
-			objectdata(a0,9)=0
-		End If
-		objectz(a0)=0.0
-		If objectdata(a0,9)>10 Then
-			AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-			objectcurrentanim(a0)=10
-			turnobjecttowarddirection(a0,-(objecttilex(a0)-objectmovexgoal(a0)),-(objecttiley(a0)-objectmoveygoal(a0)),4,-objectyawadjust(a0))
-		Else
-			If objectcurrentanim(a0)<>1 Then
-				AnimateMD2 objectentity(a0),1,1.5,1,30,0.0
-				objectcurrentanim(a0)=1
-			End If
-			turnobjecttowarddirection(a0,-(objecttilex(a0)-objecttilex2(a0)),-(objecttiley(a0)-objecttiley2(a0)),4,-objectyawadjust(a0))
-		End If
-		If ((objectmovementtimer(a0)=0 And (objecttilex(a0)=objectmovexgoal(a0))) And (objecttiley(a0)=objectmoveygoal(a0))) Then
-			objectmovementtype(a0)=0
-			objectcurrentanim(a0)=10
-			AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-		End If
-	Else If objectflying(a0)/10=1 Then
-		If objectcurrentanim(a0)<>11 Then
-			AnimateMD2 objectentity(a0),3,2.0,31,60,0.0
-			objectcurrentanim(a0)=11
-		End If
-		turnobjecttowarddirection(a0,-(objecttilex(a0)-objecttilex2(a0)),-(objecttiley(a0)-objecttiley2(a0)),10,-objectyawadjust(a0))
-	Else If objectflying(a0)/10=2 Then
-		If objectcurrentanim(a0)<>11 Then
-			AnimateMD2 objectentity(a0),3,2.0,31,60,0.0
-			objectcurrentanim(a0)=11
-		End If
-	Else
-		Select objectdata(a0,7) Mod 10
-		Case 0
-			If objectyaw(a0)<>0.0 Then
-				turnobjecttowarddirection(a0,0.0,1.0,4,0)
-			End If
-		Case 1
-			turnobjecttowarddirection(a0,objectx(playerobject)-objectx(a0),objecty(playerobject)-objecty(a0),6,-objectyawadjust(a0))
-		Case 2
-			objectyaw(a0)=(objectyaw(a0)-0.5) Mod 360.0
-		Case 3
-			objectyaw(a0)=(objectyaw(a0)-2.0) Mod 360.0
-		Case 4
-			objectyaw(a0)=(objectyaw(a0)+0.5) Mod 360.0
-		Case 5
-			objectyaw(a0)=(objectyaw(a0)+2.0) Mod 360.0
-		End Select
-		If objectdata(a0,7)/10=1 Then
-			objectz(a0)=0.4*Abs(Sin(leveltimer*3.6 Mod 360.0))
-		Else If objectdata(a0,7)/10=2 Then
-			objectz(a0)=0.2*Abs(Sin(leveltimer*7.2 Mod 360.0))
-		End If
-		Select objectdata(a0,8)
-		Case 0
-			If objectcurrentanim(a0)<>10 Then
-				objectcurrentanim(a0)=10
-				AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-			End If
-		Case 1
-			If objectcurrentanim(a0)<>13 Then
-				objectcurrentanim(a0)=13
-				AnimateMD2 objectentity(a0),3,0.5,31,50,0.0
-			End If
-		Case 2
-			If (objectcurrentanim(a0)<>13 And (v1>3)) Then
-				objectcurrentanim(a0)=13
-				AnimateMD2 objectentity(a0),3,0.5,31,50,0.0
-			End If
-			If (objectcurrentanim(a0)<>113 And (v1<=3)) Then
-				objectcurrentanim(a0)=113
-				AnimateMD2 objectentity(a0),3,-0.5,50,31,0.0
-			End If
-		Case 3
-			If objectcurrentanim(a0)=10 Then
-				If (Rand(1,10)<5 And (leveltimer Mod 240=0)) Then
-					objectcurrentanim(a0)=15
-					AnimateMD2 objectentity(a0),2,0.5,55,70,0.0
-				End If
-			Else If leveltimer Mod 240=0 Then
-				objectcurrentanim(a0)=10
-				AnimateMD2 objectentity(a0),3,-0.2,70,53,0.0
-			End If
-		Case 4
-			If objectcurrentanim(a0)<>15 Then
-				objectcurrentanim(a0)=15
-				AnimateMD2 objectentity(a0),2,0.5,59,70,0.0
-			End If
-		Case 5
-			If objectcurrentanim(a0)<>16 Then
-				objectcurrentanim(a0)=16
-				AnimateMD2 objectentity(a0),2,0.5,31,50,0.0
-			End If
-		End Select
-	End If
-End Function
-
-Function controlbabyboomer(a0)
-	
-	If ((objectfrozen(a0)=1 Or (objectfrozen(a0)=10001)) Or (objectfrozen(a0)=-1)) Then
-		If objectfrozen(a0)=10001 Then
-			objectfrozen(a0)=objectfrozen(a0)+999
-		Else
-			objectfrozen(a0)=objectfrozen(a0)*1000
-		End If
-		objectcurrentanim(a0)=11
-		AnimateMD2 objectentity(a0),3,2.0,31,50,0.0
-	End If
-	If (objectfrozen(a0)=2 Or (objectfrozen(a0)=10002)) Then
-		objectfrozen(a0)=0
-		objectcurrentanim(a0)=10
-		AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-	End If
-	If (objectfrozen(a0)>2 Or (objectfrozen(a0)<0)) Then
-		objectfrozen(a0)=objectfrozen(a0)-1
-		Return 0
-	End If
-	If objecttiletypecollision(a0)=0 Then
-		objecttiletypecollision(a0)=24089
-		objectobjecttypecollision(a0)=320
-		objecttilex(a0)=Floor(objectx(a0))
-		objecttiley(a0)=Floor(objecty(a0))
-		objecttilex2(a0)=Floor(objectx(a0))
-		objecttiley2(a0)=Floor(objecty(a0))
-		objectmovementtype(a0)=0
-		objectmovementtimer(a0)=0
-		objectmovementspeed(a0)=35
-		objectsubtype(a0)=1
-		objectcurrentanim(a0)=3
-	End If
-	If objectdead(a0)=1 Then
-		objectyaw(a0)=(objectyaw(a0)+10.0) Mod 360.0
-		objectz(a0)=objectz(a0)+0.01
-		objectsubtype(a0)=-2
-		Return 0
-	End If
-	If objectdead(a0)=3 Then
-		objectyaw(a0)=90.0
-		objectz(a0)=objectz(a0)-0.005
-		objectsubtype(a0)=-2
-		Return 0
-	End If
-	If objectsubtype(a0)=-1 Then
-		Return 0
-	End If
-	If objectdata(a0,8)=1 Then
-		If Rand(0,100)<20 Then
-			addparticle(23,objectx(a0),Rnd(0.7,0.8),-objecty(a0),0.0,0.05,Rnd(-0.005,0.005),Rnd(0.0,0.005),Rnd(-0.005,0.005),0.0,0.004,0.0,0.0,0.0,50,3)
-		End If
-	End If
-	If objectdata(a0,8)>0 Then
-		EntityTexture objectentity(a0),kaboomtexturesquint,0,0
-		If (objectdata(a0,8) Mod 10=0 And (objectdata(a0,8)>=50)) Then
-			SoundPitch soundfx(77),objectdata(a0,8)*75+44000
-			playsoundfx(77,-1,-1)
-		End If
-		;v1=1
-		For v1=1 To 5
-			If Rand(0,100)<objectdata(a0,8) Then
-				addparticle(Rand(16,18),objectx(a0),Rnd(0.7,0.8),-objecty(a0),0.0,0.1,Rnd(-0.02,0.02),Rnd(0.0,0.02),Rnd(-0.02,0.02),0.0,0.004,0.0,-0.0001,0.0,50,3)
-			End If
-			;v1=v1+1
-		Next
-	End If
-	If objectdata(a0,8)>=50 Then
-		EntityTexture objectentity(a0),kaboomtexturesquint,0,0
-	Else
-		EntityTexture objectentity(a0),kaboomtexture(1),0,0
-	End If
-	If ((objectcaged(a0)=1 And (objectsubtype(a0)<>4)) And (objectsubtype(a0)<>5)) Then
-		playsoundfx(79,objecttilex(a0),objecttiley(a0))
-		If objectsubtype(a0)=2 Then
-			objectsubtype(a0)=5
-		Else
-			objectsubtype(a0)=4
-		End If
-		AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-		objectcurrentanim(a0)=10
-	End If
-	If (objectcaged(a0)=0 And ((objectsubtype(a0)=4 Or (objectsubtype(a0)=5)))) Then
-		objectsubtype(a0)=objectsubtype(a0)-3
-		objectmovementtypedata(a0)=0
-		If ((objectsubtype(a0)=2 And (objecttilex(a0)=objectmovexgoal(a0))) And (objecttiley(a0)=objectmoveygoal(a0))) Then
-			v2=1
-			v3=1
-			If Rand(0,100)<50 Then
-				v2=-1
-			End If
-			If Rand(0,100)<50 Then
-				v3=-1
-			End If
-			;v4=-1
-			For v4=-1 To 1
-				;v5=-1
-				For v5=-1 To 1
-					If canobjectmovetotile(a0,objecttilex(a0)+v4*v2,objecttiley(a0)+v5*v3,1,1)=1 Then
-						moveobjecttotile(a0,objecttilex(a0)+v4*v2,objecttiley(a0)+v5*v3)
-						objectmovexgoal(a0)=objecttilex(a0)+v4*v2
-						objectmoveygoal(a0)=objecttiley(a0)+v5*v3
-						v4=2
-						v5=2
-					End If
-					;v5=v5+1
-				Next
-				;v4=v4+1
-			Next
-		End If
-	End If
-	If objectcaged(a0)=1 Then
-		turnobjecttowarddirection(a0,objecttilex(playerobject)-objecttilex(a0),objecttiley(playerobject)-objecttiley(a0),3,0)
-		Return 0
-	End If
-	If objectmovementtype(a0)>0 Then
-		If objectmovementtimer(a0)=0 Then
-			objectdata(a0,9)=objectdata(a0,9)+1
-		End If
-		If objectmovementtimer(a0)>0 Then
-			objectdata(a0,9)=0
-		End If
-		objectz(a0)=0.0
-		If (objectcurrentanim(a0)<>1 And (objectdata(a0,9)<10)) Then
-			AnimateMD2 objectentity(a0),1,1.5,1,30,0.0
-			objectcurrentanim(a0)=1
-		End If
-		turnobjecttowarddirection(a0,-(objecttilex(a0)-objecttilex2(a0)),-(objecttiley(a0)-objecttiley2(a0)),4,-objectyawadjust(a0))
-		If ((objectmovementtimer(a0)=0 And (objecttilex(a0)=objectmovexgoal(a0))) And (objecttiley(a0)=objectmoveygoal(a0))) Then
-			If objectsubtype(a0)=2 Then
-				objectmovementtype(a0)=0
-				objectcurrentanim(a0)=10
-			End If
-			AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-		End If
-	Else If objectflying(a0)/10=1 Then
-		If objectcurrentanim(a0)<>11 Then
-			AnimateMD2 objectentity(a0),3,2.0,31,60,0.0
-			objectcurrentanim(a0)=11
-		End If
-		turnobjecttowarddirection(a0,-(objecttilex(a0)-objecttilex2(a0)),-(objecttiley(a0)-objecttiley2(a0)),10,-objectyawadjust(a0))
-	Else If objectflying(a0)/10=2 Then
-		If objectcurrentanim(a0)<>11 Then
-			AnimateMD2 objectentity(a0),3,2.0,31,60,0.0
-			objectcurrentanim(a0)=11
-		End If
-	Else
-		AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-	End If
-	If objectdata(a0,9)=10 Then
-		objectcurrentanim(a0)=10
-		AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
-	End If
-	If objectmovementtimer(a0)=0 Then
-		If objectsubtype(a0)=1 Then
-			objectmovexgoal(a0)=objecttilex(playerobject)
-			objectmoveygoal(a0)=objecttiley(playerobject)
-		End If
-		If (objecttilelogic(objecttilex(a0),objecttiley(a0)) And (2))>0 Then
-			If objectsubtype(a0)=2 Then
-				playsoundfx(74,objecttilex(a0),objecttiley(a0))
-			End If
-			objectsubtype(a0)=1
-			objectmovementtype(a0)=14
-			v6=0
-			v2=1
-			v3=1
-			If Rand(0,100)<50 Then
-				v2=-1
-			End If
-			If Rand(0,100)<50 Then
-				v3=-1
-			End If
-			;v4=-1
-			For v4=-1 To 1
-				;v5=-1
-				For v5=-1 To 1
-					If canobjectmovetotile(a0,objecttilex(a0)+v4*v2,objecttiley(a0)+v5*v3,1,1)=1 Then
-						moveobjecttotile(a0,objecttilex(a0)+v4*v2,objecttiley(a0)+v5*v3)
-						v4=2
-						v5=2
-						v6=1
-					End If
-					;v5=v5+1
-				Next
-				;v4=v4+1
-			Next
-			If v6=0 Then
-				v4=objecttilex(playerobject)
-				v5=objecttiley(playerobject)
-				If (((v4<>objecttilex(a0) Or (v5<>objecttiley(a0))) And (Abs(v4-objecttilex(a0))<=1)) And (Abs(v5-objecttiley(a0))<=1)) Then
-					v7=1
-					If (objecttilelogic(v4,v5) And (2))>0 Then
-						objecttilelogic(v4,v5)=objecttilelogic(v4,v5)-2.0
-						If canobjectmovetotile(a0,v4,v5,1,1)=1 Then
-							moveobjecttotile(a0,v4,v5)
-							v6=1
-						End If
-						objecttilelogic(v4,v5)=objecttilelogic(v4,v5)+2.0
-					End If
-				End If
-			End If
-			If v6=0 Then
-			End If
-		End If
-	End If
-End Function
-
-Function createflipbridgemesh(a0)
-	
-	v1=3
-	v2=CreateMesh(0)
-	v3=CreateSurface(v2,0)
-	AddVertex(v3,-0.25,0.1,0.49,0.76,0.01,1.0)
-	AddVertex(v3,0.25,0.1,0.49,1.0,0.01,1.0)
-	AddVertex(v3,-0.25,0.1,-0.49,0.76,0.24,1.0)
-	AddVertex(v3,0.25,0.1,-0.49,1.0,0.24,1.0)
-	AddTriangle(v3,0,1,2)
-	AddTriangle(v3,1,3,2)
-	AddVertex(v3,-0.2,0.105,0.45,a0 Mod 8*0.125+0.01,a0/8*0.125+0.51,1.0)
-	AddVertex(v3,-0.1,0.105,0.45,a0 Mod 8*0.125+0.115,a0/8*0.125+0.51,1.0)
-	AddVertex(v3,-0.2,0.105,-0.45,a0 Mod 8*0.125+0.01,a0/8*0.125+0.51+0.115,1.0)
-	AddVertex(v3,-0.1,0.105,-0.45,a0 Mod 8*0.125+0.115,a0/8*0.125+0.51+0.115,1.0)
-	AddTriangle(v3,4,5,6)
-	AddTriangle(v3,5,7,6)
-	AddVertex(v3,0.1,0.105,0.45,a0 Mod 8*0.125+0.01,a0/8*0.125+0.51,1.0)
-	AddVertex(v3,0.2,0.105,0.45,a0 Mod 8*0.125+0.115,a0/8*0.125+0.51,1.0)
-	AddVertex(v3,0.1,0.105,-0.45,a0 Mod 8*0.125+0.01,a0/8*0.125+0.51+0.115,1.0)
-	AddVertex(v3,0.2,0.105,-0.45,a0 Mod 8*0.125+0.115,a0/8*0.125+0.51+0.115,1.0)
-	AddTriangle(v3,8,9,10)
-	AddTriangle(v3,9,11,10)
-	;v4=0
-	For v4=0 To 3
-		Select v4
-		Case 0
-			v6#=-0.25
-			v7#=0.25
-			v8#=-0.49
-			v9#=-0.49
-		Case 1
-			v6#=0.25
-			v7#=0.25
-			v8#=-0.49
-			v9#=0.49
-		Case 2
-			v6#=0.25
-			v7#=-0.25
-			v8#=0.49
-			v9#=0.49
-		Case 3
-			v6#=-0.25
-			v7#=-0.25
-			v8#=0.49
-			v9#=-0.49
-		End Select
-		AddVertex(v3,v6#,0.104,v8#,v1*0.25+0.01,0.01,1.0)
-		AddVertex(v3,v7#,0.104,v9#,v1*0.25+0.24,0.01,1.0)
-		AddVertex(v3,v6#,-0.4,v8#,v1*0.25+0.01,0.24,1.0)
-		AddVertex(v3,v7#,-0.4,v9#,v1*0.25+0.24,0.24,1.0)
-		AddTriangle(v3,v4*4+12,v4*4+13,v4*4+14)
-		AddTriangle(v3,v4*4+13,v4*4+15,v4*4+14)
-		;v4=v4+1
-	Next
-	UpdateNormals v2
-	EntityTexture v2,gatetexture,0,0
-	Return v2
-End Function
-
-Function redoflipbridgetexture(a0)
-	
-	v1=GetSurface(objectentity(a0),1)
-	v2=(objectid(a0)-500)/5
-	;v3=0
-	For v3=0 To 1
-		VertexTexCoords v1,v3*4+4,v2 Mod 8*0.125+0.01,v2/8*0.125+0.51,1.0,0
-		VertexTexCoords v1,v3*4+5,v2 Mod 8*0.125+0.115,v2/8*0.125+0.51,1.0,0
-		VertexTexCoords v1,v3*4+6,v2 Mod 8*0.125+0.01,v2/8*0.125+0.51+0.115,1.0,0
-		VertexTexCoords v1,v3*4+7,v2 Mod 8*0.125+0.115,v2/8*0.125+0.51+0.115,1.0,0
-		;v3=v3+1
-	Next
-	UpdateNormals objectentity(a0)
-End Function
-
-Function controlflipbridge(a0)
-	
-	objectyawadjust(a0)=0.0
-	If objectid(a0)=-1 Then
-		objectid(a0)=objectdata(a0,0)*5+500+objectdata(a0,1)
-	End If
-	objectscaleyadjust(a0)=1.0+5.6*objectactive(a0)/1001.0
-	Select objectdata(a0,2)
-	Case 0
-		v2=0
-		v3=-1
-	Case 1
-		v2=1
-		v3=-1
-	Case 2
-		v2=1
-		v3=0
-	Case 3
-		v2=1
-		v3=1
-	Case 4
-		v2=0
-		v3=1
-	Case 5
-		v2=-1
-		v3=1
-	Case 6
-		v2=-1
-		v3=0
-	Case 7
-		v2=-1
-		v3=-1
-	End Select
-	turnobjecttowarddirection(a0,v2,v3,2,0)
-End Function
-
-Function activateflipbridge(a0)
-	
-	v1=1
-	v2=Floor(objectx(a0))
-	v3=Floor(objecty(a0))
-	Select objectdata(a0,2)
-	Case 0,4
-		v5=0
-		v6=-1
-		v7=3
-	Case 1,5
-		v5=1
-		v6=-1
-		v7=2
-	Case 2,6
-		v5=1
-		v6=0
-		v7=3
-	Case 3,7
-		v5=1
-		v6=1
-		v7=2
-	End Select
-	;v8=1
-	For v8=1 To v7
-		If (leveltilelogic(v8*v5+v2,v8*v6+v3)<>2 And (leveltilelogic(v8*v5+v2,v8*v6+v3)<>5)) Then
-			v1=0
-		Else If (leveltilelogic(v2-(v8*v5),v3-(v8*v6))<>2 And (leveltilelogic(v2-(v8*v5),v3-(v8*v6))<>5)) Then
-			v1=0
-		Else If ((objecttilelogic(v8*v5+v2,v8*v6+v3)>0 And (objecttilelogic(v8*v5+v2,v8*v6+v3)<>1024.0)) Or ((objecttilelogic(v2-(v8*v5),v3-(v8*v6))>0 And (objecttilelogic(v2-(v8*v5),v3-(v8*v6))<>1024.0)))) Then
-			v1=0
-		End If
-		;v8=v8+1
-	Next
-	If v1=0 Then
-		objectactive(a0)=200
-	Else
-		objectactive(a0)=objectactive(a0)+objectactivationspeed(a0)+1
-		If objectactive(a0)>1001 Then
-			objectactive(a0)=1001
-		End If
-		;v8=1
-		For v8=1 To v7
-			objectdata(a0,3)=leveltilelogic(v2-(v8*v5),v3-(v8*v6))
-			leveltilelogic(v2-(v8*v5),v3-(v8*v6))=0
-			leveltilelogic(v8*v5+v2,v8*v6+v3)=0
-			;v8=v8+1
-		Next
-	End If
-End Function
-
-Function deactivateflipbridge(a0)
-	
-	v1=Floor(objectx(a0))
-	v2=Floor(objecty(a0))
-	Select objectdata(a0,2)
-	Case 0,4
-		v4=0
-		v5=-1
-		v6=3
-	Case 1,5
-		v4=1
-		v5=-1
-		v6=2
-	Case 2,6
-		v4=1
-		v5=0
-		v6=3
-	Case 3,7
-		v4=1
-		v5=1
-		v6=2
-	End Select
-	objectactive(a0)=(objectactive(a0)-objectactivationspeed(a0))-1
-	If objectactive(a0)<0 Then
-		objectactive(a0)=0
-	End If
-	;v7=1
-	For v7=1 To v6
-		leveltilelogic(v1-(v7*v4),v2-(v7*v5))=objectdata(a0,3)
-		leveltilelogic(v7*v4+v1,v7*v5+v2)=objectdata(a0,3)
-		;v7=v7+1
-	Next
-End Function
-
-Function turnflipbridge(a0,a1)
-	
-	v1=0
-	v2=Floor(objectx(a0))
-	v3=Floor(objecty(a0))
-	v4=objectdata(a0,2)
-	v5=1
-	Select a1
-	Case 1
-		Select v4
-		Case 0,4
-			v8=1
-			If ((checkflipbridgedestination(v5*1*v8+v2,v3-(3*v8)) And (checkflipbridgedestination(v5*2*v8+v2,v3-(3*v8)))) And (checkflipbridgedestination(v5*1*v8+v2,v3-(v8*2)))) Then
-				v8=-1
-				If ((checkflipbridgedestination(v5*1*v8+v2,v3-(3*v8)) And (checkflipbridgedestination(v5*2*v8+v2,v3-(3*v8)))) And (checkflipbridgedestination(v5*1*v8+v2,v3-(v8*2)))) Then
-					v1=1
-				End If
-			End If
-		Case 1,5
-			v8=1
-			If ((checkflipbridgedestination(3*v5*v8+v2,v3-(v8*2)) And (checkflipbridgedestination(v5*2*v8+v2,v3-(v8*1)))) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*1)))) Then
-				v8=-1
-				If ((checkflipbridgedestination(3*v5*v8+v2,v3-(v8*2)) And (checkflipbridgedestination(v5*2*v8+v2,v3-(v8*1)))) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*1)))) Then
-					v1=1
-				End If
-			End If
-		Case 2,6
-			v8=1
-			If ((checkflipbridgedestination(v5*2*v8+v2,v8*1+v3) And (checkflipbridgedestination(3*v5*v8+v2,v8*1+v3))) And (checkflipbridgedestination(3*v5*v8+v2,v8*2+v3))) Then
-				v8=-1
-				If ((checkflipbridgedestination(v5*2*v8+v2,v8*1+v3) And (checkflipbridgedestination(3*v5*v8+v2,v8*1+v3))) And (checkflipbridgedestination(3*v5*v8+v2,v8*2+v3))) Then
-					v1=1
-				End If
-			End If
-		Case 3,7
-			v8=1
-			If ((checkflipbridgedestination(v5*1*v8+v2,3*v8+v3) And (checkflipbridgedestination(v5*2*v8+v2,3*v8+v3))) And (checkflipbridgedestination(v5*1*v8+v2,v8*2+v3))) Then
-				v8=-1
-				If ((checkflipbridgedestination(v5*1*v8+v2,3*v8+v3) And (checkflipbridgedestination(v5*2*v8+v2,3*v8+v3))) And (checkflipbridgedestination(v5*1*v8+v2,v8*2+v3))) Then
-					v1=1
-				End If
-			End If
-		End Select
-	Case 0
-		Select v4
-		Case 0,4
-			v8=1
-			If ((checkflipbridgedestination(v2-(v5*1*v8),v3-(3*v8)) And (checkflipbridgedestination(v2-(v5*2*v8),v3-(3*v8)))) And (checkflipbridgedestination(v2-(v5*1*v8),v3-(v8*2)))) Then
-				v8=-1
-				If ((checkflipbridgedestination(v2-(v5*1*v8),v3-(3*v8)) And (checkflipbridgedestination(v2-(v5*2*v8),v3-(3*v8)))) And (checkflipbridgedestination(v2-(v5*1*v8),v3-(v8*2)))) Then
-					v1=1
-				End If
-			End If
-		Case 1,5
-			v8=1
-			If ((checkflipbridgedestination(v5*2*v8+v2,v3-(3*v8)) And (checkflipbridgedestination(v5*1*v8+v2,v3-(v8*2)))) And (checkflipbridgedestination(v5*1*v8+v2,v3-(3*v8)))) Then
-				v8=-1
-				If ((checkflipbridgedestination(v5*2*v8+v2,v3-(3*v8)) And (checkflipbridgedestination(v5*1*v8+v2,v3-(v8*2)))) And (checkflipbridgedestination(v5*1*v8+v2,v3-(3*v8)))) Then
-					v1=1
-				End If
-			End If
-		Case 2,6
-			v8=1
-			If ((checkflipbridgedestination(v5*2*v8+v2,v3-(v8*1)) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*1)))) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*2)))) Then
-				v8=-1
-				If ((checkflipbridgedestination(v5*2*v8+v2,v3-(v8*1)) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*1)))) And (checkflipbridgedestination(3*v5*v8+v2,v3-(v8*2)))) Then
-					v1=1
-				End If
-			End If
-		Case 3,7
-			v8=1
-			If ((checkflipbridgedestination(3*v5*v8+v2,v8*1+v3) And (checkflipbridgedestination(3*v5*v8+v2,v8*2+v3))) And (checkflipbridgedestination(v5*2*v8+v2,v8*1+v3))) Then
-				v8=-1
-				If ((checkflipbridgedestination(3*v5*v8+v2,v8*1+v3) And (checkflipbridgedestination(3*v5*v8+v2,v8*2+v3))) And (checkflipbridgedestination(v5*2*v8+v2,v8*1+v3))) Then
-					v1=1
-				End If
-			End If
-		End Select
-	End Select
-	v10=0
-	If (objectactive(a0)>0 And (objectactive(a0) Mod 2=1)) Then
-		v10=1
-	End If
-	If v10=1 Then
-		deactivateflipbridge(a0)
-	End If
-	If a1=0 Then
-		objectdata(a0,2)=(objectdata(a0,2)-1+8) Mod 8
-	Else
-		objectdata(a0,2)=(objectdata(a0,2)+1) Mod 8
-	End If
-	If v1=1 Then
-		If v10=1 Then
-			activateflipbridge(a0)
-		End If
-	End If
-End Function
-
-Function checkflipbridgedestination(a0,a1)
-	
-	If ((leveltilelogic(a0,a1)=2 Or (leveltilelogic(a0,a1)=5)) And (objecttilelogic(a0,a1)=0)) Then
-		Return 1
-	End If
-	Return 0
-End Function
-
-Function createretrolasergatemesh(a0)
-	
-	v1=CreateMesh(0)
-	v2=CreateCylinder(6,0,0)
-	ScaleMesh v2,0.05,0.5,0.05
-	RotateMesh v2,0.0,0.0,90.0
-	PositionMesh v2,0.0,0.25,0.0
-	AddMesh v2,v1
-	PositionMesh v2,0.0,-0.375,0.2165
-	AddMesh v2,v1
-	PositionMesh v2,0.0,0.0,-0.433
-	AddMesh v2,v1
-	FreeEntity v2
-	EntityAlpha v1,0.5
-	If a0=0 Then
-		EntityColor v1,255.0,0.0,0.0
-	Else If a0=1 Then
-		EntityColor v1,255.0,128.0,0.0
-	Else If a0=2 Then
-		EntityColor v1,255.0,255.0,0.0
-	Else If a0=3 Then
-		EntityColor v1,0.0,255.0,0.0
-	Else If a0=4 Then
-		EntityColor v1,0.0,255.0,255.0
-	Else If a0=5 Then
-		EntityColor v1,0.0,0.0,255.0
-	Else
-		EntityColor v1,255.0,0.0,255.0
-	End If
-	Return v1
-End Function
-
-Function controlretrolasergate(a0)
-	
-	If objectid(a0)=-1 Then
-		objectid(a0)=objectdata(a0,0)*5+500+objectdata(a0,1)
-	End If
-	objecttilex(a0)=Floor(objectx(a0))
-	objecttiley(a0)=Floor(objecty(a0))
-	If objectactive(a0)=0 Then
-		If leveltilelogic(objecttilex(a0),objecttiley(a0))<>0 Then
-			leveltilelogic(objecttilex(a0),objecttiley(a0))=0
-		End If
-	Else If leveltilelogic(objecttilex(a0),objecttiley(a0))<>1 Then
-		leveltilelogic(objecttilex(a0),objecttiley(a0))=1
-	End If
-	If (objectyawadjust(a0)=0.0 Or (objectyawadjust(a0)=180.0)) Then
-		objectpitch(a0)=(objectpitch(a0)+2.0) Mod 360.0
-	Else
-		objectroll(a0)=(objectroll(a0)+2.0) Mod 360.0
-	End If
-End Function
-
 Function activatecommand(a0,a1,a2,a3,a4)
 	
 	Select a0
@@ -13351,7 +12395,7 @@ Function activatecommand(a0,a1,a2,a3,a4)
 	Case 61
 		;v2=0
 		For v2=0 To nofobjects-1
-			If (objectexists(v2)=1 And (((objecttype(v2)=110 Or (objecttype(v2)=290)) Or (objecttype(v2)=330)) Or (objecttype(v2)=390))) Then
+			If (objectexists(v2)=1 And (((objecttype(v2)=110 Or (objecttype(v2)=290)) Or (objecttype(v2)=330)))) Then
 				If (objectid(v2)=a1 And ((objectmovementtimer(v2)>0 Or ((a2<>objecttilex(v2) Or (a3<>objecttiley(v2))))))) Then
 					If (v2=dialogobject1 And (gamemode=8)) Then
 						objectdata10(v2)=a3*200+a2
@@ -13367,7 +12411,7 @@ Function activatecommand(a0,a1,a2,a3,a4)
 	Case 62
 		;v2=0
 		For v2=0 To nofobjects-1
-			If (objectexists(v2)=1 And (((objecttype(v2)=110 Or (objecttype(v2)=330)) Or (objecttype(v2)=180)) Or (objecttype(v2)=390))) Then
+			If (objectexists(v2)=1 And (((objecttype(v2)=110 Or (objecttype(v2)=330)) Or (objecttype(v2)=180)))) Then
 				If objectid(v2)=a1 Then
 					If a2>=0 Then
 						objecttalkable(v2)=a2
@@ -13658,10 +12702,6 @@ End Function
 
 Function astar(a0,a1,a2,a3,a4,a5,a6,a7)
 	
-	;If isthereaflipbridge=1 Then
-	;	astaralt(a0,a1,a2,a3,a4,a5,a6,a7)
-	;	Return 0
-	;End If
 	If a5<3 Then
 		a5=3
 	End If
@@ -13762,139 +12802,6 @@ Function astar(a0,a1,a2,a3,a4,a5,a6,a7)
 		For v6=a5 To 2 Step -1
 			astarpathnode(v6)=astarpathnode((v6-1))
 			;v6=v6+-1
-		Next
-		astarpathnode(1)=astarparent(astarpathnode(1))
-	Until (astarx(astarparent(astarpathnode(1)))=a1 And (astary(astarparent(astarpathnode(1)))=a2))
-End Function
-
-Function astaralt(a0,a1,a2,a3,a4,a5,a6,a7)
-	
-	If a5<3 Then
-		a5=3
-	End If
-	If a5>100 Then
-		a5=100
-	End If
-	v1=1
-	astarparent(1)=1
-	astarx(1)=a1
-	astary(1)=a2
-	astaropen(1)=1
-	astarh(1)=(Abs(a3-v2)+Abs(a4-v3))*9
-	astarg(1)=0
-	astarf(1)=astarg(1)+astarh(1)
-	astargrid(a1,a2)=1
-	v4=0
-	v5=0
-	v6=objecttilex(a0)
-	v7=objecttiley(a0)
-	Repeat
-		v8=99999
-		v9=-1
-		;v10=1
-		For v10=1 To v1
-			If (astaropen(v10)=1 And (astarf(v10)<v8)) Then
-				v9=v10
-				v8=astarf(v10)
-			End If
-			;v10=v10+1
-		Next
-		If (v9=-1 Or (v1>=a6)) Then
-			v5=1
-			Exit
-		End If
-		astaropen(v9)=2
-		astargrid(astarx(v9),astary(v9))=9999
-		;v10=1
-		For v10=1 To 8
-			Select v10
-			Case 1
-				v2=astarx(v9)+1
-				v3=astary(v9)
-			Case 2
-				v2=astarx(v9)-1
-				v3=astary(v9)
-			Case 3
-				v2=astarx(v9)
-				v3=astary(v9)+1
-			Case 4
-				v2=astarx(v9)
-				v3=astary(v9)-1
-			Case 5
-				v2=astarx(v9)+1
-				v3=astary(v9)-1
-			Case 6
-				v2=astarx(v9)-1
-				v3=astary(v9)-1
-			Case 7
-				v2=astarx(v9)+1
-				v3=astary(v9)+1
-			Case 8
-				v2=astarx(v9)-1
-				v3=astary(v9)+1
-			End Select
-			If (((v2>=0 And (v2<100)) And (v3>=0)) And (v3<100)) Then
-				objecttilex(a0)=astarx(v9)
-				objecttiley(a0)=astary(v9)
-				If (canobjectmovetotile(a0,v2,v3,1,0)=1 Or ((v2=a3 And (v3=a4)))) Then
-					If astargrid(v2,v3)=0 Then
-						v1=v1+1
-						astarparent(v1)=v9
-						astarx(v1)=v2
-						astary(v1)=v3
-						astaropen(v1)=1
-						astarh(v1)=(Abs(a3-v2)+Abs(a4-v3))*9
-						If v10<5 Then
-							astarg(v1)=astarg(v9)+10
-						Else
-							astarg(v1)=astarg(v9)+14
-						End If
-						astarf(v1)=astarg(v1)+astarh(v1)
-						astargrid(v2,v3)=1
-					Else If astaropen(astargrid(v2,v3))=1 Then
-						v12=(Abs(a3-v2)+Abs(a4-v3))*9
-						If v10<5 Then
-							v13=astarg(v9)+10
-						Else
-							v13=astarg(v9)+14
-						End If
-						If v13+v12<astarf(astargrid(v2,v3)) Then
-							astarg(astargrid(v2,v3))=v13
-							astarh(astargrid(v2,v3))=v12
-							astarf(astargrid(v2,v3))=v13+v12
-							astarparent(astargrid(v2,v3))=v9
-						End If
-					End If
-					If (Abs(v2-a3)<=a7 And (Abs(v3-a4)<=a7)) Then
-						v4=1
-						v10=8
-					End If
-				End If
-			End If
-			;v10=v10+1
-		Next
-	Until (v4=1 Or (v5=1))
-	objecttilex(a0)=v6
-	objecttiley(a0)=v7
-	;v10=1
-	For v10=1 To v1
-		astargrid(astarx(v10),astary(v10))=0
-		;v10=v10+1
-	Next
-	If v5=1 Then
-		astarpathnode(1)=-1
-		Return 0
-	End If
-	;v10=1
-	For v10=1 To a5
-		astarpathnode(v10)=v1
-		;v10=v10+1
-	Next
-	Repeat
-		;v10=a5
-		For v10=a5 To 2 Step -1
-			astarpathnode(v10)=astarpathnode((v10-1))
-			;v10=v10+-1
 		Next
 		astarpathnode(1)=astarparent(astarpathnode(1))
 	Until (astarx(astarparent(astarpathnode(1)))=a1 And (astary(astarparent(astarpathnode(1)))=a2))
@@ -14138,10 +13045,6 @@ Function controlicons()
 			If (nofcrabsinadventure>0 And (adventuregoal=7)) Then
 				createicon(7,0,13,3,nofcrabsinadventure,"Capture")
 				iconsubtext(7)=nofcrabsinadventure
-			End If
-			If (nofbabyboomersinadventure>0 And (adventuregoal=8)) Then
-				createicon(7,0,14,3,nofbabyboomersinadventure,"Rescue")
-				iconsubtext(7)=nofbabyboomersinadventure
 			End If
 		End If
 		If (currentcharm=1 And (currentlightpower>0)) Then
@@ -18413,15 +17316,6 @@ Function preloadmodels()
 	EntityTexture turtlemesh,turtletexture,0,0
 	ScaleEntity turtlemesh,0.03,0.025,0.03,0
 	HideEntity turtlemesh
-	kaboommesh=myloadmd2("data\models\kaboom\kaboom.md2")
-	;v5=1
-	For v5=1 To 5
-		kaboomtexture(v5)=myloadtexture("data\models\kaboom\kaboom0"+v5+".jpg",1)
-		;v5=v5+1
-	Next
-	EntityTexture kaboommesh,kaboomtexture(1),0,0
-	kaboomtexturesquint=myloadtexture("data\models\kaboom\kaboom00_squint.bmp",1)
-	HideEntity kaboommesh
 	fireflowermesh=myloadmd2("data\models\fireflower\fireflower.wdf")
 	fireflowertexture=myloadtexture("data\models\fireflower\fireflower04.png",4)
 	EntityTexture fireflowermesh,fireflowertexture,0,0
@@ -19273,12 +18167,12 @@ Data "weewoo"
 Data "weethanks"
 Data "weebye"
 Data "weeyeay"
-Data "kaboom1"
-Data "kaboom2"
-Data "kaboom3"
-Data "kaboom4"
-Data "kaboom5"
-Data "kaboom6"
+Data "---"
+Data "---"
+Data "---"
+Data "---"
+Data "---"
+Data "---"
 Data "magiccharge"
 Data "magicblink2"
 Data "magiccast"
