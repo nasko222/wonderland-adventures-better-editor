@@ -5103,6 +5103,9 @@ Function loadobject(a0,a1,a2)
 	Else If objecttype(v1)<>1 Then
 		adjustleveltilelogic(Floor(objectx(v1)),Floor(objecty(v1)),v1)
 	End If
+	If objectmodelname(v1)="" Then
+		Return 0
+	End If
 	If a2=0 Then
 		nofobjects=nofobjects+1
 		Return 0
@@ -5384,7 +5387,6 @@ Function loadobject(a0,a1,a2)
 		objecty(v3)=objecty(v1)
 		objectz(v3)=-0.241
 		EntityTexture objectentity(v3),cagetexture,0,0
-		objectmodelname(v3)="!Shadow"
 	End Select
 End Function
 
