@@ -4921,9 +4921,6 @@ Function createnewobject()
 		;v2=v2+1
 	Next
 	objecttalkable(v1)=0
-	If (objecttype(v1)<>370 Or (objectstatus(v1)<>2)) Then
-		objectcurrentanim(v1)=0
-	End If
 	objectstandardanim(v1)=0
 	objecttilex(v1)=0
 	objecttiley(v1)=0
@@ -5040,7 +5037,9 @@ Function loadobject(a0,a1,a2)
 	Next
 	objecttalkable(v1)=ReadInt(a0)
 	objectcurrentanim(v1)=ReadInt(a0)
-	objectcurrentanim(v1)=0
+	If (objecttype(v1)<>370 Or (objectstatus(v1)<>2)) Then
+		objectcurrentanim(v1)=0
+	End If
 	objectstandardanim(v1)=ReadInt(a0)
 	objecttilex(v1)=ReadInt(a0)
 	objecttiley(v1)=ReadInt(a0)
@@ -5285,6 +5284,8 @@ Function loadobject(a0,a1,a2)
 			objectentity(v1)=CopyEntity(cylinder,0)
 		Case "!Square"
 			objectentity(v1)=CopyMesh(square,0)
+		Case "!Retrolasergate"
+			objectentity(v1)=createretrolasergatemesh(objectdata(v1,0))
 		Case "!None"
 			objectentity(v1)=CreatePivot(0)
 		Default
@@ -5362,6 +5363,7 @@ Function loadobject(a0,a1,a2)
 		objecty(v3)=objecty(v1)
 		objectz(v3)=-0.241
 		EntityTexture objectentity(v3),cagetexture,0,0
+		objectmodelname(v3)="!Shadow"
 	End Select
 End Function
 
@@ -5866,6 +5868,8 @@ Function controlobjects()
 				controlcrab(v2)
 			Case 410
 				controlflipbridge(v2)
+			Case 424
+				controlretrolasergate(v2)
 			End Select
 			If objectentity(v2)>0 Then
 				ScaleEntity objectentity(v2),v5#,v7#,v6#,0
@@ -9420,7 +9424,7 @@ Function controlbutton(a0)
 										;v5=0
 										For v5=0 To nofobjects-1
 											If (objectexists(v5)=1 And (objectid(v5)=(objectdata(a0,v2)-16)*5+500+objectdata(a0,v2+4))) Then
-												If ((objecttype(v5)=10 Or (objecttype(v5)=140)) Or (objecttype(v5)=20)) Then
+												If ((objecttype(v5)=10 Or (objecttype(v5)=140)) Or (objecttype(v5)=20)) Or (objecttype(v5)=424) Then
 													activateobject(v5)
 												Else If objecttype(v5)=210 Then
 												Else
@@ -9478,7 +9482,7 @@ Function controlbutton(a0)
 									;v5=0
 									For v5=0 To nofobjects-1
 										If (objectexists(v5)=1 And (objectid(v5)=(objectdata(a0,v2)-16)*5+500+objectdata(a0,v2+4))) Then
-											If ((objecttype(v5)=10 Or (objecttype(v5)=140)) Or (objecttype(v5)=20)) Then
+											If ((objecttype(v5)=10 Or (objecttype(v5)=140)) Or (objecttype(v5)=20)) Or (objecttype(v5)=424) Then
 												activateobject(v5)
 											Else If objecttype(v5)=210 Then
 											Else
@@ -9552,9 +9556,9 @@ Function controlbutton(a0)
 								objectid(v5)=objectdata(a0,v2+0)*5+500+objectdata(a0,v2+2)
 								redotransportertexture(v5)
 							Else If objecttype(v5)=410 Then
-								objectid(v5)=objectdata(a0,v2+1)*5+500+objectdata(a0,v2+3)
-								objectdata(v5,0)=objectdata(a0,v2+1)
-								objectdata(v5,1)=objectdata(a0,v2+3)
+								objectid(v5)=objectdata(a0,v2+0)*5+500+objectdata(a0,v2+2)
+								objectdata(v5,0)=objectdata(a0,v2)
+								objectdata(v5,1)=objectdata(a0,v2+2)
 								redoflipbridgetexture(v5)
 							Else If objecttype(v5)=40 Then
 								If (objectdata(a0,v2+0)>=8 And (objectdata(a0,v2+0)<12)) Then
@@ -9656,7 +9660,7 @@ Function activatebutton(a0)
 					;v4=0
 					For v4=0 To nofobjects-1
 						If (objectexists(v4)=1 And (objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+4))) Then
-							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Then
+							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Or (objecttype(v4)=424) Then
 								deactivateobject(v4)
 							Else If objecttype(v4)=210 Then
 								activatetransporter(v4)
@@ -9686,7 +9690,7 @@ Function activatebutton(a0)
 					;v4=0
 					For v4=0 To nofobjects-1
 						If (objectexists(v4)=1 And (objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+4))) Then
-							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Then
+							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Or (objecttype(v4)=424) Then
 								deactivateobject(v4)
 							Else If objecttype(v4)=210 Then
 								activatetransporter(v4)
@@ -9785,7 +9789,7 @@ Function activatebutton(a0)
 					;v4=0
 					For v4=0 To nofobjects-1
 						If (objectexists(v4)=1 And (objectid(v4)=objectdata(a0,v3)*5+500+objectdata(a0,v3+4))) Then
-							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Then
+							If ((objecttype(v4)=10 Or (objecttype(v4)=140)) Or (objecttype(v4)=20)) Or (objecttype(v4)=424) Then
 								deactivateobject(v4)
 							Else If objecttype(v4)=210 Then
 								activatetransporter(v4)
@@ -9939,10 +9943,10 @@ Function activatebutton(a0)
 							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
 							redotransportertexture(v4)
 						Else If objecttype(v4)=410 Then
-								objectid(v4)=objectdata(a0,v3+0)*5+500+objectdata(a0,v3+2)
-								objectdata(v4,0)=objectdata(a0,v3)
-								objectdata(v4,1)=objectdata(a0,v3+2)
-								redoflipbridgetexture(v4)
+							objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
+							objectdata(v4,0)=objectdata(a0,v3+1)
+							objectdata(v4,1)=objectdata(a0,v3+3)
+							redoflipbridgetexture(v4)
 						Else If objecttype(v4)=40 Then
 							If (objectdata(a0,v3+1)>=8 And (objectdata(a0,v3+1)<12)) Then
 								objectid(v4)=objectdata(a0,v3+1)*5+500+objectdata(a0,v3+3)
@@ -12548,6 +12552,59 @@ Function checkflipbridgedestination(a0,a1)
 	Return 0
 End Function
 
+Function createretrolasergatemesh(a0)
+	
+	v1=CreateMesh(0)
+	v2=CreateCylinder(6,0,0)
+	ScaleMesh v2,0.05,0.5,0.05
+	RotateMesh v2,0.0,0.0,90.0
+	PositionMesh v2,0.0,0.25,0.0
+	AddMesh v2,v1
+	PositionMesh v2,0.0,-0.375,0.2165
+	AddMesh v2,v1
+	PositionMesh v2,0.0,0.0,-0.433
+	AddMesh v2,v1
+	FreeEntity v2
+	EntityAlpha v1,0.5
+	If a0=0 Then
+		EntityColor v1,255.0,0.0,0.0
+	Else If a0=1 Then
+		EntityColor v1,255.0,128.0,0.0
+	Else If a0=2 Then
+		EntityColor v1,255.0,255.0,0.0
+	Else If a0=3 Then
+		EntityColor v1,0.0,255.0,0.0
+	Else If a0=4 Then
+		EntityColor v1,0.0,255.0,255.0
+	Else If a0=5 Then
+		EntityColor v1,0.0,0.0,255.0
+	Else
+		EntityColor v1,255.0,0.0,255.0
+	End If
+	Return v1
+End Function
+
+Function controlretrolasergate(a0)
+	
+	If objectid(a0)=-1 Then
+		objectid(a0)=objectdata(a0,0)*5+500+objectdata(a0,1)
+	End If
+	objecttilex(a0)=Floor(objectx(a0))
+	objecttiley(a0)=Floor(objecty(a0))
+	If objectactive(a0)=0 Then
+		If leveltilelogic(objecttilex(a0),objecttiley(a0))<>0 Then
+			leveltilelogic(objecttilex(a0),objecttiley(a0))=0
+		End If
+	Else If leveltilelogic(objecttilex(a0),objecttiley(a0))<>1 Then
+		leveltilelogic(objecttilex(a0),objecttiley(a0))=1
+	End If
+	If (objectyawadjust(a0)=0.0 Or (objectyawadjust(a0)=180.0)) Then
+		objectpitch(a0)=(objectpitch(a0)+2.0) Mod 360.0
+	Else
+		objectroll(a0)=(objectroll(a0)+2.0) Mod 360.0
+	End If
+End Function
+
 Function activatecommand(a0,a1,a2,a3,a4)
 	
 	Select a0
@@ -13095,10 +13152,10 @@ End Function
 
 Function astar(a0,a1,a2,a3,a4,a5,a6,a7)
 	
-	If isthereaflipbridge=1 Then
-		astaralt(a0,a1,a2,a3,a4,a5,a6,a7)
-		Return 0
-	End If
+	;If isthereaflipbridge=1 Then
+	;	astaralt(a0,a1,a2,a3,a4,a5,a6,a7)
+	;	Return 0
+	;End If
 	If a5<3 Then
 		a5=3
 	End If
