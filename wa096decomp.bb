@@ -76,7 +76,7 @@ Field f7#
 Field f8#
 End Type
 
-AppTitle "Wonderland Adventures [DECOMPILE BUILD #6]",""
+AppTitle "Wonderland Adventures [DECOMPILE BUILD #7]",""
 
 Global particlemesh
 Global particlesurface
@@ -5294,16 +5294,14 @@ Function loadobject(a0,a1,a2)
 		EntityTexture objectentity(v1),firetraptexture,0,0
 	Else If (((objecttexturename(v1)<>"" And ((objecttexturename(v1)<>"")<>"!None")) And (Left$(objecttexturename(v1),1)<>"!")) And (objectmodelname(v1)<>"!Button")) Then
 	objecttexture(v1)=myloadtexture(objecttexturename(v1),4)
-	If (objecttexture(v1)<>0)
-			EntityTexture objectentity(v1),objecttexture(v1),0,0
-			;v3=1
-			For v3=1 To CountChildren(objectentity(v1))
-				EntityTexture GetChild(objectentity(v1),v3),objecttexture(v1),0,0
-				;v3=v3+1
-			Next
-		Else
-			objecttexture(v1)=0
-		End If
+		EntityTexture objectentity(v1),objecttexture(v1),0,0
+		;v3=1
+		For v3=1 To CountChildren(objectentity(v1))
+			EntityTexture GetChild(objectentity(v1),v3),objecttexture(v1),0,0
+			;v3=v3+1
+		Next
+	Else
+		objecttexture(v1)=0
 	End If
 	nofobjects=nofobjects+1
 	Select objectmodelname(v1)
@@ -17238,7 +17236,19 @@ Function myloadtexture(a0$,a1)
 	If v5=0 Then
 		v5=LoadTexture(v1$,a1)
 		If v5=0 Then
-			If FileType(v3$)<>1 Then
+			v6=0
+			Repeat
+				v6=v6+1
+			Until FileType("debug."+v6)=0
+			v7=WriteFile("debug."+v6)
+			Print "Couldn't Load Texture:"+a0$
+			Delay 5000
+			WriteString(v7,a0$)
+			WriteString(v7,v3$)
+			If FileType(v3$)=1 Then
+				WriteString(v7,"File Exists!")
+			Else
+				WriteString(v7,"File Doesn't Exist!")
 				If a0$="load.jpg" Then
 					Print ""
 					Print "Please ensure that you install any updates INTO"
@@ -17254,6 +17264,15 @@ Function myloadtexture(a0$,a1)
 					WaitKey()
 					End
 				End If
+			End If
+			WriteInt(v7,TotalVidMem())
+			WriteInt(v7,AvailVidMem())
+			Print "Trying Again"
+			v5=LoadTexture(v3$,a1)
+			If v5=0 Then
+				Print "Nope."
+				Delay 5000
+				End
 			End If
 		End If
 	End If
