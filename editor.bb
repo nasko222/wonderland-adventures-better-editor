@@ -11,7 +11,7 @@
 
 Include "particles-define.bb"
 
-Global VersionText$="WA 0.96 Editor (BetterEditor Mod Build 8)"
+Global VersionText$="WA 0.96 Editor (BetterEditor Mod Build 7)"
 
 Global MASTERUSER=False
 Global LeftMouse,LeftMouseReleased,RightMouse,RightMouseReleased
@@ -676,12 +676,6 @@ Global CrabTexture1=myLoadTexture("data\models\crab\crab03a.jpg",1)
 Global CrabTexture2=myLoadTexture("data\models\crab\crab03b.jpg",1)
 EntityTexture CrabMesh,CrabTexture1
 HideEntity CrabMesh
-
-; Kaboom
-Global KaboomMesh=myLoadMD2("data\models\kaboom\kaboom.md2")
-Global KaboomTexture=myLoadTexture("data\models\kaboom\kaboom01.jpg",1)
-EntityTexture KaboomMesh,KaboomTexture
-HideEntity KaboomMesh
 
 ; Turtles
 Global TurtleMesh=MyLoadMesh("data\models\turtle\dragonturtle2.3ds",0)
@@ -1836,18 +1830,6 @@ Function EditorControls()
 		Text 715,115,"Cave/Woods"
 	Case 6
 		Text 715,115,"Scary/Void"
-	Case 7
-		Text 715,115,"WondrFalls"
-	Case 8
-		Text 715,115,"  Jungle  "
-	Case 9
-		Text 715,115,"KaboomTown"
-	Case 10
-		Text 715,115,"Acid Pools"
-	Case 11
-		Text 719,115,"  Retro  "
-	Case 12
-		Text 719,115,"  Cave  "
 	Default
 		Text 719-5,115,"Custom:" + LevelMusic
 
@@ -4280,7 +4262,7 @@ Function DisplayObjectAdjuster(i)
 	Case "Data0"
 		tex$=Str$(CurrentObjectData(0))
 		
-		If CurrentObjectModelName$="!Scritter" Or CurrentObjectModelName$="!Cuboid" Or CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectTextureName$="!GloveTex"  Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage"  Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge"
+		If CurrentObjectModelName$="!Scritter" Or CurrentObjectModelName$="!Cuboid" Or CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectTextureName$="!GloveTex"  Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage"  Or CurrentObjectTextureName$="!FireTrap"
 			tex2$="Colour"
 		EndIf
 		
@@ -4442,25 +4424,6 @@ Function DisplayObjectAdjuster(i)
 				
 			
 		EndIf
-		
-		If CurrentObjectModelName$="!Kaboom"
-			tex2$="Texture"
-			
-			Select CurrentObjectData(0)
-			Case 1
-				tex$="Blue"
-			Case 2
-				tex$="Purple"
-			Case 3
-				tex$="Red"
-			Case 4
-				tex$="Gold"
-			Case 5
-				tex$="Dark"
-			End Select
-				
-			
-		EndIf
 
 		If CurrentObjectModelName$="!Rubberducky"
 			tex2$="Move"
@@ -4501,7 +4464,7 @@ Function DisplayObjectAdjuster(i)
 
 	Case "Data1"
 		tex$=Str$(CurrentObjectData(1))
-		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap"  Or CurrentObjectModelName$="!FlipBridge" Or CurrentObjectModelName$="!Retrolasergate"
+		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap"
 			tex2$="SubColour"
 		EndIf
 		
@@ -4667,24 +4630,12 @@ Function DisplayObjectAdjuster(i)
 			tex2$="Goal X"
 		EndIf
 		
-		If  (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectModelName$<>"!Retrolasergate")
-
-			tex2$="Turning"
-			If CurrentObjectData(1)=0
-				tex$="Left"
-			Else If CurrentObjectData(1)=1
-				tex$="Right"
-			
-			EndIf
-		EndIf
-		
 
 
 		
 	Case "Data2" 
 		tex$=Str$(CurrentObjectData(2))
-		If CurrentObjectModelName$="!Spring"  Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!FlipBridge"
-
+		If CurrentObjectModelName$="!Spring"  Or CurrentObjectModelName$="!Transporter"
 
 			tex2$="Direction"
 			If CurrentObjectModelName$="!Transporter" Then tex$=Str$(3-CurrentObjectData(2))
@@ -5388,7 +5339,7 @@ Function DisplayObjectAdjuster(i)
 				
 			EndIf
 		EndIf
-		If CurrentObjectModelName$="!NPC" Or CurrentObjectModelName$="!Kaboom"
+		If CurrentObjectModelName$="!NPC"
 		
 			tex2$="Turn"
 			If (CurrentObjectData(7) Mod 10)=0 tex$="Fixed"
@@ -5439,31 +5390,6 @@ Function DisplayObjectAdjuster(i)
 			
 			
 		EndIf
-		
-		If CurrentObjectModelName$="!Kaboom"
-			
-			tex2$="Anim"
-			If CurrentObjectData(8)=0 tex$="Stand"
-			If CurrentObjectData(8)=1 tex$="Sit"
-			If CurrentObjectData(8)=2 tex$="Sit/Stand"
-			If CurrentObjectData(8)=3 tex$="Shiver Some"
-			If CurrentObjectData(8)=4 tex$="Shiver Constant"
-			If CurrentObjectData(8)=5 tex$="Exercise"
-	
-			
-			
-		EndIf
-		
-		If CurrentObjectModelName$="!BabyBoomer"
-			
-			tex2$="Boom"
-			If CurrentObjectData(8)=0 tex$="No"
-			If CurrentObjectData(8)=1 tex$="Yes"
-				
-			
-			
-		EndIf
-		
 		If CurrentObjectModelName$="!StinkerWee"
 			
 			tex2$="Type"
@@ -5836,7 +5762,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(0)<=-32768 Then CurrentObjectData(0)=32767
 			If CurrentObjectData(0)>=32767 Then CurrentObjectData(0)=-32768
 
-		Else If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or (CurrentObjectModelName$="!Button" And ((CurrentObjectSubType Mod 32)<10 Or (CurrentObjectSubType Mod 32)=16 Or (CurrentObjectSubType Mod 32)=17)) Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!FlipBridge"
+		Else If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or (CurrentObjectModelName$="!Button" And ((CurrentObjectSubType Mod 32)<10 Or (CurrentObjectSubType Mod 32)=16 Or (CurrentObjectSubType Mod 32)=17)) Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!ColourGate"
 
 			; colours [2^16-1; 2^16-1)
 			If CurrentObjectData(0)<=-32768 Then CurrentObjectData(0)=32767
@@ -5896,7 +5822,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(0)<0 CurrentObjectData(0)=3
 		EndIf
 		
-		If CurrentObjectModelName$="!NPC" Or CurrentObjectModelName="!Kaboom"
+		If CurrentObjectModelName$="!NPC"
 
 			If CurrentObjectData(0)>5 CurrentObjectData(0)=1
 			If CurrentObjectData(0)<1 CurrentObjectData(0)=5
@@ -5940,7 +5866,7 @@ Function AdjustObjectAdjuster(i)
 		If Fast Adj=10
 		If LeftMouse=True Then CurrentObjectData(1)=CurrentObjectData(1)+Adj
 		If RightMouse=True Then CurrentObjectData(1)=CurrentObjectData(1)-Adj
-		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter"  Or (CurrentObjectModelName$="!Button" And ((CurrentObjectSubType Mod 32)=16 Or (CurrentObjectSubType Mod 32)=17)) Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge" Or CurrentObjectModelName$="!Retrolasergate"
+		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter"  Or (CurrentObjectModelName$="!Button" And ((CurrentObjectSubType Mod 32)=16 Or (CurrentObjectSubType Mod 32)=17)) Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap"
 
 
 			; subcolours [2^16-1; 2^16-1)
@@ -6002,7 +5928,7 @@ Function AdjustObjectAdjuster(i)
 			
 
 		EndIf
-		If CurrentObjectModelName$="!Thwart" Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectModelName$<>"!Retrolasergate")
+		If CurrentObjectModelName$="!Thwart"
 
 			If CurrentObjectData(1)>1 CurrentObjectData(1)=0
 			If CurrentObjectData(1)<0 CurrentObjectData(1)=1
@@ -6030,7 +5956,7 @@ Function AdjustObjectAdjuster(i)
 
 		If LeftMouse=True Then CurrentObjectData(2)=CurrentObjectData(2)+Adj
 		If RightMouse=True Then CurrentObjectData(2)=CurrentObjectData(2)-Adj
-		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!FlipBridge"
+		If CurrentObjectModelName$="!Spring"
 			; direction 0-7
 			If CurrentObjectData(2)>7 CurrentObjectData(2)=0
 			If CurrentObjectData(2)<0 CurrentObjectData(2)=7
@@ -6372,7 +6298,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentobjectData(7)=19 CurrentObjectData(7)=15
 
 		EndIf
-		If CurrentObjectModelName$="!NPC" Or CurrentObjectModelName="!Kaboom"
+		If CurrentObjectModelName$="!NPC"
 
 			If CurrentobjectData(7)=-2 CurrentObjectData(7)=25
 			If CurrentobjectData(7)=26 CurrentObjectData(7)=-1
@@ -6412,19 +6338,6 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(8)<0 CurrentObjectData(8)=10
 			
 
-		EndIf
-		
-		If CurrentObjectModelName$="!Kaboom"
-			If CurrentObjectData(8)>5 CurrentObjectData(8)=0
-			If CurrentObjectData(8)<0 CurrentObjectData(8)=5
-			
-
-		EndIf
-		
-		If CurrentObjectModelName$="!BabyBoomer"
-
-			If CurrentObjectData(8)>1 CurrentObjectData(8)=0
-			If CurrentObjectData(8)<0 CurrentObjectData(8)=1
 		EndIf
 		
 		If CurrentObjectModelName$="!StinkerWee"
@@ -6961,12 +6874,6 @@ Function BuildCurrentObjectModel()
 	Else If CurrentObjectModelName$="!Crab"
 		CurrentObjectModel=CopyEntity(CrabMesh)
 		If CurrentObjectSubType=0 Then EntityTexture CurrentObjectModel,CrabTexture2
-	Else If CurrentObjectModelName$="!Kaboom"
-		CurrentObjectModel=CopyEntity(KaboomMesh)
-	Else If CurrentObjectModelName$="!BabyBoomer"
-		CurrentObjectModel=CopyEntity(KaboomMesh)
-	Else If CurrentObjectModelName$="!Retrolasergate"
-		CurrentObjectModel=CreateretrolasergateMesh(Currentobjectdata(0))
 	Else If CurrentObjectModelName$="!FireFlower"
 		CurrentObjectModel=CopyEntity(FireFlowerMesh)
 		If CurrentObjectSubType<>1
@@ -7053,12 +6960,7 @@ Function BuildCurrentObjectModel()
 
 
 		EntityTexture CurrentObjectModel,Springtexture
-		
-	Else If CurrentObjectModelName$="!FlipBridge"
-		CurrentObjectModel=CreateCube()
-		ScaleMesh CurrentObjectModel,.35,.1,.5
-		CurrentObjectYawAdjust=(-45*CurrentObjectData(2) +3600) Mod 360
-		
+	
 	Else If CurrentObjectModelName$="!Door"
 		CurrentObjectModel=MyLoadmesh("data\models\houses\door01.3ds",0)
 	Else If CurrentObjectModelName$="!Square"
@@ -7163,8 +7065,6 @@ Function BuildCurrentObjectModel()
 		RotateEntity CurrentObjectModel,0,0,0
 		TurnEntity CurrentObjectModel,CurrentObjectPitchAdjust,0,CurrentObjectRollAdjust
 		TurnEntity CurrentObjectModel,0,CurrentObjectYawAdjust,0
-		
-		If CurrentObjectModelName$="!Kaboom" Or CurrentObjectModelName$="!Crab" Then TurnEntity CurrentObjectModel,0,90,0
 
 
 	;	PositionEntity CurrentObjectModel,CurrentObjectXAdjust,CurrentObjectZAdjust+CurrentObjectZ,-CurrentObjectYAdjust
@@ -8207,20 +8107,11 @@ Function LoadLevel(levelnumber)
 		Else If ObjectModelName$(Dest)="!Crab"
 			ObjectEntity(Dest)=CopyEntity(CrabMesh)
 			If ObjectSubType(Dest)=0 Then EntityTexture ObjectEntity(Dest),CrabTexture2
-		Else If ObjectModelName$(Dest)="!Retrolasergate"
-			ObjectEntity(Dest)=Createretrolasergatemesh(ObjectData(Dest,0))
 		Else If ObjectModelName$(Dest)="!Busterfly"
 			ObjectEntity(Dest)=CopyEntity(busterflyMesh)
 			
 		Else If ObjectModelName$(Dest)="!Rubberducky"
 			ObjectEntity(Dest)=CopyEntity(rubberduckymesh)
-			
-		Else If ObjectModelName$(Dest)="!Kaboom"
-			ObjectEntity(Dest)=CopyEntity(KaboomMesh)
-			
-
-		Else If ObjectModelName$(Dest)="!BabyBoomer"
-			ObjectEntity(Dest)=CopyEntity(KaboomMesh)
 			
 		Else If ObjectModelName$(Dest)="!GlowWorm"  Or ObjectModelName$(Dest)="!Zipper"
 			ObjectEntity(Dest)=CreateSphere(12)
@@ -8240,15 +8131,6 @@ Function LoadLevel(levelnumber)
 
 
 		;	RotateEntity ObjectEntity(Dest),0,90*ObjectData(Dest,0),0
-		
-		Else If ObjectModelName$(Dest)="!FlipBridge"
-			ObjectEntity(Dest)=CreateCube()
-			ScaleMesh ObjectEntity(Dest),.35,.1,.5
-			
-
-
-
-		;
 		
 		Else If ObjectModelName$(Dest)="!Obstacle10"
 			ObjectEntity(Dest)=CopyEntity(  ObstacleMesh(10)  )
@@ -8445,8 +8327,6 @@ Function LoadLevel(levelnumber)
 	
 			TurnEntity ObjectEntity(Dest),ObjectPitchAdjust(Dest),0,ObjectRollAdjust(Dest)
 			TurnEntity ObjectEntity(Dest),0,ObjectYawAdjust(Dest),0
-			
-			If ObjectModelName$(Dest)="!Kaboom" Or ObjectModelName$(Dest)="!Crab" Then TurnEntity ObjectEntity(Dest),0,90,0
 			
 			EndIf
 		EndIf
@@ -8677,44 +8557,6 @@ Function CreateColourGateMesh(subtype,tex)
 	EntityTexture Entity,GateTexture
 	Return Entity
 
-End Function
-
-Function CreateRetroLaserGateMesh(col)
-		
-	
-	; create the mesh if laser gate
-	Entity=CreateMesh() 
-	cyl=CreateCylinder (6,False) ; an individual cylinder
-	ScaleMesh cyl,0.05,0.5,0.05
-	RotateMesh cyl,0,0,90
-	PositionMesh cyl,0,.25,0.0
-	AddMesh cyl,Entity
-	PositionMesh cyl,0,-.375,.2165
-	AddMesh cyl,Entity
-	PositionMesh cyl,0,0,-.433
-	AddMesh cyl,Entity
-	FreeEntity cyl
-	
-	EntityAlpha Entity,0.5
-	
-	If col=0
-		EntityColor Entity,255,0,0
-	Else If col=1
-		EntityColor Entity,255,128,0
-	Else If col=2
-		EntityColor Entity,255,255,0
-	Else If col=3
-		EntityColor Entity,0,255,0
-	Else If col=4
-		EntityColor Entity,0,255,255
-	Else If col=5
-		EntityColor Entity,0,0,255
-	Else 
-		EntityColor Entity,255,0,255
-	EndIf
-	
-	Return Entity
-	
 End Function
 
 Function CreateTransporterMesh(tex,subtype)
@@ -12176,7 +12018,7 @@ Include "particles.bb"
 
 
 .winning
-Data "None (e.g. collect star)","Rescue All Stinkers","Capture/Destroy Scritters","Collect All Gems","Destroy All Bricks","Destroy FireFlowers","Race","Capture/Destroy Crabs","Rescue All BabyBoomers"
+Data "None (e.g. collect star)","Rescue All Stinkers","Capture/Destroy Scritters","Collect All Gems","Destroy All Bricks","Destroy FireFlowers","Race","Capture All Crabs"
 Data "Done"
 	
 .Commands
