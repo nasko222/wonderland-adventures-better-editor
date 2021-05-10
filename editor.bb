@@ -11,7 +11,7 @@
 
 Include "particles-define.bb"
 
-Global VersionText$="WA 0.96 Editor (BetterEditor Mod Build 8)"
+Global VersionText$="WA 0.96 Editor (BetterEditor Mod Build 9)"
 
 Global MASTERUSER=False
 Global LeftMouse,LeftMouseReleased,RightMouse,RightMouseReleased
@@ -5865,8 +5865,8 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(0)<0 CurrentObjectData(0)=0
 		EndIf
 		If CurrentObjectModelName$="!CustomItem"
-			If CurrentObjectData(0)<0 CurrentObjectData(0)=62
-			If CurrentObjectData(0)>62 CurrentObjectData(0)=0
+			If CurrentObjectData(0)<-64 CurrentObjectData(0)=63
+			If CurrentObjectData(0)>63 CurrentObjectData(0)=-64
 		EndIf
 		If CurrentObjectModelName$="!Gem"
 			If CurrentObjectData(0)>2 CurrentObjectData(0)=0
