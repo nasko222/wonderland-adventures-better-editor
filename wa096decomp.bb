@@ -76,7 +76,7 @@ Field f7#
 Field f8#
 End Type
 
-AppTitle "Wonderland Adventures [DECOMPILE BUILD #7]",""
+AppTitle "[DECOMPILE BUILD #08]",""
 
 Global particlemesh
 Global particlesurface
@@ -729,7 +729,7 @@ Global altx.altxtype=New altxtype
 Dim consoledata(6)
 oldgfxwindowed=gfxwindowed
 Graphics3D gfxwidth,gfxheight,gfxdepth,gfxwindowed
-SetFont LoadFont("courier", 15)
+
 SetBuffer BackBuffer()
 HidePointer
 v4=ReadFile(globaldirname+"\global.wdf")
@@ -935,7 +935,6 @@ Repeat
 			messagelinetext1="Sorry. I don't have the"
 			messagelinetext2="key to the Vault ;-)"
 			messagelinetimer=100
-			midnightvault=4
 		Else If ((((KeyDown(2) Or (KeyDown(4))) Or (KeyDown(5))) Or (KeyDown(8))) Or (KeyDown(10))) Then
 			midnightvault=0
 		End If
@@ -7312,28 +7311,28 @@ Function controlplayeringame(a0)
 		If ((playercontrolmode=0 And (gamemode=0)) And (objectmovementtimer(a0)=0)) Then
 			v5=0
 			v6=0
-			If (KeyDown(71) Or ((KeyDown(200) And (KeyDown(203)))) Or (KeyDown(17) And (KeyDown(30)))) Then
+			If (KeyDown(71) Or ((KeyDown(200) And (KeyDown(203))))) Then
 				v5=-1
 				v6=-1
-			Else If (KeyDown(73) Or ((KeyDown(200) And (KeyDown(205)))) Or (KeyDown(17) And (KeyDown(32)))) Then
+			Else If (KeyDown(73) Or ((KeyDown(200) And (KeyDown(205))))) Then
 				v5=1
 				v6=-1
-			Else If (KeyDown(79) Or ((KeyDown(208) And (KeyDown(203)))) Or (KeyDown(31) And (KeyDown(30)))) Then
+			Else If (KeyDown(79) Or ((KeyDown(208) And (KeyDown(203))))) Then
 				v5=-1
 				v6=1
-			Else If (KeyDown(81) Or ((KeyDown(205) And (KeyDown(208)))) Or (KeyDown(32) And (KeyDown(31)))) Then
+			Else If (KeyDown(81) Or ((KeyDown(205) And (KeyDown(208))))) Then
 				v5=1
 				v6=1
-			Else If (KeyDown(72) Or (KeyDown(200)) Or (KeyDown(17))) Then
+			Else If (KeyDown(72) Or (KeyDown(200))) Then
 				v5=0
 				v6=-1
-			Else If (KeyDown(205) Or (KeyDown(77)) Or (KeyDown(32))) Then
+			Else If (KeyDown(205) Or (KeyDown(77))) Then
 				v5=1
 				v6=0
-			Else If (KeyDown(208) Or (KeyDown(80)) Or (KeyDown(31))) Then
+			Else If (KeyDown(208) Or (KeyDown(80))) Then
 				v5=0
 				v6=1
-			Else If (KeyDown(203) Or (KeyDown(75)) Or (KeyDown(30))) Then
+			Else If (KeyDown(203) Or (KeyDown(75))) Then
 				v5=-1
 				v6=0
 			End If

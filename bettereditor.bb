@@ -738,7 +738,6 @@ Global altx.altxtype=New altxtype
 Dim consoledata(6)
 oldgfxwindowed=gfxwindowed
 Graphics3D gfxwidth,gfxheight,gfxdepth,gfxwindowed
-SetFont LoadFont("courier", 15)
 SetBuffer BackBuffer()
 HidePointer
 v4=ReadFile(globaldirname+"\global.wdf")
