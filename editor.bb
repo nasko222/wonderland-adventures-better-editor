@@ -4651,7 +4651,7 @@ Function DisplayObjectAdjuster(i)
 			If CurrentObjectData(1)=0
 				tex$="Awake"
 			Else If CurrentObjectData(1)=1
-				tex$="Curious"
+				tex$="Reversed"
 			Else If CurrentObjectData(1)=2
 				tex$="Asleep"
 			Else If CurrentObjectData(1)=3

@@ -12254,7 +12254,7 @@ Function controlcrab(a0)
 			Case 0
 				objectmovementtype(a0)=0
 			Case 1
-				objectmovementtype(a0)=14
+				objectmovementtype(a0)=32
 			Case 2,3
 				objectmovementtype(a0)=0
 				AnimateMD2 objectentity(a0),3,1.0,48,49,0.0
@@ -12269,7 +12269,7 @@ Function controlcrab(a0)
 			Case 0
 				objectmovementtype(a0)=32
 			Case 1
-				objectmovementtype(a0)=14
+				objectmovementtype(a0)=0
 			Case 2,3
 				objectmovementtype(a0)=0
 				AnimateMD2 objectentity(a0),3,1.0,48,49,0.0
@@ -12352,6 +12352,11 @@ Function controlcrab(a0)
 				End If
 			End If
 		Case 1
+			If (objectsubtype(a0)=1 And (objectstatus(a0)=0)) Then
+				If (Abs(objecttilex(a0)-objecttilex(playerobject))<4 And (Abs(objecttiley(a0)-objecttiley(playerobject))<6)) Then
+					objectmovementtype(a0)=14
+				End If
+			End If
 		Case 2
 			If (Abs(objecttilex(a0)-objecttilex(playerobject))<4 And (Abs(objecttiley(a0)-objecttiley(playerobject))<4)) Then
 				vacateobjecttile(a0)
