@@ -11,7 +11,7 @@
 
 Include "particles-define.bb"
 
-Global VersionText$="WA 0.96 Editor (BetterEditor Mod Build 8)"
+Global VersionText$="WA 0.96 Editor (BetterEditor Mod Build 9)"
 
 Global MASTERUSER=False
 Global LeftMouse,LeftMouseReleased,RightMouse,RightMouseReleased
@@ -683,6 +683,42 @@ Global KaboomTexture=myLoadTexture("data\models\kaboom\kaboom01.jpg",1)
 EntityTexture KaboomMesh,KaboomTexture
 HideEntity KaboomMesh
 
+; Tentacle
+Global TentacleMesh=myLoadMesh("data\models\trees\tentacle.b3d",0)
+Global TentacleTexture = myLoadTexture ("data\models\trees\tentacle.jpg",1)
+
+EntityTexture tentaclemesh,tentacletexture
+HideEntity TentacleMesh
+
+; Retrostuff
+Global RetroBoxMesh=myLoadMesh("data\models\retro\box.3ds",0)
+Global RetroBoxTexture=myLoadTexture("data\models\retro\woodbox.bmp",1)
+EntityTexture Retroboxmesh,retroboxtexture
+HideEntity RetroBoxMesh
+Global RetroCoilyMesh=myLoadMD2("data\models\retro\coily.md2")
+Global RetroCoilyTexture=myLoadTexture("data\models\retro\coily.bmp",1)
+EntityTexture Retrocoilymesh,retrocoilytexture
+HideEntity RetroCoilyMesh
+Global RetroScougeMesh=myLoadMesh("data\models\retro\scouge.3ds",0)
+Global RetroScougeTexture=myLoadTexture("data\models\retro\scouge3.bmp",1)
+EntityTexture Retroscougemesh,retroscougetexture
+RotateMesh RetroScougeMesh,-90,0,0
+RotateMesh RetroScougeMesh,0,-90,0
+HideEntity RetroScougeMesh
+Global RetroUfoMesh=myLoadMesh("data\models\retro\ufo.3ds",0)
+Global RetroUfoTexture=myLoadTexture("data\models\retro\ufo.bmp",1)
+EntityTexture retroufomesh,retroufotexture
+RotateMesh RetroUFOMesh,-90,0,0
+RotateMesh RetroUFOMesh,0,-90,0
+HideEntity RetroUFOMesh
+Global RetroZbotMesh=myLoadMesh("data\models\retro\zbot.3ds",0)
+Global RetroZbotTexture=myLoadTexture("data\models\retro\zbot.bmp",1)
+EntityTexture retrozbotmesh,retrozbottexture
+RotateMesh RetrozbotMesh,-90,0,0
+RotateMesh RetrozbotMesh,0,90,0
+HideEntity RetrozbotMesh
+Global RetroRainbowCoinTexture=myLoadTexture("data\models\retro\rainbowcoin.bmp",1)
+
 ; Turtles
 Global TurtleMesh=MyLoadMesh("data\models\turtle\dragonturtle2.3ds",0)
 RotateMesh TurtleMesh,-90,0,0
@@ -888,7 +924,12 @@ ObstacleMesh(41)=myLoadMesh("data\models\houses\windmill_main.b3d",0)
 HideEntity ObstacleMesh(41)
 
 ObstacleMesh(42)=myLoadMesh("data\models\houses\windmill_rotor.b3d",0)
-	HideEntity ObstacleMesh(42)
+HideEntity ObstacleMesh(42)
+	
+ObstacleMesh(46)=myLoadMesh("data\models\houses\bridge.3ds",0)
+ObstacleTexture(46)=myLoadTexture("data\models\cage\cage.jpg",1)
+EntityTexture ObstacleMesh(46),ObstacleTexture(46)
+HideEntity ObstacleMesh(46)
 
 Global Fence1=MyLoadmesh("data\models\houses\fence.3ds",0)
 HideEntity Fence1
@@ -4183,10 +4224,6 @@ Function DisplayObjectAdjuster(i)
 				tex$="GlowGem"
 			Else If CurrentObjectSubType=-4
 				tex$="Spy-Eye"
-			Else If CurrentObjectSubType=-5
-				tex$="Glyph"
-			Else If CurrentObjectSubType=-6
-				tex$="MapPiece"
 			Else If CurrentObjectSubType=-99
 				tex$="Whistle"
 			EndIf
@@ -4280,7 +4317,7 @@ Function DisplayObjectAdjuster(i)
 	Case "Data0"
 		tex$=Str$(CurrentObjectData(0))
 		
-		If CurrentObjectModelName$="!Scritter" Or CurrentObjectModelName$="!Cuboid" Or CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectTextureName$="!GloveTex"  Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage"  Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge"
+		If CurrentObjectModelName$="!Retrolasergate" Or CurrentObjectModelName$="!Cuboid" Or CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectTextureName$="!GloveTex"  Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage"  Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge"
 			tex2$="Colour"
 		EndIf
 		
@@ -4408,7 +4445,7 @@ Function DisplayObjectAdjuster(i)
 				tex$="NorthWest"
 			End Select
 		EndIf
-		If CurrentObjectModelName$="!Turtle"
+		If CurrentObjectModelName$="!Turtle" Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectType<>424)
 			tex2$="Direction"
 			
 			Select CurrentObjectData(0)
@@ -4614,7 +4651,7 @@ Function DisplayObjectAdjuster(i)
 			If CurrentObjectData(1)=0
 				tex$="Awake"
 			Else If CurrentObjectData(1)=1
-				tex$="Curious"
+				tex$="Reversed"
 			Else If CurrentObjectData(1)=2
 				tex$="Asleep"
 			Else If CurrentObjectData(1)=3
@@ -5714,12 +5751,12 @@ Function AdjustObjectAdjuster(i)
 		If RightMouse=True Then CurrentObjectSubType=CurrentObjectSubType-1
 		
 		If CurrentObjectModelName$="!CustomItem"
-			If CurrentObjectSubType=-7
+			If CurrentObjectSubType=-5
 				CurrentObjectSubType=-99
 			Else If CurrentObjectSubType=-100
 				CurrentObjectSubType=27
 			Else If CurrentObjectSubType=-98
-				CurrentObjectSubType=-6
+				CurrentObjectSubType=-4
 			Else If CurrentObjectSubType=28
 				CurrentObjectSubType=-99
 			Else If CurrentObjectSubType=8
@@ -5865,8 +5902,8 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(0)<0 CurrentObjectData(0)=0
 		EndIf
 		If CurrentObjectModelName$="!CustomItem"
-			If CurrentObjectData(0)<0 CurrentObjectData(0)=62
-			If CurrentObjectData(0)>62 CurrentObjectData(0)=0
+			If CurrentObjectData(0)<-64 CurrentObjectData(0)=63
+			If CurrentObjectData(0)>63 CurrentObjectData(0)=-64
 		EndIf
 		If CurrentObjectModelName$="!Gem"
 			If CurrentObjectData(0)>2 CurrentObjectData(0)=0
@@ -5891,7 +5928,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(0)>7 CurrentObjectData(0)=0
 			If CurrentObjectData(0)<0 CurrentObjectData(0)=7
 		EndIf
-		If CurrentObjectModelName$="!Turtle"
+		If CurrentObjectModelName$="!Turtle"  Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectType<>424)
 			If CurrentObjectData(0)>3 CurrentObjectData(0)=0
 			If CurrentObjectData(0)<0 CurrentObjectData(0)=3
 		EndIf
@@ -6958,6 +6995,8 @@ Function BuildCurrentObjectModel()
 	Else If CurrentObjectModelName$="!Thwart"
 		CurrentObjectModel=CopyEntity(ThwartMesh)
 		EntityTexture CurrentObjectModel,ThwartTexture(CurrentObjectData(2))
+	Else If CurrentObjectModelName$="!Tentacle"
+		CurrentObjectModel=CopyEntity(TentacleMesh)
 	Else If CurrentObjectModelName$="!Crab"
 		CurrentObjectModel=CopyEntity(CrabMesh)
 		If CurrentObjectSubType=0 Then EntityTexture CurrentObjectModel,CrabTexture2
@@ -7022,6 +7061,29 @@ Function BuildCurrentObjectModel()
 	Else If CurrentObjectModelName$="!Coin"
 		CurrentObjectModel=CopyEntity(CoinMesh)
 		EntityTexture CurrentObjectModel,GoldCoinTexture
+		If CurrentObjectType=425 EntityTexture CurrentObjectModel,Retrorainbowcointexture
+		
+	Else If CurrentObjectModelName$="!Retrobox"
+		CurrentObjectModel=CopyEntity(RetroBoxMesh)
+		
+	Else If CurrentObjectModelName$="!Retrocoily"
+		CurrentObjectModel=CopyEntity(RetroCoilyMesh)
+		
+	Else If CurrentObjectModelName$="!Retroscouge"
+		CurrentObjectModel=CopyEntity(RetroScougeMesh)
+		CurrentObjectYawAdjust=(-90*CurrentObjectData(0) +3600) Mod 360
+	
+	Else If CurrentObjectModelName$="!Retrozbot"
+		CurrentObjectModel=CopyEntity(RetroZbotMesh)
+		CurrentObjectYawAdjust=(-90*CurrentObjectData(0) +3600) Mod 360
+		
+	Else If CurrentObjectModelName$="!Retroufo"
+		CurrentObjectModel=CopyEntity(RetroUFOMesh)
+		CurrentObjectYawAdjust=(-90*CurrentObjectData(0) +3600) Mod 360
+	
+	Else If CurrentObjectModelName$="!Retrolasergate"
+		CurrentObjectModel=CreateretrolasergateMesh(Currentobjectdata(0))
+		
 	Else If CurrentObjectModelName$="!Token"
 		CurrentObjectModel=CopyEntity(CoinMesh)
 		EntityTexture CurrentObjectModel,TokenCoinTexture
@@ -8201,12 +8263,34 @@ Function LoadLevel(levelnumber)
 		Else If ObjectModelName$(Dest)="!Thwart"
 			ObjectEntity(Dest)=CopyEntity(ThwartMesh)
 			EntityTexture ObjectEntity(Dest),ThwartTexture(ObjectData(Dest,0))
+		
+		Else If ObjectModelName$(Dest)="!Tentacle"
+			ObjectEntity(Dest)=CopyEntity(TentacleMesh)
 
 		Else If ObjectModelName$(Dest)="!FireFlower"
 			ObjectEntity(Dest)=CopyEntity(FireFlowerMesh)
 		Else If ObjectModelName$(Dest)="!Crab"
 			ObjectEntity(Dest)=CopyEntity(CrabMesh)
 			If ObjectSubType(Dest)=0 Then EntityTexture ObjectEntity(Dest),CrabTexture2
+			
+		Else If ObjectModelName$(Dest)="!Retrobox"
+			ObjectEntity(Dest)=CopyEntity(RetroBoxMesh)
+			
+		Else If ObjectModelName$(Dest)="!Retrocoily"
+			ObjectEntity(Dest)=CopyEntity(RetroCoilyMesh)
+			
+		Else If ObjectModelName$(Dest)="!Retroscouge"
+			ObjectEntity(Dest)=CopyEntity(RetroScougeMesh)
+			ObjectYawAdjust(Dest)=(-90*ObjectData(Dest,0) +3600) Mod 360
+		
+		Else If ObjectModelName$(Dest)="!Retrozbot"
+			ObjectEntity(Dest)=CopyEntity(RetroZbotMesh)
+			ObjectYawAdjust(Dest)=(-90*ObjectData(Dest,0) +3600) Mod 360
+
+		Else If ObjectModelName$(Dest)="!Retroufo"
+			ObjectEntity(Dest)=CopyEntity(RetroUFOMesh)
+			ObjectYawAdjust(Dest)=(-90*ObjectData(Dest,0) +3600) Mod 360
+			
 		Else If ObjectModelName$(Dest)="!Retrolasergate"
 			ObjectEntity(Dest)=Createretrolasergatemesh(ObjectData(Dest,0))
 		Else If ObjectModelName$(Dest)="!Busterfly"
@@ -8270,6 +8354,7 @@ Function LoadLevel(levelnumber)
 		Else If ObjectModelName$(Dest)="!Coin"
 			ObjectEntity(Dest)=CopyMesh(CoinMesh)
 			EntityTexture ObjectEntity(Dest),GoldCoinTexture
+			If ObjectType(Dest)=425 Then EntityTexture ObjectEntity(Dest),RetroRainbowCoinTexture
 		Else If ObjectModelName$(Dest)="!Token"
 			ObjectEntity(Dest)=CopyMesh(CoinMesh)
 			EntityTexture ObjectEntity(Dest),TokenCoinTexture
