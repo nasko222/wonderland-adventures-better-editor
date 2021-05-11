@@ -4076,10 +4076,10 @@ Function loadgame(a0)
 	v4=ReadFile(globaldirname+"\Player Profiles\"+playername+"\SaveFiles\"+a0+"\wla")
 	v5$=ReadString(v4)
 	CloseFile(v4)
-	If currentspell>0 Then
+	If currentspell>=0 Then
 		createicon(0,0,16+currentspell,1002+currentspell,"- "+currentspellpower+"-","Activate")
 	End If
-	If currentspell=0 Then
+	If currentspell=0 And currentspellpower=0 Then
 		deleteicon(0)
 	End If
 	If currentcharm=0 Then
@@ -13789,6 +13789,16 @@ Function activatecommand(a0,a1,a2,a3,a4)
 		delaycommand=115
 		playsoundfxnow(42)
 		startmenu(8)
+	Case 211
+		inventorysize=1
+	Case 212
+		inventorysize=2
+	Case 213
+		inventorysize=3
+	Case 216
+		inventorysize=6
+	Case 217
+		inventorysize=7
 	End Select
 End Function
 
@@ -14367,28 +14377,63 @@ Function activateicon(a0,a1)
 				swapitem(a0)
 			End If
 		Else If a1=1 Then
-			Select currentspell
-			Case -1,0
+			If currentspellpower<=0 Then
 				playsoundfx(175,-1,-1)
 				messagelinetext1="It's a pair of Rainbow Gloves."
 				messagelinetext2="They are currently not charged."
 				messagelinetimer=100
+			Else If currentspell < 0 Then
+				playsoundfx(176,-1,-1)
+				messagelinetext1="These gloves are charged"
+				messagelinetext2="with an unknown destructive magic!"
+				messagelinetimer=100
+			Else Select currentspell
+			Case 3
+				playsoundfx(176,-1,-1)
+				messagelinetext1="These gloves are charged"
+				messagelinetext2="with 'Green' Magic!"
+				messagelinetimer=100
+			Case 5
+				playsoundfx(176,-1,-1)
+				messagelinetext1="These gloves are charged"
+				messagelinetext2="with 'Indigo' Magic!"
+				messagelinetimer=100
 			Case 4
 				playsoundfx(176,-1,-1)
 				messagelinetext1="These gloves are charged"
-				messagelinetext2="with 'Brr' Power!"
+				messagelinetext2="with 'Brr' Magic!"
 				messagelinetimer=100
 			Case 6
 				playsoundfx(176,-1,-1)
 				messagelinetext1="These gloves are charged"
-				messagelinetext2="with 'Blink' Power!"
+				messagelinetext2="with 'Blink' Magic!"
+				messagelinetimer=100
+			Case 2
+				playsoundfx(176,-1,-1)
+				messagelinetext1="These gloves are charged"
+				messagelinetext2="with 'Pop' Magic!"
+				messagelinetimer=100
+			Case 1
+				playsoundfx(176,-1,-1)
+				messagelinetext1="These gloves are charged"
+				messagelinetext2="with 'Pow' Magic!"
+				messagelinetimer=100
+			Case 0
+				playsoundfx(176,-1,-1)
+				messagelinetext1="These gloves are charged"
+				messagelinetext2="with 'Crimson' Magic!"
 				messagelinetimer=100
 			Case 7
 				playsoundfx(176,-1,-1)
 				messagelinetext1="These gloves are charged"
-				messagelinetext2="with 'Pop' Power!"
+				messagelinetext2="with 'Null' Magic!"
 				messagelinetimer=100
-			End Select
+			Default
+				playsoundfx(176,-1,-1)
+				messagelinetext1="These gloves are charged"
+				messagelinetext2="with an unknown magic!"
+				messagelinetimer=100
+			End Select End If
 		Else If a1=2 Then
 			gamemode=6
 			v3=Floor(a0/10)-1.0
@@ -14553,20 +14598,32 @@ Function activateicon(a0,a1)
 			inventoryswapicon=a0
 		End If
 	Case 3011
-		addparticle(4,objectx(playerobject),0.1,-objecty(playerobject),0.0,1.0,0.0,0.0,0.0,0.0,0.05,0.0,0.0,0.0,60,4)
-		Animate GetChild(objectentity(playerobject),3),3,0.3,8,0.0
-		;v5=0
-		For v5=0 To nofobjects-1
-			If ((objecttype(v5)=120 And ((objectsubtype(v5)=0 Or (objectsubtype(v5)=3)))) And (objectexists(v5)=1)) Then
-				If (Abs(objecttilex(v5)-objecttilex(playerobject))<=3 And (Abs(objecttiley(v5)-objecttiley(playerobject))<=3)) Then
-					objectsubtype(v5)=1
-					objectmovementtype(v5)=14
-					EntityTexture objectentity(v5),stinkerweetexture,0,0
-				End If
+		If gamemode=6 Then
+			If inventoryswapicon<>a0 Then
+				swapitem(a0)
 			End If
-			;v5=v5+1
-		Next
-		closerucksack(8)
+		Else If a1=1 Then
+			addparticle(4,objectx(playerobject),0.1,-objecty(playerobject),0.0,1.0,0.0,0.0,0.0,0.0,0.05,0.0,0.0,0.0,60,4)
+			Animate GetChild(objectentity(playerobject),3),3,0.3,8,0.0
+			;v5=0
+			For v5=0 To nofobjects-1
+				If ((objecttype(v5)=120 And ((objectsubtype(v5)=0 Or (objectsubtype(v5)=3)))) And (objectexists(v5)=1)) Then
+					If (Abs(objecttilex(v5)-objecttilex(playerobject))<=3 And (Abs(objecttiley(v5)-objecttiley(playerobject))<=3)) Then
+						objectsubtype(v5)=1
+						objectmovementtype(v5)=14
+						EntityTexture objectentity(v5),stinkerweetexture,0,0
+					End If
+				End If
+				;v5=v5+1
+			Next
+			closerucksack(8)
+		Else If a1=2 Then
+			gamemode=6
+			v3=Floor(a0/10)-1.0
+			v4=a0 Mod 10-(9-inventorysize)
+			inventoryswapitem=v3*inventorysize+v4
+			inventoryswapicon=a0
+		End If
 	Case 3021
 		If gamemode=6 Then
 			If inventoryswapicon<>a0 Then
@@ -14810,14 +14867,26 @@ Function openrucksack(a0)
 	For v3=1 To inventorysize
 		;v4=9-inventorysize
 		For v4=9-inventorysize To 8
-			createicon(v4,v3,inventorytexture(v2),inventoryitem(v2),inventorysubtext(v2),inventoryhelptext(v2))
+			If (iconsize((v3*10+v4))>0 And (iconsize((v3*10+v4)) Mod 2=0)) Then
+				iconsize((v3*10+v4))=1001
+			Else
+				createicon(v4,v3,inventorytexture(v2),inventoryitem(v2),inventorysubtext(v2),inventoryhelptext(v2))
+			End If
 			v2=v2+1
 			;v4=v4+1
 		Next
 		;v3=v3+1
 	Next
-	createicon(7,inventorysize+1,6,-1,"","")
-	createicon(8,inventorysize+1,7,-1,"","")
+	If (iconsize((v3*10+v4))>0 And (iconsize((v3*10+v4)) Mod 2=0)) Then
+		iconsize(((inventorysize+1)*10+7))=1001
+	Else
+		createicon(7,inventorysize+1,6,-1,"","")
+	End If
+	If (iconsize((v3*10+v4))>0 And (iconsize((v3*10+v4)) Mod 2=0)) Then
+		iconsize(((inventorysize+1)*10+8))=1001
+	Else
+		createicon(8,inventorysize+1,7,-1,"","")
+	End If
 	gamemode=5
 End Function
 
