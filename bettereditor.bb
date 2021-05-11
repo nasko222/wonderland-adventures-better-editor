@@ -5618,7 +5618,11 @@ Function adjustleveltilelogic(a0,a1,a2)
 			objecttilelogic(a0,a1)=objecttilelogic(a0,a1)+32.0
 		End If
 	Case 160,165
-		If (objecttexturename(a2)<>"!Cottage" And (objecttexturename(a2)<>"!Townhouse")) Then
+		If objectmodelname(a2)="!Obstacle46" Then
+			If (objectzadjust(a2)>-1.0 And (objectzadjust(a2)<1.0)) Then
+				leveltilelogic(a0,a1)=0
+			End If
+		Else If (objecttexturename(a2)<>"!Cottage" And (objecttexturename(a2)<>"!Townhouse")) Then
 			leveltilelogic(a0,a1)=1
 		End If
 	Case 170,171,172,173,174,175,176,177,178,179,425
@@ -18755,6 +18759,10 @@ Function preloadmodels()
 	HideEntity obstaclemesh(41)
 	obstaclemesh(42)=myloadmesh("data\models\houses\windmill_rotor.b3d",0)
 	HideEntity obstaclemesh(42)
+	ObstacleMesh(46)=myLoadMesh("data\models\houses\bridge.3ds",0)
+	ObstacleTexture(46)=myLoadTexture("data\models\cage\cage.jpg",1)
+	EntityTexture ObstacleMesh(46),ObstacleTexture(46)
+	HideEntity ObstacleMesh(46)
 	buttontexture=myloadtexture("data/graphics/buttons1.bmp",4)
 	gatetexture=myloadtexture("data/graphics/gates.bmp",1)
 	adventuretitlebackgroundtex=myloadtexture("data\graphics\logos\starpaper.jpg",1)
