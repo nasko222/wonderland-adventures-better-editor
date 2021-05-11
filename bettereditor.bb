@@ -497,6 +497,19 @@ Global rubberduckytexture
 Global springtexture
 Global voidtexture
 Global thwartmesh
+Global tentaclemesh
+Global tentacletexture
+Global retroboxmesh
+Global retroboxtexture
+Global retrocoilymesh
+Global retrocoilytexture
+Global retroscougemesh
+Global retroscougetexture
+Global retroufomesh
+Global retroufotexture
+Global retrozbotmesh
+Global retrozbottexture
+Global retrorainbowcointexture
 Dim obstaclemesh(50)
 Dim obstacletexture(50)
 Global cylinder
@@ -5209,6 +5222,9 @@ Function loadobject(a0,a1,a2)
 			EntityTexture objectentity(v1),thwarttexture(objectdata(v1,0)),0,0
 		Case "!Bowler"
 			objectentity(v1)=CopyEntity(bowlermesh,0)
+		Case "!Tentacle"
+			objectentity(v1)=CopyEntity(tentaclemesh,0)
+			Animate GetChild(objectentity(v1),3),1,0.1,1,0.0
 		Case "!Busterfly"
 			objectentity(v1)=CopyEntity(busterflymesh,0)
 			AnimateMD2 objectentity(v1),2,0.4,2,9,0.0
@@ -5240,6 +5256,9 @@ Function loadobject(a0,a1,a2)
 		Case "!Coin"
 			objectentity(v1)=CopyEntity(coinmesh,0)
 			EntityTexture objectentity(v1),goldcointexture,0,0
+			If objecttype(v1)=425 Then
+				EntityTexture objectentity(v1),retrorainbowcointexture,0,0
+			End If
 		Case "!Token"
 			objectentity(v1)=CopyEntity(coinmesh,0)
 			EntityTexture objectentity(v1),tokencointexture,0,0
@@ -5306,6 +5325,19 @@ Function loadobject(a0,a1,a2)
 			objectentity(v1)=CopyMesh(square,0)
 		Case "!Retrolasergate"
 			objectentity(v1)=createretrolasergatemesh(objectdata(v1,0))
+		Case "!Retrobox"
+			objectentity(v1)=CopyEntity(retroboxmesh,0)
+		Case "!Retrocoily"
+			objectentity(v1)=CopyEntity(retrocoilymesh,0)
+		Case "!Retroscouge"
+			objectentity(v1)=CopyEntity(retroscougemesh,0)
+			objectyawadjust(v1)=(objectdata(v1,0)*(-90)+3600) Mod 360
+		Case "!Retrozbot"
+			objectentity(v1)=CopyEntity(retrozbotmesh,0)
+			objectyawadjust(v1)=(objectdata(v1,0)*(-90)+3600) Mod 360
+		Case "!Retroufo"
+			objectentity(v1)=CopyEntity(retroufomesh,0)
+			objectyawadjust(v1)=(objectdata(v1,0)*(-90)+3600) Mod 360
 		Case "!None"
 			objectentity(v1)=CreatePivot(0)
 		Default
@@ -5581,7 +5613,7 @@ Function adjustleveltilelogic(a0,a1,a2)
 		If objectactive(a2)=1001 Then
 			leveltilelogic(a0,a1)=11
 		End If
-	Case 150
+	Case 150,340
 		If (objecttilelogic(a0,a1) And (32))=0 Then
 			objecttilelogic(a0,a1)=objecttilelogic(a0,a1)+32.0
 		End If
@@ -5589,7 +5621,7 @@ Function adjustleveltilelogic(a0,a1,a2)
 		If (objecttexturename(a2)<>"!Cottage" And (objecttexturename(a2)<>"!Townhouse")) Then
 			leveltilelogic(a0,a1)=1
 		End If
-	Case 170,171,172,173,174,175,176,177,178,179
+	Case 170,171,172,173,174,175,176,177,178,179,425
 		If (((objecttilelogic(a0,a1) And (16)))=0 And (objectactive(a2)=1001)) Then
 			objecttilelogic(a0,a1)=objecttilelogic(a0,a1)+16.0
 		End If
@@ -5621,7 +5653,7 @@ Function adjustleveltilelogic(a0,a1,a2)
 		Else If (((objecttilelogic(a0,a1) And (128)))=0 And (objectactive(a2)>0)) Then
 			objecttilelogic(a0,a1)=objecttilelogic(a0,a1)+128.0
 		End If
-	Case 250,260
+	Case 250,260,420,422,423
 		If (objecttilelogic(a0,a1) And (256))=0 Then
 			objecttilelogic(a0,a1)=objecttilelogic(a0,a1)+256.0
 		End If
@@ -5758,7 +5790,7 @@ Function controlobjects()
 				controlplayer(v2)
 			Case 10
 				controlgate(v2)
-			Case 11
+			Case 11,426
 				controlstargate(v2)
 			Case 20
 				controltrap(v2)
@@ -5883,6 +5915,8 @@ Function controlobjects()
 				controlvoid(v2)
 			Case 330
 				controlwisp(v2)
+			Case 340
+				controltentacle(v2)
 			Case 370
 				controlcrab(v2)
 			Case 390
@@ -5891,8 +5925,16 @@ Function controlobjects()
 				controlbabyboomer(v2)
 			Case 410
 				controlflipbridge(v2)
+			Case 420
+				controlretrocoily(v2)
+			Case 421
+				controlretroscouge(v2)
+			Case 422,423
+				controlretrozbotufo(v2)
 			Case 424
 				controlretrolasergate(v2)
+			Case 425
+				controlretrorainbowcoin(v2)
 			End Select
 			If objectentity(v2)>0 Then
 				ScaleEntity objectentity(v2),v5#,v7#,v6#,0
@@ -6245,6 +6287,8 @@ Function destroyobject(a0,a1)
 			End If
 			Return 0
 		End If
+	Case 420,421,422,423
+		playsoundfx(15,objecttilex(a0),objecttiley(a0))
 	End Select
 	objectexists(a0)=0
 	Select objectdestructiontype(a0)
@@ -6789,7 +6833,7 @@ Function occupyobjecttile(a0,a1,a2)
 	
 	If objectfrozen(a0)>0 Then
 		Select objecttype(a0)
-		Case 1,110,120,150,220,230,250,260,290,370,390,400
+		Case 1,110,120,150,220,230,250,260,290,370,390,400,420,421,422,423
 			If (objecttilelogic(a1,a2) And (1024))=0 Then
 				objecttilelogic(a1,a2)=objecttilelogic(a1,a2)+1024.0
 			End If
@@ -6841,7 +6885,7 @@ Function occupyobjecttile(a0,a1,a2)
 		If (objecttilelogic(a1,a2) And (128))=0 Then
 			objecttilelogic(a1,a2)=objecttilelogic(a1,a2)+128.0
 		End If
-	Case 250,260
+	Case 250,260,420,422,423
 		If (objecttilelogic(a1,a2) And (256))=0 Then
 			objecttilelogic(a1,a2)=objecttilelogic(a1,a2)+256.0
 		End If
@@ -6887,7 +6931,7 @@ Function vacateobjecttile(a0)
 	v2=objecttiley(a0)
 	If objectfrozen(a0)>0 Then
 		Select objecttype(a0)
-		Case 1,110,120,150,220,230,250,260,290,370,390,400
+		Case 1,110,120,150,220,230,250,260,290,370,390,400,420,421,422,423
 			If (objecttilelogic(v1,v2) And (1024))>0 Then
 				objecttilelogic(v1,v2)=objecttilelogic(v1,v2)-1024.0
 			End If
@@ -6939,7 +6983,7 @@ Function vacateobjecttile(a0)
 		If (objecttilelogic(v1,v2) And (128))>0 Then
 			objecttilelogic(v1,v2)=objecttilelogic(v1,v2)-128.0
 		End If
-	Case 250,260
+	Case 250,260,420,422,423
 		If (objecttilelogic(v1,v2) And (256))>0 Then
 			objecttilelogic(v1,v2)=objecttilelogic(v1,v2)-256.0
 		End If
@@ -6958,27 +7002,12 @@ Function endmovetilecheck(a0,a1,a2)
 	Select leveltilelogic(objecttilex(a0),objecttiley(a0))
 	Case 0
 	Case 1
-		If (((((((((objecttype(a0)=1 Or (objecttype(a0)=110)) Or (objecttype(a0)=120)) Or (objecttype(a0)=150)) Or (objecttype(a0)=220)) Or (objecttype(a0)=250)) Or (objecttype(a0)=260)) Or (objecttype(a0)=290)) Or (objecttype(a0)=390)) Or (objecttype(a0)=400)) Then
+		If ((((((((((((objecttype(a0)=1 Or (objecttype(a0)=110)) Or (objecttype(a0)=120)) Or (objecttype(a0)=150)) Or (objecttype(a0)=220)) Or (objecttype(a0)=250)) Or (objecttype(a0)=260)) Or (objecttype(a0)=290)) Or (objecttype(a0)=390)) Or (objecttype(a0)=400)) Or (objecttype(a0)=420)) Or (objecttype(a0)=422)) Or (objecttype(a0)=423)) Then
 			destroyobject(a0,0)
-		End If
-		If (objecttype(a0)=370) Then
-			v0=1
-			;v1=0
-			For v1=0 To nofobjects-1
-				If objecttype(v3)=350 Then
-					If (Floor(objectx(v3))=objecttilex(a0) And (Floor(objecty(v3))=objecttiley(a0))) Then
-						v0=0
-					End If
-				End If
-				;v1=v1+1
-			Next
-			If v0=1 Then
-				destroyobject(a0,0)
-			End If
 		End If
 	Case 2
 		If (objectflying(a0)=0 Or (objectflying(a0)>=20)) Then
-			If ((((((((objecttype(a0)=1 Or (objecttype(a0)=110)) Or (objecttype(a0)=120)) Or (objecttype(a0)=150)) Or ((objecttype(a0)=250 And (objectdata(a0,1)<>1)))) Or (objecttype(a0)=260)) Or (objecttype(a0)=290)) Or (objecttype(a0)=390)) Or (objecttype(a0)=400)) Then
+			If (((((((((objecttype(a0)=1 Or (objecttype(a0)=110)) Or (objecttype(a0)=120)) Or (objecttype(a0)=150)) Or ((objecttype(a0)=250 And (objectdata(a0,1)<>1)))) Or (objecttype(a0)=260)) Or (objecttype(a0)=290)) Or (objecttype(a0)=390)) Or (objecttype(a0)=400)) Or (objecttype(a0)=423)) Then
 				destroyobject(a0,2)
 			End If
 			If ((objecttype(a0)=220 Or (objecttype(a0)=370)) And (objectstatus(a0)=0)) Then
@@ -9003,7 +9032,7 @@ Function controlstargate(a0)
 	Else
 		leveltilelogic(objecttilex(a0),objecttiley(a0))=1
 	End If
-	If objectactive(a0)=1001 Then
+	If (objectactive(a0)=1001 And (objecttype(a0)<>426)) Then
 		If (Abs(objecttilex(a0)-objecttilex(playerobject))<=1 And (Abs(objecttiley(a0)-objecttiley(playerobject))<=1)) Then
 			If objectdata(a0,1)=0 Then
 				If playerstars>=objectdata(a0,0) Then
@@ -11735,7 +11764,7 @@ Function controlspellball(a0)
 					createiceblock(objectx(v5),objecty(v5),v5)
 				End If
 				v9=1
-			Case 170,171,172,173,174,175,176,177,178,179
+			Case 170,171,172,173,174,175,176,177,178,179,425
 				v9=1
 			Case 220
 				If objectstatus(v5)=0 Then
@@ -11790,23 +11819,7 @@ Function controlspellball(a0)
 					End If
 					v9=1
 				End If
-			Case 250
-				If objectsubtype(a0)<2 Then
-					destroyobject(v5,1)
-				End If
-				If objectsubtype(a0)=4 Then
-					createiceblock(objectx(v5),objecty(v5),v5)
-				End If
-				v9=1
-			Case 260
-				If objectsubtype(a0)<2 Then
-					destroyobject(v5,1)
-				End If
-				If objectsubtype(a0)=4 Then
-					createiceblock(objectx(v5),objecty(v5),v5)
-				End If
-				v9=1
-			Case 290
+			Case 250,260,290,420,422,423
 				If objectsubtype(a0)<2 Then
 					destroyobject(v5,1)
 				End If
@@ -11819,6 +11832,10 @@ Function controlspellball(a0)
 					destroyobject(v5,1)
 				End If
 				v9=1
+			Case 340,421
+				If (leveltilelogic(Floor(objectx(v4)),Floor(objecty(v4)))<>13 And (objectactive(v4)>1)) Then
+					v8=1
+				End If
 			End Select
 			If v9=1 Then
 				destroyobject(a0,0)
@@ -12176,6 +12193,53 @@ Function controlvoid(a0)
 	Next
 End Function
 
+Function controltentacle(a0)
+	
+	If objectdata(a0,0)=0 Then
+		objectdata(a0,0)=Rand(-10,10)
+	End If
+	TurnEntity GetChild(objectentity(a0),3),0.0,objectdata(a0,0)/10.0,0.0,0
+	v1=Floor(objectx(a0))
+	v2=Floor(objecty(a0))
+	v3=0
+	;v4=0
+	For v4=0 To nofobjects-1
+		If ((objecttype(v4)=1 Or (objecttype(v4)=110)) Or (objecttype(v4)=120)) Then
+			If (Abs(objecttilex(v4)-Floor(objectx(a0)))<3.0 And (Abs(objecttiley(v4)-Floor(objecty(a0)))<3.0)) Then
+				v3=1
+				v4=nofobjects
+			End If
+		End If
+		;v4=v4+1
+	Next
+	If v3=1 Then
+		If objectactive(a0)>1 Then
+			If objectactive(a0)=1001 Then
+				playsoundfx(112,Floor(objectx(a0)),Floor(objecty(a0)))
+			End If
+			objectactive(a0)=objectactive(a0)-80
+			If objectactive(a0)<1 Then
+				objectactive(a0)=1
+			End If
+			If objectactive(a0)=1 Then
+				If (objecttilelogic(v1,v2) And (32))>0 Then
+					objecttilelogic(v1,v2)=objecttilelogic(v1,v2)-32.0
+				End If
+			End If
+		End If
+	Else
+		If (objectactive(a0)<1001 And ((objectactive(a0)>1 Or (objecttilelogic(Floor(objectx(a0)),Floor(objecty(a0)))=0)))) Then
+			If objectactive(a0)=1 Then
+				playsoundfx(111,Floor(objectx(a0)),Floor(objecty(a0)))
+			End If
+			objectactive(a0)=objectactive(a0)+20
+			If (objecttilelogic(v1,v2) And (32))=0 Then
+				objecttilelogic(v1,v2)=objecttilelogic(v1,v2)+32.0
+			End If
+		End If
+	End If
+End Function
+
 Function controlcrab(a0)
 	
 	If objecttiletypecollision(a0)=0 Then
@@ -12229,17 +12293,13 @@ Function controlcrab(a0)
 	Else If (objectcurrentanim(a0)>=5 And (objectcurrentanim(a0)<20)) Then
 		objectcurrentanim(a0)=objectcurrentanim(a0)+1
 	End If
-	If ((objectfrozen(a0)=1 Or (objectfrozen(a0)=10001)) Or (objectfrozen(a0)=-1)) Then
-		If objectfrozen(a0)=10001 Then
-			objectfrozen(a0)=objectfrozen(a0)+999
-		Else
-			objectfrozen(a0)=objectfrozen(a0)*1000
-		End If
+	If objectfrozen(a0)=1 Then
+		objectfrozen(a0)=objectfrozen(a0)*1000
 		objectpitch(a0)=Rand(-30,30)
 		objectroll(a0)=Rand(-30,30)
 		objectz(a0)=0.3
 	End If
-	If (objectfrozen(a0)=2 Or (objectfrozen(a0)=10002)) Then
+	If objectfrozen(a0)=2 Then
 		objectfrozen(a0)=0
 		objectpitch(a0)=0.0
 		objectroll(a0)=0.0
@@ -12374,16 +12434,12 @@ End Function
 
 Function controlkaboom(a0)
 	
-	If ((objectfrozen(a0)=1 Or (objectfrozen(a0)=10001)) Or (objectfrozen(a0)=-1)) Then
-		If objectfrozen(a0)=10001 Then
-			objectfrozen(a0)=objectfrozen(a0)+999
-		Else
-			objectfrozen(a0)=objectfrozen(a0)*1000
-		End If
+	If objectfrozen(a0)=1 Then
+		objectfrozen(a0)=objectfrozen(a0)*1000
 		objectcurrentanim(a0)=11
 		AnimateMD2 objectentity(a0),3,2.0,31,50,0.0
 	End If
-	If (objectfrozen(a0)=2 Or (objectfrozen(a0)=10002)) Then
+	If objectfrozen(a0)=2 Then
 		objectfrozen(a0)=0
 		objectcurrentanim(a0)=10
 		AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
@@ -12546,16 +12602,12 @@ End Function
 
 Function controlbabyboomer(a0)
 	
-	If ((objectfrozen(a0)=1 Or (objectfrozen(a0)=10001)) Or (objectfrozen(a0)=-1)) Then
-		If objectfrozen(a0)=10001 Then
-			objectfrozen(a0)=objectfrozen(a0)+999
-		Else
-			objectfrozen(a0)=objectfrozen(a0)*1000
-		End If
+	If objectfrozen(a0)=1 Then
+		objectfrozen(a0)=objectfrozen(a0)*1000
 		objectcurrentanim(a0)=11
 		AnimateMD2 objectentity(a0),3,2.0,31,50,0.0
 	End If
-	If (objectfrozen(a0)=2 Or (objectfrozen(a0)=10002)) Then
+	If objectfrozen(a0)=2 Then
 		objectfrozen(a0)=0
 		objectcurrentanim(a0)=10
 		AnimateMD2 objectentity(a0),0,0.2,1,2,0.0
@@ -13052,6 +13104,239 @@ Function checkflipbridgedestination(a0,a1)
 		Return 1
 	End If
 	Return 0
+End Function
+
+Function controlretrozbotufo(a0)
+	
+	;v1=0
+	For v1=0 To nofobjects-1
+		If ((((objecttype(v1)=1 Or (objecttype(v1)=120)) Or (objecttype(v1)=400)) Or (objecttype(v1)=110)) Or (objecttype(v1)=390)) Then
+			If (objectx(a0)-objectx(v1))^2.0+(objecty(a0)-objecty(v1))^2.0<0.5 Then
+				destroyobject(v1,0)
+			End If
+		End If
+		;v1=v1+1
+	Next
+	If objectfrozen(a0)=1  Then
+		objectfrozen(a0)=objectfrozen(a0)*1000
+		objectpitch(a0)=Rand(-30,30)
+		objectroll(a0)=Rand(-30,30)
+		objectz(a0)=0.3
+		playsoundfx(86,objectx(a0),objecty(a0))
+	End If
+	If objectfrozen(a0)=2 Then
+		objectfrozen(a0)=0
+		objectpitch(a0)=0.0
+		objectroll(a0)=0.0
+		objectz(a0)=0.0
+	End If
+	If (objectfrozen(a0)>2 Or (objectfrozen(a0)<0)) Then
+		objectfrozen(a0)=objectfrozen(a0)-1
+		Return 0
+	End If
+	If objecttiletypecollision(a0)=0 Then
+		If objecttype(a0)=423 Then
+			objectmovementspeed(a0)=60
+		Else
+			objectmovementspeed(a0)=20
+		End If
+		objecttilex(a0)=Floor(objectx(a0))
+		objecttiley(a0)=Floor(objecty(a0))
+		objecttiletypecollision(a0)=24125
+		objectobjecttypecollision(a0)=74
+		objectmovementtype(a0)=objectdata(a0,0)*2+41+objectdata(a0,1)
+	End If
+	If objecttype(a0)=423 Then
+		If objectdata(a0,0)=0 Then
+			turnobjecttowarddirection(a0,objecttilex2(a0)-objecttilex(a0),objecttiley2(a0)-objecttiley(a0),4,-180)
+		Else If objectdata(a0,0)=1 Then
+			turnobjecttowarddirection(a0,objecttilex2(a0)-objecttilex(a0),objecttiley2(a0)-objecttiley(a0),4,-90)
+		Else If objectdata(a0,0)=2 Then
+			turnobjecttowarddirection(a0,objecttilex2(a0)-objecttilex(a0),objecttiley2(a0)-objecttiley(a0),4,0)
+		Else If objectdata(a0,0)=3 Then
+			turnobjecttowarddirection(a0,objecttilex2(a0)-objecttilex(a0),objecttiley2(a0)-objecttiley(a0),4,90)
+		End If
+	Else
+		objectyaw(a0)=objectyaw(a0)+2.0
+	End If
+	objectdata10(a0)=objectmovementtimer(a0)
+	If objecttype(a0)=422 Then
+		If objectdata(a0,3)>0 Then
+			objectdata(a0,3)=objectdata(a0,3)-1
+		Else
+			If objecttilex(a0)=objecttilex(playerobject) Then
+				If objecttiley(a0)<objecttiley(playerobject) Then
+					If leveltilelogic(objecttilex(a0),objecttiley(a0)+1)<>1 Then
+						createspellball(objectx(a0),objecty(a0)+0.5,0.5,0.0,0.1,1,-1,-1,0,300)
+						objectdata(a0,3)=60
+					End If
+				Else If leveltilelogic(objecttilex(a0),objecttiley(a0)-1)<>1 Then
+					createspellball(objectx(a0),objecty(a0)-0.5,0.5,0.0,-0.1,1,-1,-1,0,300)
+					objectdata(a0,3)=60
+				End If
+			End If
+			If objecttiley(a0)=objecttiley(playerobject) Then
+				If objecttilex(a0)<objecttilex(playerobject) Then
+					If leveltilelogic(objecttilex(a0)+1,objecttiley(a0))<>1 Then
+						createspellball(objectx(a0)+0.5,objecty(a0),0.5,0.1,0.0,1,-1,-1,0,300)
+						objectdata(a0,3)=60
+					End If
+				Else If leveltilelogic(objecttilex(a0)-1,objecttiley(a0))<>1 Then
+					createspellball(objectx(a0)-0.5,objecty(a0),0.5,-0.1,0.0,1,-1,-1,0,300)
+					objectdata(a0,3)=60
+				End If
+			End If
+		End If
+	End If
+End Function
+
+Function controlretrocoily(a0)
+	
+	;v1=0
+	For v1=0 To nofobjects-1
+		If ((((objecttype(v1)=1 Or (objecttype(v1)=120)) Or (objecttype(v1)=400)) Or (objecttype(v1)=110)) Or (objecttype(v1)=390)) Then
+			If (objectx(a0)-objectx(v1))^2.0+(objecty(a0)-objecty(v1))^2.0<0.5 Then
+				destroyobject(v1,0)
+			End If
+		End If
+		;v1=v1+1
+	Next
+	If objectfrozen(a0)=1 Then
+		objectfrozen(a0)=objectfrozen(a0)*1000
+		objectpitch(a0)=Rand(-30,30)
+		objectroll(a0)=Rand(-30,30)
+		objectz(a0)=0.3
+		playsoundfx(86,objectx(a0),objecty(a0))
+	End If
+	If objectfrozen(a0)=2 Then
+		objectfrozen(a0)=0
+		objectpitch(a0)=0.0
+		objectroll(a0)=0.0
+		objectz(a0)=0.0
+	End If
+	If (objectfrozen(a0)>2 Or (objectfrozen(a0)<0)) Then
+		objectfrozen(a0)=objectfrozen(a0)-1
+		Return 0
+	End If
+	If objecttiletypecollision(a0)=0 Then
+		objectmovementspeed(a0)=30
+		objecttilex(a0)=Floor(objectx(a0))
+		objecttiley(a0)=Floor(objecty(a0))
+		objecttiletypecollision(a0)=17929
+		objectobjecttypecollision(a0)=74
+		objectmovementtype(a0)=objectdata(a0,0)*2+41+objectdata(a0,1)
+	End If
+	objectyaw(a0)=objectyaw(a0)+2.0
+	If objectmovementtimer(a0)=0 Then
+		objectz(a0)=0.0
+		v2=Rand(0,3)
+		Select v2
+		Case 0
+			v4=0
+			v5=-1
+		Case 1
+			v4=1
+			v5=0
+		Case 2
+			v4=0
+			v5=1
+		Case 3
+			v4=-1
+			v5=0
+		End Select
+		If canobjectmovetotile(a0,objecttilex(a0)+v4,objecttiley(a0)+v5,0,1) Then
+			moveobjecttotile(a0,objecttilex(a0)+v4,objecttiley(a0)+v5)
+			playsoundfx(118,objectx(a0),objecty(a0))
+		End If
+	Else
+		objectz(a0)=Sin(objectmovementtimer(a0)/1001.0*180.0)
+	End If
+End Function
+
+Function controlretroscouge(a0)
+	
+	objecttimer(a0)=objecttimer(a0)-1
+	objecttilex(a0)=Floor(objectx(a0))
+	objecttiley(a0)=Floor(objecty(a0))
+	v1=objecttilex(a0)
+	v2=objecttiley(a0)
+	leveltilelogic(v1,v2)=1
+	v3#=0.0
+	v4#=0.0
+	Select objectdata(a0,0)
+	Case 0
+		v3#=0.0
+		v4#=-1.0
+	Case 1
+		v3#=1.0
+		v4#=0.0
+	Case 2
+		v3#=0.0
+		v4#=1.0
+	Case 3
+		v3#=-1.0
+		v4#=0.0
+	End Select
+	If objecttimer(a0)<0 Then
+		objecttimer(a0)=objecttimermax1(a0)
+		If leveltilelogic(objecttilex(a0)+v3#,objecttiley(a0)+v4#)<>1 Then
+			createspellball(objectx(a0)+0.6*v3#,objecty(a0)+0.6*v4#,0.5,0.1*v3#,0.1*v4#,1,-1,-1,0,300)
+		End If
+		playsoundfx(103,objecttilex(a0),objecttiley(a0))
+	End If
+End Function
+
+Function controlretrorainbowcoin(a0)
+	
+	If objectactive(a0)<1001 Then
+		objectyaw(a0)=objectyaw(a0)+10.0
+		If objectactive(a0)>600 Then
+			objectz(a0)=1.2+((1000-objectactive(a0))/400.0)
+		Else
+			objectz(a0)=2.2
+		End If
+		If objectactive(a0)=400 Then
+			;v1=1
+			For v1=1 To 20
+				addparticle(19,objecttilex(a0)+0.5,2.6,(-objecttiley(a0))-0.5,Rand(0,360),0.15,Rnd(-0.035,0.035),Rnd(-0.015,0.015),Rnd(-0.035,0.035),0.0,0.0,0.0,0.0,0.0,50,3)
+				;v1=v1+1
+			Next
+		End If
+		If objectactive(a0)<600 Then
+			objectscalexadjust(a0)=objectactive(a0)/600.0
+			objectscaleyadjust(a0)=objectactive(a0)/600.0
+			objectscalezadjust(a0)=objectactive(a0)/600.0
+		End If
+	Else
+		objectyaw(a0)=objectyaw(a0)+3.0
+		objectz(a0)=0.0
+		v2=maximum2(Abs(objecttilex(a0)-objecttilex(playerobject)),Abs(objecttiley(a0)-objecttiley(playerobject)))
+		If (objectmovementtimer(playerobject)=0 And (v2=0)) Then
+			If (objecttilelogic(objecttilex(a0),objecttiley(a0)) And (16))>0 Then
+				objecttilelogic(objecttilex(a0),objecttiley(a0))=objecttilelogic(objecttilex(a0),objecttiley(a0))-16.0
+			End If
+			deactivateobject(a0)
+			playsoundfx(173,-1,-1)
+			v3=1
+			;v1=0
+			For v1=0 To nofobjects-1
+				If (objecttype(v1)=425 And (objectactive(v1)=1001)) Then
+					v3=0
+				End If
+				;v1=v1+1
+			Next
+			If v3=1 Then
+				;v1=0
+				For v1=0 To nofobjects-1
+					If (objecttype(v1)=426 And (objectactive(v1)=1001)) Then
+						deactivateobject(v1)
+						playsoundfx(12,-1,-1)
+					End If
+					;v1=v1+1
+				Next
+			End If
+		End If
+	End If
 End Function
 
 Function createretrolasergatemesh(a0)
@@ -18327,6 +18612,42 @@ Function preloadmodels()
 	Next
 	EntityTexture thwartmesh,thwarttexture(0),0,0
 	HideEntity thwartmesh
+	tentaclemesh=myloadanimmesh("data\models\trees\tentacle.b3d",0)
+	ExtractAnimSeq(GetChild(tentaclemesh,3),41,60,0)
+	tentacletexture=myloadtexture("data\models\trees\tentacle.jpg",1)
+	;v5=1
+	For v5=1 To CountChildren(tentaclemesh)
+		EntityTexture GetChild(tentaclemesh,v5),tentacletexture,0,0
+		;v5=v5+1
+	Next
+	HideEntity tentaclemesh
+	retroboxmesh=myloadmesh("data\models\retro\box.3ds",0)
+	retroboxtexture=myloadtexture("data\models\retro\woodbox.bmp",1)
+	EntityTexture retroboxmesh,retroboxtexture,0,0
+	HideEntity retroboxmesh
+	retrocoilymesh=myloadmd2("data\models\retro\coily.md2")
+	retrocoilytexture=myloadtexture("data\models\retro\coily.bmp",1)
+	EntityTexture retrocoilymesh,retrocoilytexture,0,0
+	HideEntity retrocoilymesh
+	retroscougemesh=myloadmesh("data\models\retro\scouge.3ds",0)
+	retroscougetexture=myloadtexture("data\models\retro\scouge3.bmp",1)
+	EntityTexture retroscougemesh,retroscougetexture,0,0
+	RotateMesh retroscougemesh,-90.0,0.0,0.0
+	RotateMesh retroscougemesh,0.0,-90.0,0.0
+	HideEntity retroscougemesh
+	retroufomesh=myloadmesh("data\models\retro\ufo.3ds",0)
+	retroufotexture=myloadtexture("data\models\retro\ufo.bmp",1)
+	EntityTexture retroufomesh,retroufotexture,0,0
+	RotateMesh retroufomesh,-90.0,0.0,0.0
+	RotateMesh retroufomesh,0.0,-90.0,0.0
+	HideEntity retroufomesh
+	retrozbotmesh=myloadmesh("data\models\retro\zbot.3ds",0)
+	retrozbottexture=myloadtexture("data\models\retro\zbot.bmp",1)
+	EntityTexture retrozbotmesh,retrozbottexture,0,0
+	RotateMesh retrozbotmesh,-90.0,0.0,0.0
+	RotateMesh retrozbotmesh,0.0,90.0,0.0
+	HideEntity retrozbotmesh
+	retrorainbowcointexture=myloadtexture("data\models\retro\rainbowcoin.bmp",1)
 	obstaclemesh(1)=myloadmesh("data\models\Trees\rock1.3ds",0)
 	obstacletexture(1)=myloadtexture("data\models\Trees\rocks.jpg",1)
 	EntityTexture obstaclemesh(1),obstacletexture(1),0,0
@@ -19169,14 +19490,14 @@ Data "thwartpickup"
 Data "splosh"
 Data "spikeyball"
 Data "brick"
-Data "---"
-Data "---"
+Data "tentacleup"
+Data "tentacledown"
 Data "---"
 Data "---"
 Data "crabwalk"
 Data "crabup"
 Data "crabdown"
-Data "---"
+Data "bounce"
 Data "---"
 Data "waterfall"
 Data "quack"
