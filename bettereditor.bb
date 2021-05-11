@@ -76,7 +76,7 @@ Field f7#
 Field f8#
 End Type
 
-AppTitle "Wonderland Adventures [FEATURE BUILD #4]",""
+AppTitle "Wonderland Adventures [FEATURE BUILD #5]",""
 
 Global particlemesh
 Global particlesurface
@@ -497,7 +497,6 @@ Global rubberduckytexture
 Global springtexture
 Global voidtexture
 Global thwartmesh
-Global isthereaflipbridge
 Dim obstaclemesh(50)
 Dim obstacletexture(50)
 Global cylinder
@@ -3277,7 +3276,6 @@ End Function
 Function loadlevel(a0$,a1,a2)
 	
 	levelformat104=0
-	isthereaflipbridge=0
 	v1=ReadFile(a0$)
 	levelwidth=ReadInt(v1)
 	levelheight=ReadInt(v1)
@@ -5231,7 +5229,6 @@ Function loadobject(a0,a1,a2)
 		Case "!FlipBridge"
 			objectentity(v1)=createflipbridgemesh(objectdata(v1,0))
 			EntityTexture objectentity(v1),gatetexture,0,0
-			isthereaflipbridge=1
 		Case "!WaterFall"
 			objectentity(v1)=createwaterfallmesh()
 		Case "!Star"
@@ -13656,11 +13653,7 @@ Function value(a0$)
 End Function
 
 Function astar(a0,a1,a2,a3,a4,a5,a6,a7)
-	
-	;If isthereaflipbridge=1 Then
-	;	astaralt(a0,a1,a2,a3,a4,a5,a6,a7)
-	;	Return 0
-	;End If
+
 	If a5<3 Then
 		a5=3
 	End If
@@ -13761,139 +13754,6 @@ Function astar(a0,a1,a2,a3,a4,a5,a6,a7)
 		For v6=a5 To 2 Step -1
 			astarpathnode(v6)=astarpathnode((v6-1))
 			;v6=v6+-1
-		Next
-		astarpathnode(1)=astarparent(astarpathnode(1))
-	Until (astarx(astarparent(astarpathnode(1)))=a1 And (astary(astarparent(astarpathnode(1)))=a2))
-End Function
-
-Function astaralt(a0,a1,a2,a3,a4,a5,a6,a7)
-	
-	If a5<3 Then
-		a5=3
-	End If
-	If a5>100 Then
-		a5=100
-	End If
-	v1=1
-	astarparent(1)=1
-	astarx(1)=a1
-	astary(1)=a2
-	astaropen(1)=1
-	astarh(1)=(Abs(a3-v2)+Abs(a4-v3))*9
-	astarg(1)=0
-	astarf(1)=astarg(1)+astarh(1)
-	astargrid(a1,a2)=1
-	v4=0
-	v5=0
-	v6=objecttilex(a0)
-	v7=objecttiley(a0)
-	Repeat
-		v8=99999
-		v9=-1
-		;v10=1
-		For v10=1 To v1
-			If (astaropen(v10)=1 And (astarf(v10)<v8)) Then
-				v9=v10
-				v8=astarf(v10)
-			End If
-			;v10=v10+1
-		Next
-		If (v9=-1 Or (v1>=a6)) Then
-			v5=1
-			Exit
-		End If
-		astaropen(v9)=2
-		astargrid(astarx(v9),astary(v9))=9999
-		;v10=1
-		For v10=1 To 8
-			Select v10
-			Case 1
-				v2=astarx(v9)+1
-				v3=astary(v9)
-			Case 2
-				v2=astarx(v9)-1
-				v3=astary(v9)
-			Case 3
-				v2=astarx(v9)
-				v3=astary(v9)+1
-			Case 4
-				v2=astarx(v9)
-				v3=astary(v9)-1
-			Case 5
-				v2=astarx(v9)+1
-				v3=astary(v9)-1
-			Case 6
-				v2=astarx(v9)-1
-				v3=astary(v9)-1
-			Case 7
-				v2=astarx(v9)+1
-				v3=astary(v9)+1
-			Case 8
-				v2=astarx(v9)-1
-				v3=astary(v9)+1
-			End Select
-			If (((v2>=0 And (v2<100)) And (v3>=0)) And (v3<100)) Then
-				objecttilex(a0)=astarx(v9)
-				objecttiley(a0)=astary(v9)
-				If (canobjectmovetotile(a0,v2,v3,1,0)=1 Or ((v2=a3 And (v3=a4)))) Then
-					If astargrid(v2,v3)=0 Then
-						v1=v1+1
-						astarparent(v1)=v9
-						astarx(v1)=v2
-						astary(v1)=v3
-						astaropen(v1)=1
-						astarh(v1)=(Abs(a3-v2)+Abs(a4-v3))*9
-						If v10<5 Then
-							astarg(v1)=astarg(v9)+10
-						Else
-							astarg(v1)=astarg(v9)+14
-						End If
-						astarf(v1)=astarg(v1)+astarh(v1)
-						astargrid(v2,v3)=1
-					Else If astaropen(astargrid(v2,v3))=1 Then
-						v12=(Abs(a3-v2)+Abs(a4-v3))*9
-						If v10<5 Then
-							v13=astarg(v9)+10
-						Else
-							v13=astarg(v9)+14
-						End If
-						If v13+v12<astarf(astargrid(v2,v3)) Then
-							astarg(astargrid(v2,v3))=v13
-							astarh(astargrid(v2,v3))=v12
-							astarf(astargrid(v2,v3))=v13+v12
-							astarparent(astargrid(v2,v3))=v9
-						End If
-					End If
-					If (Abs(v2-a3)<=a7 And (Abs(v3-a4)<=a7)) Then
-						v4=1
-						v10=8
-					End If
-				End If
-			End If
-			;v10=v10+1
-		Next
-	Until (v4=1 Or (v5=1))
-	objecttilex(a0)=v6
-	objecttiley(a0)=v7
-	;v10=1
-	For v10=1 To v1
-		astargrid(astarx(v10),astary(v10))=0
-		;v10=v10+1
-	Next
-	If v5=1 Then
-		astarpathnode(1)=-1
-		Return 0
-	End If
-	;v10=1
-	For v10=1 To a5
-		astarpathnode(v10)=v1
-		;v10=v10+1
-	Next
-	Repeat
-		;v10=a5
-		For v10=a5 To 2 Step -1
-			astarpathnode(v10)=astarpathnode((v10-1))
-			;v10=v10+-1
 		Next
 		astarpathnode(1)=astarparent(astarpathnode(1))
 	Until (astarx(astarparent(astarpathnode(1)))=a1 And (astary(astarparent(astarpathnode(1)))=a2))

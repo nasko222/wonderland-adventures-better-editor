@@ -4183,10 +4183,6 @@ Function DisplayObjectAdjuster(i)
 				tex$="GlowGem"
 			Else If CurrentObjectSubType=-4
 				tex$="Spy-Eye"
-			Else If CurrentObjectSubType=-5
-				tex$="Glyph"
-			Else If CurrentObjectSubType=-6
-				tex$="MapPiece"
 			Else If CurrentObjectSubType=-99
 				tex$="Whistle"
 			EndIf
@@ -5714,12 +5710,12 @@ Function AdjustObjectAdjuster(i)
 		If RightMouse=True Then CurrentObjectSubType=CurrentObjectSubType-1
 		
 		If CurrentObjectModelName$="!CustomItem"
-			If CurrentObjectSubType=-7
+			If CurrentObjectSubType=-5
 				CurrentObjectSubType=-99
 			Else If CurrentObjectSubType=-100
 				CurrentObjectSubType=27
 			Else If CurrentObjectSubType=-98
-				CurrentObjectSubType=-6
+				CurrentObjectSubType=-4
 			Else If CurrentObjectSubType=28
 				CurrentObjectSubType=-99
 			Else If CurrentObjectSubType=8
