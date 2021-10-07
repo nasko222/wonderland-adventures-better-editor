@@ -11,7 +11,7 @@
 
 Include "particles-define.bb"
 
-Global VersionText$="WA 0.96 Editor (BetterEditor Mod Build 9)"
+Global VersionText$="WA 0.96 Editor (BetterEditor Mod Build 10)"
 
 Global MASTERUSER=False
 Global LeftMouse,LeftMouseReleased,RightMouse,RightMouseReleased
@@ -676,6 +676,13 @@ Global CrabTexture1=myLoadTexture("data\models\crab\crab03a.jpg",1)
 Global CrabTexture2=myLoadTexture("data\models\crab\crab03b.jpg",1)
 EntityTexture CrabMesh,CrabTexture1
 HideEntity CrabMesh
+
+; Ice Troll
+Global TrollMesh=myLoadMD2("data\models\thwart\ice troll.md2")
+Global TrollTexture=myLoadTexture("data\models\thwart\icetroll01.bmp",1)
+EntityTexture TrollMesh,TrollTexture
+HideEntity TrollMesh
+
 
 ; Kaboom
 Global KaboomMesh=myLoadMD2("data\models\kaboom\kaboom.md2")
@@ -4684,7 +4691,7 @@ Function DisplayObjectAdjuster(i)
 		
 	
 
-		If CurrentObjectModelName$="!Thwart"
+		If CurrentObjectModelName$="!Thwart" Or CurrentObjectModelName$="!Troll"
 			tex2$="Anim"
 			If CurrentObjectData(1)=0
 				tex$="Normal"
@@ -5385,7 +5392,7 @@ Function DisplayObjectAdjuster(i)
 			End Select
 		EndIf
 		
-		If CurrentObjectModelName$="!Thwart"
+		If CurrentObjectModelName$="!Thwart" Or CurrentObjectModelName$="!Troll"
 
 			tex2$="Shooter"
 			Select CurrentObjectData(6)
@@ -5438,7 +5445,7 @@ Function DisplayObjectAdjuster(i)
 			If CurrentObjectData(7) >=20 And CurrentObjectData(7)<30 tex$=tex$+"BouFas"
 		EndIf
 		
-		If CurrentObjectModelName$="!Thwart"
+		If CurrentObjectModelName$="!Thwart" Or CurrentObjectModelName$="!Troll"
 
 			tex2$="TimerMax1"
 		EndIf
@@ -6039,7 +6046,7 @@ Function AdjustObjectAdjuster(i)
 			
 
 		EndIf
-		If CurrentObjectModelName$="!Thwart" Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectModelName$<>"!Retrolasergate")
+		If CurrentObjectModelName$="!Thwart" Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectModelName$<>"!Retrolasergate") Or CurrentObjectModelName$="!Troll"
 
 			If CurrentObjectData(1)>1 CurrentObjectData(1)=0
 			If CurrentObjectData(1)<0 CurrentObjectData(1)=1
@@ -6368,7 +6375,7 @@ Function AdjustObjectAdjuster(i)
 			
 
 		EndIf
-		If CurrentObjectModelName$="!Thwart"
+		If CurrentObjectModelName$="!Thwart" Or CurrentObjectModelName$="!Troll"
 			If CurrentObjectData(6)>1 CurrentObjectData(6)=0
 			If CurrentObjectData(6)<0 CurrentObjectData(6)=1
 			
@@ -7000,6 +7007,8 @@ Function BuildCurrentObjectModel()
 	Else If CurrentObjectModelName$="!Crab"
 		CurrentObjectModel=CopyEntity(CrabMesh)
 		If CurrentObjectSubType=0 Then EntityTexture CurrentObjectModel,CrabTexture2
+	Else If CurrentObjectModelName$="!Troll"
+		CurrentObjectModel=CopyEntity(TrollMesh)
 	Else If CurrentObjectModelName$="!Kaboom"
 		CurrentObjectModel=CopyEntity(KaboomMesh)
 	Else If CurrentObjectModelName$="!BabyBoomer"
@@ -8269,10 +8278,14 @@ Function LoadLevel(levelnumber)
 
 		Else If ObjectModelName$(Dest)="!FireFlower"
 			ObjectEntity(Dest)=CopyEntity(FireFlowerMesh)
+			
 		Else If ObjectModelName$(Dest)="!Crab"
 			ObjectEntity(Dest)=CopyEntity(CrabMesh)
 			If ObjectSubType(Dest)=0 Then EntityTexture ObjectEntity(Dest),CrabTexture2
 			
+		Else If ObjectModelName$(Dest)="!Troll"
+			ObjectEntity(Dest)=CopyEntity(TrollMesh)
+		
 		Else If ObjectModelName$(Dest)="!Retrobox"
 			ObjectEntity(Dest)=CopyEntity(RetroBoxMesh)
 			
