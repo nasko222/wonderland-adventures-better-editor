@@ -1862,6 +1862,26 @@ Function EditorControls()
 		Text 719,100,"  Weird"
 	Case 7
 		Text 715,100,"ThundrStrm"
+	Case 8
+		Text 715,100,"  Alarm"
+	Case 9
+		Text 715,100,"Light Rise"
+	Case 10
+		Text 715,100,"Light Fall"
+	Case 11
+		Text 715,100,"Rainb Rise"
+	Case 12
+		Text 715,100,"Rainb Fall"
+	Case 13
+		Text 715,100,"  Foggy"
+	Case 14
+		Text 715,100,"FoggyGreen"
+	Case 15
+		Text 715,100,"  Leaves"
+	Case 16
+		Text 715,100,"Sand Storm"
+	Case 17
+		Text 715,100," Abstract"
 
 
 
@@ -1948,12 +1968,12 @@ Function EditorControls()
 		If my>=100 And my<115 And leftmouse=True And leftmousereleased=True
 			leftmousereleased=False
 			LevelWeather=LevelWeather+1
-			If levelweather=8 Then levelweather=0
+			If levelweather=18 Then levelweather=0
 		EndIf
 		If my>=100 And my<115 And rightmouse=True And rightmousereleased=True
 			rightmousereleased=False
 			LevelWeather=LevelWeather-1
-			If levelweather=-1 Then levelweather=7
+			If levelweather=-1 Then levelweather=17
 		EndIf
 		If my>=115 And my<130 And leftmouse=True And leftmousereleased=True
 			leftmousereleased=False

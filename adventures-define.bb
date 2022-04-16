@@ -195,6 +195,8 @@ Global CageMesh,CageTexture
 ; StarGates
 Global StarGateMesh
 
+; AutoDoors
+Global AutodoorMesh,AutoDoorTexture
 ; Buttons
 Global ButtonTexture
 
@@ -261,6 +263,9 @@ Global NofBabyBoomersInAdventure
 Global FireFlowerMesh,FireFlowerTexture
 Global NofFireFlowersInAdventure
 
+; BurstFlowers
+Global BurstFlowerMesh
+Global BurstFlowerTexture
 ; Boxes etc
 Global BarrelMesh,BarrelTexture1,BarrelTexture2,BarrelTexture3
 Global NofBricksInAdventure
@@ -297,6 +302,22 @@ Global PlasmaTexture, FlashTexture
 Global RetroBoxMesh,RetroBoxTexture,RetroCoilyMesh,RetroCoilyTexture,RetroScougeMesh,RetroScougeTexture
 Global RetroUfoMesh,RetroUfoTexture,RetroZbotMesh,RetroZbotTexture,RetroRainbowCoinTexture
 
+;ZBots
+Global WeebotMesh, WeebotTexture
+Global ZapbotMesh, ZapbotTexture
+Global PushbotMesh, PushbotTexture
+Global ZbotNPCMesh
+Dim ZbotNPCTexture(8)
+Global NofZBotNPCsInAdventure
+Global MothershipMesh, Mothershiptexture
+Global NofZBotsInAdventure
+
+; Lurker
+Global LurkerMesh,LurkerTexture
+
+; Ghosts
+Global GhostMesh,WraithMesh,GhostTexture
+Dim WraithTexture(3)
 ; Obstacles
 Dim ObstacleMesh(50),ObstacleTexture(50)
 

@@ -328,6 +328,10 @@ Function ControlIcons()
 				CreateIcon(7,0,14,3,Str$(NofBabyBoomersInAdventure),"Rescue")
 				IconSubText$(7)=Str$(NofBabyBoomersInAdventure)	
 			EndIf
+			If NofZBotsInAdventure>0 And AdventureGoal=9
+				CreateIcon(7,0,15,3,Str$(NofZBotsInAdventure),"Destroy")
+				IconSubText$(7)=Str$(NofZBotsInAdventure)	
+			EndIf
 
 
 		EndIf

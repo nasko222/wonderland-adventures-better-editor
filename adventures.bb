@@ -115,7 +115,7 @@ Function CreateNewPlayer()
 	WriteInt file,0;NofFireFlowersInAdventure
 	WriteInt file,0;NofCrabsInAdventure
 	WriteInt file,0;NofBabyBoomersInAdventure
-	WriteInt file,future
+	WriteInt file,0;NofZBotsInAdventure
 	WriteInt file,future
 	WriteInt file,future
 	WriteInt file,future
@@ -943,7 +943,7 @@ Function LoadPlayer(name$)
 	NofFireFlowersInAdventure=ReadInt(file)
 	NofCrabsInAdventure=ReadInt(file)
 	NofBabyBoomersInAdventure=ReadInt(file)
-	future=ReadInt(file)
+	NofZBotsInAdventure=ReadInt(file)
 	future=ReadInt(file)
 	future=ReadInt(file)
 	future=ReadInt(file)
@@ -1149,7 +1149,7 @@ Function SavePlayer(name$)
 	WriteInt file,NofFireFlowersInAdventure
 	WriteInt file,NofCrabsInAdventure
 	WriteInt file,NofBabyBoomersInAdventure
-	WriteInt file,future
+	WriteInt file,NofZBotsInAdventure
 	WriteInt file,future
 	WriteInt file,future
 	WriteInt file,future
@@ -1643,6 +1643,8 @@ Function AnalyzeAdventure()
 	NofFireFlowersInAdventure=0
 	NofCrabsInAdventure=0
 	NofBabyBoomersInAdventure=0
+	NofZBotsInAdventure=0
+	NofZBotNPCsInAdventure=0
 	
 	AdventureCompletedCoinsTotal(AdventureCurrentNumber)=0
 	AdventureCompletedGemsTotal(AdventureCurrentNumber)=0
@@ -1755,6 +1757,9 @@ Function AnalyzeAdventure()
 					NofCrabsInAdventure=NofCrabsInAdventure+1
 				Case 400
 					NofBabyBoomersInAdventure=NofBabyBoomersInAdventure+1
+				Case 423,430,431,432,433
+					NofZBotsInAdventure=NofZBotsInAdventure+1
+					If oType=433 And a3=0 Then NofZBotNPCsInAdventure=NofZBotNPCsInAdventure+1
 				
 				End Select
 			Next
@@ -2181,11 +2186,28 @@ Function AdventureLost()
 		Return
 	EndIf
 	
-	; game over
-	If Rand(0,100)<50
-		PlaySoundFX(Rand(160,163),-1,-1)
+		; game over saying - check if zbot npcs on board
+	
+	flag=False
+	For i=0 To nofobjects-1
+		If (ObjectType(i)=433 And ObjectActive(i)>0) Or ObjectType(i)=431
+			flag=True
+		EndIf
+	Next
+	
+	If flag=True
+		If Rand(0,100)<80
+			PlaySoundFX(158,-1,-1)
+		Else
+			PlaySoundFX(Rand(148,149),-1,-1)
+		EndIf
 	Else
-		playsoundFX(Rand(160,161),-1,-1)
+	
+		If Rand(0,100)<50
+			PlaySoundFX(Rand(160,163),-1,-1)
+		Else
+			playsoundFX(Rand(160,161),-1,-1)
+		EndIf
 	EndIf
 	
 	Spellactive=False
@@ -2873,6 +2895,12 @@ Function LoadObject(file, complete,create)
 		ScaleMesh ObjectEntity(Dest),1.1,1.1,1.1
 		EntityTexture ObjectEntity(Dest),SpringTexture
 		
+	Case "!Suctube"
+		ObjectEntity(Dest)=CreateSucTubeMesh(ObjectData(Dest,3),ObjectData(Dest,0),ObjectActive(Dest))
+		Redosuctubemesh(Dest)
+		
+	Case "!SuctubeX"
+		ObjectEntity(Dest)=CreateSucTubeXMesh(ObjectData(Dest,3))
 	Case "!FlipBridge"
 		ObjectEntity(Dest)=CreateFlipBridgeMesh(ObjectData(Dest,0))
 		EntityTexture ObjectEntity(Dest),GateTexture
@@ -2896,7 +2924,8 @@ Function LoadObject(file, complete,create)
 	
 	Case "!Key"
 		ObjectEntity(Dest)=CreateKeyMesh(ObjectData(Dest,0))
-		
+	Case "!KeyCard"
+		ObjectEntity(Dest)=CreateKeyCardMesh(ObjectData(Dest,0))
 	Case "!Gem"
 		ObjectEntity(Dest)=CopyEntity(GemMesh(ObjectData(Dest,0))) 
 		EntityTexture ObjectEntity(Dest),TeleporterTexture(ObjectData(Dest,1))
@@ -2935,6 +2964,23 @@ Function LoadObject(file, complete,create)
 		ObjectEntity(Dest)=CreateTransporterMesh(ObjectData(Dest,0))
 	;	RotateMesh ObjectEntity(Dest),0,90*ObjectData(Dest,2),0
 
+	Case "!Conveyor"
+		convsize#=1.0
+		If ObjectType(Dest)=45 
+			convsize=1.1
+		Else
+			convsize=0.7
+		EndIf
+		
+		If ObjectData(Dest,4)=4
+			ObjectEntity(Dest)=CreateCloudMesh(convsize,ObjectData(Dest,0))
+		Else
+			ObjectEntity(Dest)=CreateTransporterMesh(ObjectData(Dest,0),ObjectData(Dest,4))
+			If ObjectType(Dest)=46
+				ObjectXScale(Dest)=.8
+				ObjectYScale(Dest)=.8
+			EndIf
+		EndIf
 		
 	Case "!Button"
 		CreateButtonMesh(Dest,ObjectSubType(Dest),ObjectData(Dest,0),ObjectData(Dest,1),ObjectData(Dest,2),ObjectData(Dest,3))
@@ -3004,6 +3050,24 @@ Function LoadObject(file, complete,create)
 		ObjectEntity(Dest)=CopyEntity(RetroUFOMesh)
 		ObjectYawAdjust(Dest)=(-90*ObjectData(Dest,0) +3600) Mod 360
 		
+	Case "!Weebot"
+		ObjectEntity(Dest)=CopyEntity(WeebotMesh)
+		ObjectYawAdjust(Dest)=(-90*ObjectData(Dest,0) +3600) Mod 360
+		
+	Case "!Zapbot"
+		ObjectEntity(Dest)=CopyEntity(ZapbotMesh)
+		
+		ObjectYawAdjust(Dest)=(-90*ObjectData(Dest,0) +3600) Mod 360
+	Case "!Pushbot"
+		ObjectEntity(Dest)=CreatePushbotMesh(ObjectData(Dest,0),ObjectData(Dest,3))
+		ObjectYawAdjust(Dest)=0 ; done withing control
+
+	Case "!ZbotNPC"
+		ObjectEntity(Dest)=CopyEntity(ZbotNPCMesh)
+		EntityTexture ObjectEntity(Dest),ZbotNPCTexture(ObjectData(Dest,2))
+		
+	Case "!Mothership"
+		ObjectEntity(Dest)=CopyEntity(MothershipMesh)
 	
 	Case "!None"
 		ObjectEntity(Dest)=CreatePivot()
@@ -15261,6 +15325,48 @@ Function ActivateCommand(command,data1,data2,data3,data4)
 		inventorysize=6
 	Case 217
 		inventorysize=7
+		
+	Case 222
+		If data1=0 Or data1=1 Then
+			For j=0 To NofObjects-1
+				If data1=0 Then ObjectXScale(j)=ObjectXScale(j)+data2/100.0
+				If data1=1 Then ObjectXScale(j)=ObjectXScale(j)-data2/100.0
+			Next
+		ElseIf data1=2 Or data1=3 Then
+			For j=0 To NofObjects-1
+				If data1=2 Then ObjectYScale(j)=ObjectYScale(j)+data2/100.0
+				If data1=3 Then ObjectYScale(j)=ObjectYScale(j)-data2/100.0
+			Next
+		ElseIf data1=4 Or data1=5 Then
+			For j=0 To NofObjects-1
+				If data1=4 Then ObjectZScale(j)=ObjectZScale(j)+data2/100.0
+				If data1=5 Then ObjectZScale(j)=ObjectZScale(j)-data2/100.0
+			Next
+		EndIf
+		
+	Case 223
+		If data1=0 Or data1=1 Then
+			For j=0 To NofObjects-1
+				If ObjectID(j)=data4
+					If data1=0 Then ObjectXScale(j)=ObjectXScale(j)+data2/100.0
+					If data1=1 Then ObjectXScale(j)=ObjectXScale(j)-data2/100.0
+				EndIf
+			Next
+		ElseIf data1=2 Or data1=3 Then
+			For j=0 To NofObjects-1
+				If ObjectID(j)=data4
+					If data1=2 Then ObjectYScale(j)=ObjectYScale(j)+data2/100.0
+					If data1=3 Then ObjectYScale(j)=ObjectYScale(j)-data2/100.0
+				EndIf
+			Next
+		ElseIf data1=4 Or data1=5 Then
+			For j=0 To NofObjects-1
+				If ObjectID(j)=data4
+					If data1=4 Then ObjectZScale(j)=ObjectZScale(j)+data2/100.0
+					If data1=5 Then ObjectZScale(j)=ObjectZScale(j)-data2/100.0
+				EndIf
+			Next
+		EndIf
 		
 	End Select
 

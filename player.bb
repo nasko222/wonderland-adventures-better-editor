@@ -5,7 +5,7 @@
 ;Local var04
 ;Local var05
 
-AppTitle "Wonderland Adventures"
+AppTitle "Wonderland Adventures Better Editor"
 ; Global Definitions
 
 Include "particles-define.bb"
@@ -813,6 +813,86 @@ Function UpdateGame()
 		; void
 		If Rand(0,200)<2 
 			SetLight(Rand(0,255),Rand(0,255),Rand(0,255),2,Rand(0,255),Rand(0,255),Rand(0,255),2)
+		EndIf
+	Case 7
+
+			;lightning storm
+			If lightningstorm<100 Then lightningstorm=100
+			AddParticle(41,CentreX+Rnd(-10,10),8,CentreY+Rnd(-10,10),0,.2,0.05,-.2,0,0,0,0,0,0,60,2)
+			AddParticle(41,CentreX+Rnd(-10,10),8,CentreY+Rnd(-10,10),0,.2,0.05,-.2,0,0,0,0,0,0,60,2)
+			If lightningstorm>100
+				If (lightningstorm-100)<7 lightningstorm=Rand(180,255)
+				lightningstorm=lightningstorm-10
+				If lightningstorm<100 Then lightningstorm=100
+			Else
+				If Rand(0,300)=10
+					lightningstorm=Rand(180,255)
+					playsoundfx(Rand(155,157),-1,-1)
+				EndIf
+			EndIf
+			
+			SetLight(lightningstorm,lightningstorm,lightningstorm,10,70,70,70,10)
+
+	Case 8
+
+			; red alert
+			
+
+			alarm=leveltimer Mod 240
+			If alarm=1 Then playsoundfxnow(98)
+			If alarm <120
+			
+				SetLight(alarm*2,0,0,10,70,20,20,10)
+			Else
+				SetLight(240-alarm*2,0,0,10,70,20,20,10)
+			EndIf
+
+		
+	Case 9
+	
+		; light rising
+		If Rand(1,8)=3 	AddParticle(1,CentreX+Rnd(-10,10),0,CentreY+Rnd(-10,10),0,.2,0,+.03,0,2,0,0,0,0,200,3)
+
+	Case 10
+	
+		; light falling
+		If Rand(1,8)=3 	AddParticle(1,CentreX+Rnd(-10,10),8,CentreY+Rnd(-10,10),0,.2,0,-.03,0,2,0,0,0,0,200,3)
+
+
+	Case 11
+	
+		; stars rising
+		If Rand(1,5)=3 	AddParticle(Rand(32,38),CentreX+Rnd(-10,10),0,CentreY+Rnd(-10,10),0,.8,0,+.03,0,2,0,0,0,0,200,3)
+
+
+	Case 12
+	
+		; stars rising
+		If Rand(1,5)=3 	AddParticle(Rand(32,38),CentreX+Rnd(-10,10),8,CentreY+Rnd(-10,10),0,.8,0,-.03,0,2,0,0,0,0,200,3)
+
+	Case 13
+	
+		; foggy
+		If Rand(1,3)=3 	AddParticle(0,CentreX+Rnd(-10,10),-.8,CentreY+Rnd(-10,10),0,2,0,+.005,0,2,0,0,0,0,500,2)
+
+	Case 14
+	
+		; green foggy
+		If Rand(1,3)=3 	AddParticle(27,CentreX+Rnd(-10,10),-.8,CentreY+Rnd(-10,10),0,2,0,+.005,0,2,0,0,0,0,500,2)
+
+	Case 15
+		; leaves
+		If Rand(1,8)=3 	AddParticle(42,CentreX+Rnd(-10,10),8,CentreY+Rnd(-10,10),0,1,Rnd(-.03,0.01),-.03,Rnd(-.03,0.01),2,0,0,0,0,200,3)
+
+	Case 16
+		; sandstorm
+		AddParticle(Rand(25,26),CentreX+Rnd(5,10),5,CentreY+Rnd(-8,4),0,.2,-0.3,-.09,0,2,0,0,0,0,80,3)
+		AddParticle(Rand(24,26),CentreX+Rnd(5,10),5,CentreY+Rnd(-8,4),0,.1,-0.3,-.09,0,2,0,0,0,0,80,3)
+
+	Case 17
+		; abstract
+		If Rand(1,40)=3
+			AddParticle(Rand(43,45),CentreX+Rnd(-10,10),Rnd(1,2),CentreY+Rnd(-10,10),0,Rnd(1,4),0,Rnd(.001,0.01),0,2,0,0,0,0,200,Rand(2,3))
 		EndIf
 	End Select
 	

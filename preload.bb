@@ -102,6 +102,13 @@ Function PreLoadModels()
 	StarGateMesh=myLoadMesh("data/models/gate/gate.3ds",0)
 	RotateMesh StarGateMesh,-90,0,0
 	HideEntity StarGateMesh
+	; AutoDoor
+	AutodoorMesh=CreateCube()
+	ScaleMesh autodoormesh,.47,.47,.47
+	PositionMesh Autodoormesh,0,.5,0
+	Autodoortexture=MyLoadTexture("data/models/autodoor/autodoor.jpg",1)
+	EntityTexture Autodoormesh,autodoortexture
+	HideEntity autodoormesh
 	; Teleporters
 	For i=0 To 8
 		TeleporterTexture(i)=myLoadTexture("data/models/teleport/teleport"+Str$(i)+".jpg",1)
@@ -225,6 +232,12 @@ Function PreLoadModels()
 ;	ScaleMesh FireFlowerMesh,.04,.04,.04
 	HideEntity FireFlowerMesh
 	
+	; BurstFlowers
+	BurstFlowerMesh=MyLoadMesh("data\models\burstflower\burstflower.b3d",0)
+	BurstFlowerTexture=MyLoadTexture("data\models\burstflower\burstflower.png",1)
+	
+	EntityTexture BurstFlowerMesh,BurstFlowerTexture
+	HideEntity BurstFlowerMesh
 	; Boxes etc
 	BarrelMesh=myLoadMesh("data\models\barrels\barrel.b3d",0)
 	BarrelTexture1=myLoadTexture("Data\models\barrels\barrel1.jpg",1)
@@ -322,6 +335,62 @@ Function PreLoadModels()
 	RotateMesh RetrozbotMesh,0,90,0
 	HideEntity RetrozbotMesh
 	RetroRainbowCoinTexture=myLoadTexture("data\models\retro\rainbowcoin.bmp",1)
+	WeeBotMesh=myLoadMesh("data\models\weebot\weebot.3ds",0)
+	WeebotTexture=myLoadTexture("data\models\weebot\weebot.jpg",1)
+	EntityTexture Weebotmesh,Weebottexture
+	RotateMesh WeebotMesh,-90,0,0
+	RotateMesh WeebotMesh,0,180,0
+	HideEntity WeebotMesh
+	
+	ZapbotMesh=myLoadMesh("data\models\zapbot\zapbot.3ds",0)
+	ZapbotTexture=myLoadTexture("data\models\zapbot\zapbot.jpg",1)
+	EntityTexture Zapbotmesh,Zapbottexture
+	RotateMesh ZapbotMesh,-90,0,0
+	RotateMesh ZapbotMesh,0,180,0
+	HideEntity ZapbotMesh
+
+	
+	PushbotTexture=myLoadTexture("data\graphics\pushbot.bmp",1)
+	
+	ZbotNPCMesh=myLoadMesh("data\models\zbots\zbotnpc.3ds",0)
+	RotateMesh ZBOTNPCMesh,-90,0,0
+	RotateMesh ZBOTNPCMesh,0,90,0
+	ScaleMesh ZBotNPCMesh,1,1.5,1
+
+
+	For i=0 To 7
+		ZbotNPCTexture(i)=myLoadTexture("data\models\zbots\zbotnpc.jpg",1)
+	Next
+	HideEntity ZbotNPCMesh
+	
+	MothershipMesh=myLoadMesh("data\models\other\starship.3ds",0)
+	Mothershiptexture=myLoadTexture("data\models\other\mothership.jpg",1)
+	EntityTexture Mothershipmesh,Mothershiptexture
+	HideEntity Mothershipmesh
+	; Lurker
+	LurkerMesh=MyLoadMesh ("data\models\lurker\lurker.3ds",0)
+	LurkerTexture=MyLoadTexture ("data\models\lurker\lurker.jpg",1)
+	EntityTexture LurkerMesh,LurkerTexture
+	RotateMesh LurkerMesh,-90,0,0
+	HideEntity LurkerMesh
+	
+	; Ghosts
+	GhostMesh=MyLoadMesh ("data\models\ghost\ghost.3ds",0)
+	GhostTexture=MyLoadTexture ("data\models\ghost\ghost.jpg",1)
+	RotateMesh ghostmesh,-90,0,0
+	RotateMesh ghostmesh,0,180,0
+	EntityTexture GhostMesh,GhostTexture
+	HideEntity GhostMesh
+	
+	WraithMesh=MyLoadMesh ("data\models\ghost\wraith.3ds",0)
+	RotateMesh wraithmesh,-90,0,0
+	RotateMesh wraithmesh,0,180,0
+
+	WraithTexture(0)=MyLoadTexture ("data\models\ghost\wraith0.jpg",1)
+	WraithTexture(1)=MyLoadTexture ("data\models\ghost\wraith1.jpg",1)
+	WraithTexture(2)=MyLoadTexture ("data\models\ghost\wraith2.jpg",1)
+	EntityTexture WraithMesh,WraithTexture(0)
+	HideEntity WraithMesh
 	
 	; Obstacles
 	ObstacleMesh(1)=myLoadMesh("data\models\Trees\rock1.3ds",0)
@@ -957,13 +1026,13 @@ End Function
 ;0
 Data "adventurewon1","adventurewon2","---","---","---","---","---","---","---","---"
 ;10
-Data "pinball2","pickupjewel","pickupcoin2","shard","wakka","explosion","---","---","---","---"
+Data "pinball2","pickupjewel","pickupcoin2","shard","wakka","explosion","electricshock","---","---","---"
 ;20
-Data "ice","buttonoff","buttonturn","buttontimer","colourchange","---","---","---","---","---"
+Data "ice","buttonoff","buttonturn","buttontimer","colourchange","---","---","---","ghost","wraith"
 ;30
-Data "fireon2","fireduring2","cageclose","bridgeup","bridgedown","gateon1","gateoff1","gatedoor","---","---"
+Data "fireon2","fireduring2","cageclose","bridgeup","bridgedown","gateon1","gateoff1","gatedoor","autodooropen","autodoorclose"
 ;40
-Data "transporter","transporterflip","teleport","---","---","---","---","---","---","---"
+Data "transporter","transporterflip","teleport","suctubein","suctubeout","flystop","---","---","---","---"
 ;50
 Data "weehello1","weehello2","weehello3","weehello4","weehello5","weeyes1","weeyes2","weeyes3","weeyes4","weezee"
 ;60
@@ -973,25 +1042,25 @@ Data "weewoo","weethanks","weebye","weeyeay","kaboom1","kaboom2","kaboom3","kabo
 ;80
 Data "magiccharge","magicblink2","magiccast","freeze","freezebreak","freezestinker","freezechomper","freezethwart","spellballbounce","---"
 ;90
-Data "magicon","magicoff","grow","floingbubble","---","---","---","---","---","---"
+Data "magicon","magicoff","grow","floingbubble","---","saucerfly","saucerdie","lurker","moobot1","moobot2"
 ;100
 Data "scritterhop","chomper","flowergrow","flowerfire","flowerhit","flowerdie","thwart","thwartpickup","splosh","spikeyball"
 ;110
-Data "brick","tentacleup","tentacledown","trollwalk","trollice","crabwalk","crabup","crabdown","bounce","---"
+Data "brick","tentacleup","tentacledown","trollwalk","trollice","crabwalk","crabup","crabdown","bounce","chomper2"
 ;120
 Data "waterfall","quack","quake","void","bubble","splash","surf1","surf2","seagull1","seagull2"
 ;130
 Data "menuclick","invenopen","invenclose","loadgame","savegame","areyousure","menuclick2","loadinggame","mystery1","mystery2"
 ;140
-Data "---","---","---","---","---","---","---","---","---","---"
+Data "zbot10","zbot1","zbot2","zbot3","zbot4","zbot5","zbot6","zbot7","zbot8","zbot9"
 ;150
-Data "voices\death1","voices\death2","voices\death3","voices\hot1","voices\hot2","lightning1","lightning2","lightning3","---","---"
+Data "voices\death1","voices\death2","voices\death3","voices\hot1","voices\hot2","lightning1","lightning2","lightning3","zbot11","zbot12"
 ;160
 Data "lost1","lost2","lost3","lost4","start1","start2","start3","start4","start5","hello"
 ;170
 Data "ice1","ice2","ice3","coin","item","item-no","aha","intro","---","---"
 ;180
-Data "---","---","---","---"
+Data "suc1","suc2","suc3","---"
 ;190
 Data "---"
 Data "---"
