@@ -2981,7 +2981,7 @@ Function LoadObject(file, complete,create)
 		ObjectEntity(Dest)=CreateColourGateMesh(ObjectData(Dest,2),ObjectData(Dest,0))
 	Case "!Transporter"
 		
-		ObjectEntity(Dest)=CreateTransporterMesh(ObjectData(Dest,0))
+		ObjectEntity(Dest)=CreateTransporterMesh(ObjectData(Dest,0),3)
 	;	RotateMesh ObjectEntity(Dest),0,90*ObjectData(Dest,2),0
 
 	Case "!Conveyor"
@@ -2995,7 +2995,7 @@ Function LoadObject(file, complete,create)
 		If ObjectData(Dest,4)=4
 			ObjectEntity(Dest)=CreateCloudMesh(convsize,ObjectData(Dest,0))
 		Else
-			ObjectEntity(Dest)=CreateTransporterMesh(ObjectData(Dest,0))
+			ObjectEntity(Dest)=CreateTransporterMesh(ObjectData(Dest,0),ObjectData(Dest,4))
 			If ObjectType(Dest)=46
 				ObjectXScale(Dest)=.8
 				ObjectYScale(Dest)=.8
@@ -3545,6 +3545,12 @@ Function AdjustLevelTileLogic(x,y,i)
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^9
 	
 	
+		EndIf
+	
+	Case 300
+		; Ice Float
+		If LevelTileLogic(x,y)=2 And ObjectData(i,0)=0
+			LevelTileLogic(x,y)=14
 		EndIf
 		
 	Case 370
@@ -5338,6 +5344,12 @@ Function OccupyObjectTile(i,x,y)
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^1
 		EndIf
 		
+	Case 432
+		; moobot
+				If (ObjectTileLogic(x,y) And 2^7) =0 
+					ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^7
+				EndIf
+		
 	Case 110,330,290,380,390,433
 		; Stinker NPC/Wisp/Troll/Thwart/Kaboom
 		If ObjectActive(i)>0
@@ -5398,7 +5410,7 @@ Function OccupyObjectTile(i,x,y)
 			EndIf
 		EndIf
 
-	Case 230, 290, 310,432,460
+	Case 230, 290, 310,460
 		; Fireflower, ducky
 		If (ObjectTileLogic(x,y) And 2^7) =0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^7
@@ -5562,6 +5574,10 @@ Function VacateObjectTile(i)
 			
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^1
 		EndIf
+	Case 432
+		If (ObjectTileLogic(x,y) And 2^7) >0 
+				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^7
+			EndIf
 	Case 110,330,290,380,390,433
 		; Stinker NPC/Wisp/Troll/Thwart/Kaboom
 		If ObjectTalkable(i)>0
@@ -11468,12 +11484,10 @@ Function ControlGloveCharge(i)
 
 End Function
 
-Function CreateTransporterMesh(tex)
+Function CreateTransporterMesh(tex,Subtype)
 	
 	Entity=CreateMesh()
 	Surface=CreateSurface(Entity)
-	
-	Subtype=3
 	
 	; Top 
 	AddVertex (surface,-.495,0.01,.495,Subtype*0.25+.01,.26)
@@ -11891,21 +11905,6 @@ Function ControlConveyor(i)
 	x=ObjectTileX(i)
 	y=ObjectTileY(i)
 
-	
-	If ObjectFrozen(i)=10001
-		; freeze in foing
-		;ObjectPitch(i)=-30
-		;ObjectRoll(i)=Rnd(-30,30)
-		;ObjectZ(i)=.3
-		ObjectFrozen(i)=ObjectFrozen(i)+999
-		
-			
-	EndIf
-	If ObjectFrozen(i)=10002
-		; revert
-		ObjectFrozen(i)=0
-		
-	EndIf
 	If ObjectFrozen(i)>2
 		; frozen
 		ObjectFrozen(i)=ObjectFrozen(i)-1
@@ -12175,7 +12174,7 @@ Function CreateConveyorTail(parent,x,y,dx,dy,olddir)
 	If ObjectData(parent,4)=4
 		ObjectEntity(i)=CreateCloudMesh(.7,ObjectData(parent,0))
 	Else
-		ObjectEntity(i)=CreateTransporterMesh(ObjectData(Parent,0))
+		ObjectEntity(i)=CreateTransporterMesh(ObjectData(Parent,0),ObjectData(Parent,4))
 		ObjectXScale(i)=.8
 		ObjectYScale(i)=.8
 	EndIf
@@ -13948,11 +13947,13 @@ Function ControlSpellBall(i)
 						destructoflag=True
 					EndIf
 					
-				Case 250,260,290,420,422,423
+				Case 250,260,290,420,422,423,430,431
 					If ObjectSubType(i)<2 Then DestroyObject(j,1)
 						If ObjectSubType(i)=4 ; ice
 							CreateIceBlock(ObjectX(j),ObjectY(j),j)
 						EndIf
+						
+					destructoflag=True
 				Case 432
 					; pushbot (not harmed by fire, activated by pop)
 					
@@ -13969,6 +13970,7 @@ Function ControlSpellBall(i)
 	
 					EndIf
 					destructoflag=True
+
 
 				Case 330
 					; wysp
@@ -14078,6 +14080,20 @@ Function ControlSpellBall(i)
 
 					EndIf
 				EndIf
+				
+				If (ObjectType(j)=300 Or ObjectType(j)=301) And ObjectData(j,0)=0
+					If ObjectTileX(j)=ObjectData(i,0) And ObjectTileY(j)=ObjectData(i,1)
+					ObjectStatus(j)=0
+					ObjectData(j,0)=40
+					ObjectActive(j)=400
+					If ObjectType(j)=300
+						PlaySoundFX(83,ObjectX(j),ObjectY(j))
+					Else
+						PlaySoundFX(124,ObjectX(j),ObjectY(j))
+					EndIf
+					EndIf
+				EndIf
+				
 			Next
 			
 			
@@ -14598,7 +14614,7 @@ Function ControlFlashBubble(i)
 		If ObjectFrozen(j)<10000 And (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.4 And ObjectExists(j)=True And ObjectActive(j)>0
 			Select ObjectType(j)
 			
-			Case 1,110,120,150,210,220,250,260,290,370,380,390,400,420,422,423
+			Case 1,45,46,110,120,150,210,220,250,260,290,370,380,390,400,420,422,423,430,431,432,433,450,460,470,471
 					; destroy
 				ObjectTileX(i)=Floor(ObjectX(i))
 				ObjectTileY(i)=Floor(ObjectY(i))
@@ -17618,6 +17634,18 @@ Function ControlGhost(i)
 		Return
 	EndIf
 	
+	If ObjectTileTypeCollision(i)=0
+	
+		ObjectYawAdjust(i)=0
+		ObjectMovementSpeed(i)=5+5*ObjectData(i,1)
+		ObjectTileX(i)=Floor(ObjectX(i))
+		ObjectTileY(i)=Floor(ObjectY(i))
+		ObjectTileTypeCollision(i)=2^0+2^3+2^4+2^9+2^10+2^11+2^12+2^14
+		ObjectObjectTypeCollision(i)=2^1+2^3+2^6
+		ObjectMovementType(i)=0
+		
+	EndIf
+	
 	
 	ObjectMoveXGoal(i)=ObjectTileX2(PlayerObject)
 	ObjectMoveYGoal(i)=ObjectTileY2(PlayerObject)
@@ -17828,6 +17856,10 @@ Function ControlWraith(i)
 						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,4,-1,-1,False,300)
 					Else If ObjectData(i,2)=2
 						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,3,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+					Else If ObjectData(i,2)=3
+						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,2,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+					Else If ObjectData(i,2)=4
+						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,6,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
 					EndIf
 				EndIf
 			EndIf

@@ -106,7 +106,7 @@ Dim AdventureWonCommand(3,6)	; 3 commands, each with level/command/fourdata
 						
 
 
-Dim winningcondition$(19)
+Dim winningcondition$(20)
 Global nofwinningconditions
 Restore winning
 Repeat
@@ -551,6 +551,7 @@ EntityTexture TexturePlane,LevelTexture
 WaterTexture=MyLoadTexture("data\LevelTextures\"+WaterTExturename$(currentwatertexture),2)
 Global ButtonTexture=MyLoadTexture("data\graphics\buttons1.bmp",4)
 Global GateTexture=MyLoadTexture("data\graphics\gates.bmp",1)
+Global CloudTexture=myLoadTexture("Data\graphics\cloud.jpg",4)
 
 ; Teleport
 Dim TeleporterTexture(16)
@@ -726,6 +727,36 @@ RotateMesh RetrozbotMesh,0,90,0
 HideEntity RetrozbotMesh
 Global RetroRainbowCoinTexture=myLoadTexture("data\models\retro\rainbowcoin.bmp",1)
 
+; Zbots
+Global WeeBotMesh=myLoadMesh("data\models\weebot\weebot.3ds",0)
+Global WeebotTexture=myLoadTexture("data\models\weebot\weebot.jpg",1)
+EntityTexture Weebotmesh,Weebottexture
+RotateMesh WeebotMesh,-90,0,0
+RotateMesh WeebotMesh,0,180,0
+HideEntity WeebotMesh
+
+Global ZapbotMesh=myLoadMesh("data\models\zapbot\zapbot.3ds",0)
+Global ZapbotTexture=myLoadTexture("data\models\zapbot\zapbot.jpg",1)
+EntityTexture Zapbotmesh,Zapbottexture
+RotateMesh ZapbotMesh,-90,0,0
+RotateMesh ZapbotMesh,0,180,0
+HideEntity ZapbotMesh
+
+Global PushbotMesh
+Global PushbotTexture=myLoadTexture("data\graphics\pushbot.bmp",1)
+
+Global ZbotNPCMesh=myLoadMesh("data\models\zbots\zbotnpc.3ds",0)
+
+RotateMesh ZBOTNPCMesh,-90,0,0
+RotateMesh ZBOTNPCMesh,0,-90,0
+
+Dim ZbotNPCTexture(8)
+For i=0 To 7
+	ZbotNPCTexture(i)=myLoadTexture("data\models\zbots\zbotnpc.jpg",1)
+Next
+EntityTexture ZbotNPCMesh,ZBotNPCTexture(0)
+HideEntity ZbotNPCMesh
+
 ; Turtles
 Global TurtleMesh=MyLoadMesh("data\models\turtle\dragonturtle2.3ds",0)
 RotateMesh TurtleMesh,-90,0,0
@@ -790,6 +821,37 @@ For i=0 To 7
 Next
 EntityTexture ThwartMesh,ThwartTexture(0)
 HideEntity ThwartMesh
+
+Global RainbowTexture=myloadTexture("data\graphics\rainbow.jpg",1)
+
+; Lurker
+Global LurkerMesh=MyLoadMesh ("data\models\lurker\lurker.3ds",0)
+Global LurkerTexture=MyLoadTexture ("data\models\lurker\lurker.jpg",1)
+EntityTexture LurkerMesh,LurkerTexture
+RotateMesh LurkerMesh,-90,0,0
+HideEntity LurkerMesh
+
+; Ghosts
+Dim WraithTexture(5)
+Global GhostMesh=MyLoadMesh ("data\models\ghost\ghost.3ds",0)
+Global GhostTexture=MyLoadTexture ("data\models\ghost\ghost.jpg",1)
+RotateMesh ghostmesh,-90,0,0
+RotateMesh ghostmesh,0,180,0
+EntityTexture GhostMesh,GhostTexture
+HideEntity GhostMesh
+
+Global WraithMesh=MyLoadMesh ("data\models\ghost\wraith.3ds",0)
+RotateMesh wraithmesh,-90,0,0
+RotateMesh wraithmesh,0,180,0
+
+WraithTexture(0)=MyLoadTexture ("data\models\ghost\wraith0.jpg",1)
+WraithTexture(1)=MyLoadTexture ("data\models\ghost\wraith1.jpg",1)
+WraithTexture(2)=MyLoadTexture ("data\models\ghost\wraith2.jpg",1)
+WraithTexture(3)=MyLoadTexture ("data\models\ghost\wraith3.jpg",1)
+WraithTexture(4)=MyLoadTexture ("data\models\ghost\wraith4.jpg",1)
+EntityTexture WraithMesh,WraithTexture(0)
+HideEntity WraithMesh
+
 
 ; Obstacles
 Dim ObstacleMesh(100),ObstacleTexture(100)
@@ -4219,6 +4281,62 @@ Function DisplayObjectAdjuster(i)
 		
 	Case "DefensePower"
 		tex$=Str$(CurrentObjectDefensePower)
+		tex2$="Greeting"
+		Select CurrentObjectDefensePower
+		Case 0
+			tex$="Stinky1"
+		Case 1
+			tex$="Stinky2"
+		Case 2
+			tex$="Loof1"
+		Case 3
+			tex$="Loof2"
+		Case 4
+			tex$="Qookie1"
+		Case 5
+			tex$="Qookie2"
+		Case 6
+			tex$="Peegue1"
+		Case 7
+			tex$="Peegue2"
+		Case 8
+			tex$="Qookie3"
+		Case 9
+			tex$="Qookie4"
+
+		Case 10,11,12,13,14,15,16,17,18
+			tex$="Wee "+Str$(CurrentObjectDefensePower-9)
+		Case 19,20,21
+			tex$="Kaboom "+Str$(CurrentObjectDefensePower-18)
+
+		Case 22,23,24
+			tex$="ZBot "+Str$(CurrentObjectDefensePower-21)
+
+		Case 25
+			tex$="Chomper"
+		Case 26
+			tex$="Thwart 1"
+		Case 27
+			tex$="Thwart 2"
+		Case 28
+			tex$="Troll 1"
+		Case 29
+			tex$="Troll 2"
+		Case 30
+			tex$="Monster"
+		Case 31
+			tex$="Stinky 3"
+		Case 32
+			tex$="Stinky 4"
+		Case 33
+			tex$="Stinky 5"
+
+		End Select
+		
+		
+
+
+
 	Case "YawAdjust"
 		tex$=Str$(CurrentObjectYawAdjust)
 	Case "PitchAdjust"
@@ -4267,8 +4385,11 @@ Function DisplayObjectAdjuster(i)
 				tex$="GlowGem"
 			Else If CurrentObjectSubType=-4
 				tex$="Spy-Eye"
-			Else If CurrentObjectSubType=-99
-				tex$="Whistle"
+			Else If CurrentObjectSubType=-5
+				tex$="Glyph"
+			Else If CurrentObjectSubType=-6
+				tex$="MapPiece"
+
 			EndIf
 			
 
@@ -4289,7 +4410,6 @@ Function DisplayObjectAdjuster(i)
 				tex$="CountW"
 			EndIf
 		EndIf
-		
 		If CurrentObjectModelName$="!Crab"
 			tex2$="Type"
 			If CurrentObjectSubType=0
@@ -4351,6 +4471,22 @@ Function DisplayObjectAdjuster(i)
 			EndIf
 			
 		EndIf
+		
+		If  Currentobjectmodelname$="!Autodoor"
+			If CurrentObjectActivationType=11
+				tex$="Down"
+			Else If CurrentObjectActivationType=17
+				tex$="North"
+			Else If CurrentObjectActivationType=18
+				tex$="East"
+			Else If CurrentObjectActivationType=19
+				tex$="South"
+			Else If CurrentObjectActivationType=20
+				tex$="West"
+			EndIf
+			
+		EndIf
+
 
 
 		
@@ -4360,8 +4496,15 @@ Function DisplayObjectAdjuster(i)
 	Case "Data0"
 		tex$=Str$(CurrentObjectData(0))
 		
-		If CurrentObjectModelName$="!Retrolasergate" Or CurrentObjectModelName$="!Cuboid" Or CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectTextureName$="!GloveTex"  Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage"  Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge"
+		If CurrentObjectModelName$="!CustomModel"
+			tex2$="YawAnim"
+		EndIf
+		If CurrentObjectModelName$="!Scritter" Or CurrentObjectModelName$="!Cuboid" Or CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!KeyCard" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage"  Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge" Or CurrentObjectType=424 Or CurrentObjectModelName$="!Pushbot" Or CurrentObjectModelName$="!Autodoor" Or CurrentObjectModelName$="!Suctube" Or CurrentObjectModelName$="!Conveyor"
 			tex2$="Colour"
+		EndIf
+		
+		If CurrentObjectModelName$="!Obstacle51" Or CurrentObjectModelName$="!Obstacle55" Or CurrentObjectModelName$="!Obstacle59"
+			tex2$="Shape"
 		EndIf
 		
 		If CurrentObjectModelName$="!Obstacle48" ; (wysp ship)
@@ -4422,6 +4565,16 @@ Function DisplayObjectAdjuster(i)
 		EndIf
 		If CurrentObjectModelName$="!Gem"
 			tex2$="Shape"
+		EndIf
+		If CurrentObjectModelName$="!Crystal"
+			tex2$="Type"
+			Select CurrentObjectData(0)
+			Case 0
+				tex$="Rainbow"
+			Case 1
+				tex$="Void"
+			End Select
+
 		EndIf
 
 		If CurrentObjectModelName$="!Bowler"
@@ -4488,7 +4641,7 @@ Function DisplayObjectAdjuster(i)
 				tex$="NorthWest"
 			End Select
 		EndIf
-		If CurrentObjectModelName$="!Turtle" Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectType<>424)
+		If CurrentObjectModelName$="!Turtle" Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectType<>424) Or CurrentObjectModelName$="!Weebot"  Or CurrentObjectModelName$="!Zapbot"
 			tex2$="Direction"
 			
 			Select CurrentObjectData(0)
@@ -4518,11 +4671,16 @@ Function DisplayObjectAdjuster(i)
 				tex$="Dark"
 			Case 5
 				tex$="Shadow"
+			Case 6
+				tex$="Fire"
+			Case 7
+				tex$="Green"
+			Case 8
+				tex$="White"
 			End Select
 				
 			
 		EndIf
-		
 		If CurrentObjectModelName$="!Kaboom"
 			tex2$="Texture"
 			
@@ -4554,24 +4712,16 @@ Function DisplayObjectAdjuster(i)
 		EndIf
 		
 
-		If CurrentObjectType=51 ; spellball generator
+		If CurrentObjectType=51 Or CurrentObjectTextureName$="!GloveTex" ; spellball generator
 			tex2$="Spell"
-			Select CurrentObjectData(0)
-			Case 0
-				tex$="Floing"
-			Case 1
-				tex$="Pow"
-			Case 2
-				tex$="Pop"
-			Case 3
-				tex$="Grow"
-			Case 4
-				tex$="Brrr"
-			Case 5
-				tex$="Not Used Yet"
-			Case 6
-				tex$="Blink"
-			End Select
+			tex$=GetMagicNameAndId(CurrentObjectData(0))
+		EndIf
+		
+		If CurrentObjectModelName$="!Mothership"
+			tex2$="TimerMax"
+		EndIf	
+		If CurrentObjectModelName$="!Ghost" Or CurrentObjectModelName$="!Wraith"
+			tex2$="Radius"
 		EndIf		
 
 
@@ -4581,8 +4731,17 @@ Function DisplayObjectAdjuster(i)
 
 	Case "Data1"
 		tex$=Str$(CurrentObjectData(1))
-		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap"  Or CurrentObjectModelName$="!FlipBridge" Or CurrentObjectModelName$="!Retrolasergate"
+		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key"  Or CurrentObjectModelName$="!KeyCard" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge" Or CurrentObjectModelName$="!Retrolasergate" Or CurrentObjectModelName$="!Pushbot" Or CurrentObjectModelname$="!Autodoor" Or CurrentObjectModelname$="!Suctube" Or CurrentObjectModelName$="!Conveyor"
 			tex2$="SubColour"
+		EndIf
+		
+		If CurrentObjectModelName$="!CustomModel"
+			tex2$="PitchAnim"
+		EndIf
+
+		
+		If CurrentObjectModelName$="!Obstacle51" Or CurrentObjectModelName$="!Obstacle55" Or CurrentObjectModelName$="!Obstacle59"
+			tex2$="Texture"
 		EndIf
 		
 		If CurrentObjectModelName$="!Cuboid"
@@ -4629,24 +4788,14 @@ Function DisplayObjectAdjuster(i)
 			tex2$="Type"
 			
 			Select CurrentObjectData(1)
-			Case 1
-				tex$="Crimson/Floing"
 			Case 0
-				tex$="Pow"
-			Case -1
-				tex$="Pop"
-			Case -2
-				tex$="Grow"
-			Case -3
-				tex$="Brr"
-			Case -4
-				tex$="Flash"
-			Case -5
-				tex$="Blink"
-			Case -6
-				tex$="White/Null"
-			Case -7
-				tex$="Bounce/Rainbow"
+				tex$="Fire"
+			Case 1
+				tex$="Ice"
+			Case 2
+				tex$="Null"
+			Case 3
+				tex$="Bounce"
 			End Select
 		EndIf
 
@@ -4675,6 +4824,8 @@ Function DisplayObjectAdjuster(i)
 				tex$="Ghost"
 			Else If currentobjectData(1)=2
 				tex$="Glow"
+			Else
+				tex$="Mecha"
 			EndIf
 			
 			
@@ -4694,7 +4845,7 @@ Function DisplayObjectAdjuster(i)
 			If CurrentObjectData(1)=0
 				tex$="Awake"
 			Else If CurrentObjectData(1)=1
-				tex$="Reversed"
+				tex$="Curious"
 			Else If CurrentObjectData(1)=2
 				tex$="Asleep"
 			Else If CurrentObjectData(1)=3
@@ -4746,8 +4897,8 @@ Function DisplayObjectAdjuster(i)
 		If CurrentObjectType=51 ; spellball generator
 			tex2$="Goal X"
 		EndIf
-		
-		If  (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectModelName$<>"!Retrolasergate")
+
+		If  (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectModelName$<>"!Retrolasergate") Or CurrentObjectModelName$="!Weebot"  Or CurrentObjectModelName$="!Zapbot"
 
 			tex2$="Turning"
 			If CurrentObjectData(1)=0
@@ -4758,16 +4909,26 @@ Function DisplayObjectAdjuster(i)
 			EndIf
 		EndIf
 		
+		If CurrentObjectModelName$="!Ghost" 
+			tex2$="Speed"
+		EndIf
+		If CurrentObjectModelName$="!Wraith"
+			tex2$="ShotTime"
+		EndIf
+		
 
 
 		
 	Case "Data2" 
 		tex$=Str$(CurrentObjectData(2))
-		If CurrentObjectModelName$="!Spring"  Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!FlipBridge"
-
+		If CurrentObjectModelName$="!Spring"  Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!FlipBridge"  Or CurrentObjectModelName$="!Pushbot" Or CurrentObjectModelName$="!Suctube"  Or CurrentObjectModelName$="!SuctubeX" Or CurrentObjectModelName$="!Conveyor"
 
 			tex2$="Direction"
 			If CurrentObjectModelName$="!Transporter" Then tex$=Str$(3-CurrentObjectData(2))
+		EndIf
+		
+		If CurrentObjectModelName$="!CustomModel"
+			tex2$="RollAnim"
 		EndIf
 
 		If CurrentObjectModelName$="!Button"
@@ -4979,6 +5140,15 @@ Function DisplayObjectAdjuster(i)
 			
 			EndIf
 		EndIf
+		If CurrentObjectModelName$="!ZbotNPC" 
+			tex2$="Turning"
+			If CurrentObjectData(2)=0
+				tex$="Player"
+			Else
+				tex$="Fixed"
+			EndIf
+			
+		EndIf
 
 		If CurrentObjectModelName$="!Sign"
 			tex2$="Move"
@@ -5001,8 +5171,28 @@ Function DisplayObjectAdjuster(i)
 			tex2$="Goal Y"
 		EndIf
 		
+		If  CurrentObjectModelName$="!Zapbot"
+			tex2$="Speed"
+		EndIf
+		
 		If  CurrentObjectModelName$="!Cuboid"
 			tex2$="Explo Command"
+		EndIf
+		
+		If CurrentObjectModelName$="!Mothership"
+			tex2$="SourceX"
+		EndIf
+		
+		If CurrentObjectModelName$="!Wraith"
+			tex2$="Magic"
+			Select CurrentObjectData(2)
+			Case 0
+				tex$="Fire"
+			Case 1
+				tex$="Ice"
+			Case 2
+				tex$="Grow"
+			End Select
 		EndIf
 
 
@@ -5010,15 +5200,22 @@ Function DisplayObjectAdjuster(i)
 		
 	Case "Data3"
 		tex$=Str$(CurrentObjectData(3))
+		If CurrentObjectModelName$="!Suctube"  Or CurrentObjectModelName$="!SuctubeX"
+			tex2$="Style"
+			
+		EndIf
+		If CurrentObjectModelName$="!CustomModel"
+			tex2$="XAnim"
+		EndIf
 
-		If CurrentObjectModelName$="!Transporter" Or CurrentObjectType=45
+		If CurrentObjectModelName$="!Pushbot" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectType=45
 			tex2$="Turn"
 			If CurrentObjectData(3)=0
 				tex$="Left"
 			Else If CurrentObjectData(3)=1
 
 				tex$="Right"
-			Else
+			Else ; only for pushbots
 				tex$="180"
 			EndIf
 		EndIf
@@ -5228,15 +5425,27 @@ Function DisplayObjectAdjuster(i)
 				
 			
 		EndIf
+		
+		If  CurrentObjectModelName$="!Zapbot"
+			tex2$="Range"
+		EndIf
+		
+		If  CurrentObjectModelName$="!Cuboid"
+			tex2$="Cmd Data1"
+		EndIf
+		
+		If CurrentObjectModelName$="!Mothership"
+			tex2$="SourceY"
+		EndIf
 
-
-	If CurrentObjectModelName$="!Cuboid"
-		tex2$="Cmd Data1"
-	EndIf
 
 
 	Case "Data4"
 		tex$=Str$(CurrentObjectData(4))
+		
+		If CurrentObjectModelName$="!CustomModel"
+			tex2$="YAnim"
+		EndIf
 
 		If CurrentObjectModelName$="!Button"
 			If (CurrentObjectSubType Mod 32)<5
@@ -5259,6 +5468,18 @@ Function DisplayObjectAdjuster(i)
 				If CurrentObjectData(4)=-1 Then	tex$="No Change"
 
 
+			EndIf
+		EndIf
+		If CurrentObjectModelName$="!Conveyor"
+			tex2$="Visual Type"
+		EndIf
+		
+		If CurrentObjectModelName$="!Suctube"  
+			tex2$="Sound"
+			If CurrentObjectData(4)=0
+				tex$="Normal"
+			Else 
+				tex$="Portal"
 			EndIf
 		EndIf
 		
@@ -5314,18 +5535,43 @@ Function DisplayObjectAdjuster(i)
 			End Select
 		EndIf
 		
-		If CurrentObjectModelName$="!Ufo"
+		If  CurrentObjectModelName$="!Zapbot" Or CurrentObjectModelName$="!Ufo"
 
 			tex2$="Track"
+		EndIf
+		
+		If CurrentObjectModelName$="!Autodoor"
+			If CurrentObjectData(4)>=0
+				tex2$="ActivateID"
+			Else
+				tex2$="ActivateType"
+				tex$=Str$(-CurrentObjectData(4))
+			EndIf
 		EndIf
 
 		If  CurrentObjectModelName$="!Cuboid"
 			tex2$="Cmd Data2"
 		EndIf
+		If CurrentObjectModelName$="!Mothership"
+			tex2$="FlyGoalX1"
+		EndIf
 
 
 	Case "Data5"
 		tex$=Str$(CurrentObjectData(5))
+		If CurrentObjectModelName$="!Suctube"
+			tex2$="Particles"
+			If CurrentObjectData(5)=0
+				tex$="Yes"
+			Else
+				tex$="No"
+			EndIf
+			
+		EndIf
+		
+		If CurrentObjectModelName$="!CustomModel"
+			tex2$="ZAnim"
+		EndIf
 
 		
 
@@ -5357,6 +5603,14 @@ Function DisplayObjectAdjuster(i)
 		If CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Obstacle36" Or CurrentObjectModelName$="!Obstacle37" Or CurrentObjectModelName$="!Obstacle38" Or CurrentObjectModelName$="!Obstacle39" Or CurrentObjectModelName$="!Obstacle40"
 			tex2$="Style"
 		EndIf
+		If CurrentObjectModelName$="!Conveyor"
+			tex2$="Logic"
+			If CurrentObjectData(5)=0
+				tex$="Move"
+			Else
+				tex$="Step"
+			EndIf
+		EndIf
 		
 		
 		If CurrentObjectModelName$="!NPC"
@@ -5384,19 +5638,33 @@ Function DisplayObjectAdjuster(i)
 			tex2$="Red"
 		EndIf
 		
+		If CurrentObjectModelName$="!Autodoor"
+			If CurrentObjectData(5)>=0
+				tex2$="ActivateID"
+			Else
+				tex2$="ActivateType"
+				tex$=Str$(-CurrentObjectData(5))
+			EndIf
+		EndIf
+		
 		If  CurrentObjectModelName$="!Cuboid"
 			tex2$="Cmd Data3"
 		EndIf
-		
-		
+
+
+		If CurrentObjectModelName$="!Mothership"
+			tex2$="FlyGoalY1"
+		EndIf
 
 
 		
 	Case "Data6"
 		tex$=Str$(CurrentObjectData(6))
-		if CurrentObjectModelName$="!CustomModel"
+		
+		If CurrentObjectModelName$="!CustomModel"
 			tex2$="XSpeed"
 		EndIf
+
 		If CurrentObjectModelName$="!Button"
 			If (CurrentObjectSubType Mod 32)<5
 				tex2$="SubColour3"
@@ -5428,7 +5696,7 @@ Function DisplayObjectAdjuster(i)
 			End Select
 		EndIf
 		
-		If CurrentObjectModelName$="!Thwart" Or CurrentObjectModelName$="!Troll"
+		If CurrentObjectModelName$="!Thwart" Or CurrentObjectModelName$="!Troll" Or CurrentObjectModelName$="!ZbotNPC"
 
 			tex2$="Shooter"
 			Select CurrentObjectData(6)
@@ -5442,13 +5710,33 @@ Function DisplayObjectAdjuster(i)
 		If CurrentObjectModelName$="!GlowWorm"  Or CurrentObjectModelName$="!Zipper"
 			tex2$="Green"
 		EndIf
+
+		If CurrentObjectModelName$="!Autodoor"
+			If CurrentObjectData(6)>=0
+				tex2$="ActivateID"
+			Else
+				tex2$="ActivateType"
+				tex$=Str$(-CurrentObjectData(6))
+			EndIf
+		EndIf
+		If CurrentObjectModelName$="!Conveyor"
+			tex2$="ActivationWait"
+		EndIf
 		
 		If  CurrentObjectModelName$="!Cuboid"
 			tex2$="Cmd Data4"
 		EndIf
 
+		If CurrentObjectModelName$="!Mothership"
+			tex2$="FlyGoalX2"
+		EndIf
+
+
 	Case "Data7"
 		tex$=Str$(CurrentObjectData(7))
+		If CurrentObjectModelName$="!CustomModel"
+			tex2$="YSpeed"
+		EndIf
 
 		If CurrentObjectModelName$="!Button"
 			If (CurrentObjectSubType Mod 32)<5
@@ -5481,19 +5769,31 @@ Function DisplayObjectAdjuster(i)
 			If CurrentObjectData(7) >=20 And CurrentObjectData(7)<30 tex$=tex$+"BouFas"
 		EndIf
 		
-		If CurrentObjectModelName$="!Thwart" Or CurrentObjectModelName$="!Troll"
+		If CurrentObjectModelName$="!Thwart" Or CurrentObjectModelName$="!Troll" Or CurrentObjectModelName$="!ZbotNPC"
 
 			tex2$="TimerMax1"
 		EndIf
 		If CurrentObjectModelName$="!GlowWorm"  Or CurrentObjectModelName$="!Zipper"
 			tex2$="Blue"
 		EndIf
+		
+		If CurrentObjectModelName$="!Autodoor"
+			tex2$="StayOnTimer"
+			
+		EndIf
+
+		If CurrentObjectModelName$="!Mothership"
+			tex2$="FlyGoalY2"
+		EndIf
 
 
 
 	Case "Data8"
 		tex$=Str$(CurrentObjectData(8))
-		
+		If CurrentObjectModelName$="!CustomModel"
+			tex2$="ZSpeed"
+		EndIf
+
 		If CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!Button"
 			tex2$="ActivateID"
 			If CurrentObjectData(8)=0
@@ -5543,7 +5843,6 @@ Function DisplayObjectAdjuster(i)
 			
 			
 		EndIf
-		
 		If CurrentObjectModelName$="!StinkerWee"
 			
 			tex2$="Type"
@@ -5555,11 +5854,33 @@ Function DisplayObjectAdjuster(i)
 			
 			
 		EndIf
+		
+		If CurrentObjectModelName$="!ZbotNPC"
+			
+			tex2$="IntroSound"
+			If CurrentObjectData(8)=0 tex$="On"
+			If CurrentObjectData(8)=1 tex$="Off"
+			
+		EndIf
+
+
+
+		If CurrentObjectModelName$="!Mothership"
+			tex2$="FlyGoalX3"
+		EndIf
 
 
 
 	Case "Data9"
 		tex$=Str$(CurrentObjectData(9))
+		
+		If CurrentObjectModelName$="!CustomModel"
+			tex2$="Deadly"
+			If CurrentObjectData(9)=0 tex$="No"
+			If CurrentObjectData(9)=1 tex$="Yes"
+			
+
+		EndIf
 
 		If CurrentObjectModelName$="!Button"
 			If CurrentObjectSubType = 11 And CurrentObjectData(0)=1
@@ -5579,6 +5900,15 @@ Function DisplayObjectAdjuster(i)
 			EndIf
 		EndIf
 		
+		If CurrentObjectModelName$="!Conveyor"
+			tex2$="Tail Length"
+		EndIf
+		
+				
+				
+		If CurrentObjectModelName$="!Mothership"
+			tex2$="FlyGoalY3"
+		EndIf
 
 		
 	Case "Talkable"
@@ -6960,6 +7290,35 @@ Function BuildCurrentTileModel()
 	
 End Function
 
+Function GetMagicNameAndId$(id)
+	Return Str(id) + ". " + GetMagicName(id)
+End Function
+
+Function GetMagicName$(id)
+	Select id
+		Case 0
+			Return "Crimson"
+		Case 1
+			Return "Pow"
+		Case 2
+			Return "Pop"
+		Case 3
+			Return "Grow"
+		Case 4
+			Return "Brrr"
+		Case 5
+			Return "Flash"
+		Case 6
+			Return "Blink"
+		Case 7
+			Return "Null"
+		Case 8
+			Return "Rainbow"
+		Default
+			Return "Black"
+	End Select
+End Function
+
 Function BuildCurrentObjectModel()
 	
 	If CurrentObjectModel>0 
@@ -7009,8 +7368,20 @@ Function BuildCurrentObjectModel()
 		CurrentObjectModel=CreateTransporterMesh(CurrentObjectData(0),3)
 		RotateMesh CurrentObjectModel,0,90*CurrentObjectData(2),0
 		
+	Else If CurrentObjectModelName$="!Conveyor"
+		If CurrentObjectData(4)=4
+			CurrentObjectModel=CreateCloudMesh(CurrentObjectData(0))
+		Else
+			CurrentObjectModel=CreateTransporterMesh(CurrentObjectData(0),CurrentObjectData(4))
+		EndIf
+		RotateMesh CurrentObjectModel,0,-90*CurrentObjectData(2),0
+		If CurrentObjectType=46 ScaleMesh CurrentObjectmodel,.5,.5,.5
+
+		
 	Else If CurrentObjectModelName$="!Key"
 		CurrentObjectModel=CreateKeyMesh(CurrentObjectData(0))
+	Else If CurrentObjectModelName$="!KeyCard" 
+		CurrentObjectModel=CreateKeyCardMesh(CurrentObjectData(0))
 	Else If CurrentObjectModelName$="!StinkerWee"
 		CurrentObjectModel=CopyEntity(StinkerWeeMesh)
 	Else If CurrentObjectModelName$="!Cage"
@@ -7020,6 +7391,21 @@ Function BuildCurrentObjectModel()
 	Else If CurrentObjectModelName$="!Scritter"
 		CurrentObjectModel=CopyEntity(ScritterMesh)
 		EntityTexture CurrentObjectModel,ScritterTexture
+		
+	Else If CurrentObjectModelName$="!RainbowBubble"
+		CurrentObjectModel=CreateSphere()
+		ScaleMesh CurrentObjectModel,.4,.4,.4
+		PositionMesh CurrentObjectModel,0,1,0
+		EntityTexture CurrentObjectModel,Rainbowtexture
+		
+		
+	Else If CurrentObjectModelName$="!PlantFloat"
+		CurrentObjectModel=CreateSphere()
+		ScaleMesh CurrentObjectModel,.4,.1,.4
+;		PositionMesh CurrentObjectModel,0,1,0
+		EntityTexture CurrentObjectModel,Rainbowtexture
+		
+		
 	Else If CurrentObjectModelName$="!IceFloat"
 		CurrentObjectModel=CreateSphere()
 		ScaleMesh CurrentObjectModel,.4,.1,.4
@@ -7040,6 +7426,13 @@ Function BuildCurrentObjectModel()
 		EntityTexture CurrentObjectModel,ThwartTexture(CurrentObjectData(2))
 	Else If CurrentObjectModelName$="!Tentacle"
 		CurrentObjectModel=CopyEntity(TentacleMesh)
+	Else If CurrentObjectModelName$="!Lurker"
+		CurrentObjectModel=CopyEntity(LurkerMesh)
+	Else If CurrentObjectModelName$="!Ghost"
+		CurrentObjectModel=CopyEntity(GhostMesh)
+	Else If CurrentObjectModelName$="!Wraith"
+		CurrentObjectModel=CopyEntity(WraithMesh)
+		EntityTexture CurrentObjectModel,WraithTexture(CurrentObjectData(2))
 	Else If CurrentObjectModelName$="!Crab"
 		CurrentObjectModel=CopyEntity(CrabMesh)
 		If CurrentObjectSubType=0 Then EntityTexture CurrentObjectModel,CrabTexture2
@@ -7129,6 +7522,23 @@ Function BuildCurrentObjectModel()
 	Else If CurrentObjectModelName$="!Retrolasergate"
 		CurrentObjectModel=CreateretrolasergateMesh(Currentobjectdata(0))
 		
+		
+	Else If CurrentObjectModelName$="!Weebot"
+		CurrentObjectModel=CopyEntity(WeebotMesh)
+		CurrentObjectYawAdjust=(-90*CurrentObjectData(0) +3600) Mod 360
+		
+	Else If CurrentObjectModelName$="!Zapbot"
+		CurrentObjectModel=CopyEntity(ZapbotMesh)
+		CurrentObjectYawAdjust=(-90*CurrentObjectData(0) +3600) Mod 360
+
+	Else If CurrentObjectModelName$="!Pushbot"
+		CurrentObjectModel=CreatePushbotMesh(CurrentObjectData(0),CurrentObjectData(3))
+		CurrentObjectYawAdjust=-CurrentObjectData(2)*90
+		
+	Else If CurrentObjectModelName$="!ZbotNPC"
+		CurrentObjectModel=CopyEntity(ZbotNPCMesh)
+		EntityTexture CurrentObjectModel,ZBotNPCTexture(CurrentObjectData(2))
+		
 	Else If CurrentObjectModelName$="!Token"
 		CurrentObjectModel=CopyEntity(CoinMesh)
 		EntityTexture CurrentObjectModel,TokenCoinTexture
@@ -7160,6 +7570,18 @@ Function BuildCurrentObjectModel()
 
 
 		EntityTexture CurrentObjectModel,Springtexture
+	
+	Else If CurrentObjectModelName$="!Suctube" 
+		CurrentObjectModel=CreateSuctubemesh(CurrentObjectData(3),CurrentObjectData(0),True)
+		
+		CurrentObjectYawAdjust=(-90*CurrentObjectData(2) +3600) Mod 360
+
+	Else If CurrentObjectModelName$="!SuctubeX" 
+		CurrentObjectModel=CreateSuctubeXmesh(CurrentObjectData(3))
+		CurrentObjectYawAdjust=(-90*CurrentObjectData(2) +3600) Mod 360
+
+
+		
 		
 	Else If CurrentObjectModelName$="!FlipBridge"
 		CurrentObjectModel=CreateCube()
@@ -8342,6 +8764,26 @@ Function LoadLevel(levelnumber)
 			
 		Else If ObjectModelName$(Dest)="!Retrolasergate"
 			ObjectEntity(Dest)=Createretrolasergatemesh(ObjectData(Dest,0))
+			
+				
+			
+		Else If ObjectModelName$(Dest)="!Weebot"
+			ObjectEntity(Dest)=CopyEntity(WeebotMesh)
+			ObjectYawAdjust(Dest)=(-90*ObjectData(Dest,0) +3600) Mod 360
+
+		Else If ObjectModelName$(Dest)="!Zapbot"
+			ObjectEntity(Dest)=CopyEntity(ZapbotMesh)
+			ObjectYawAdjust(Dest)=(-90*ObjectData(Dest,0) +3600) Mod 360
+
+		Else If ObjectModelName$(Dest)="!Pushbot"
+			ObjectEntity(Dest)=CreatePushbotMesh(ObjectData(Dest,0),ObjectData(Dest,3))
+			ObjectYawAdjust(Dest)=-90*ObjectData(Dest,2)
+			
+		Else If ObjectModelName$(Dest)="!ZbotNPC"
+			ObjectEntity(Dest)=CopyEntity(ZbotNPCMesh)
+			EntityTexture ObjectEntity(Dest),ZbotNPCTexture(ObjectData(Dest,2))
+			
+			
 		Else If ObjectModelName$(Dest)="!Busterfly"
 			ObjectEntity(Dest)=CopyEntity(busterflyMesh)
 			
@@ -8354,6 +8796,16 @@ Function LoadLevel(levelnumber)
 
 		Else If ObjectModelName$(Dest)="!BabyBoomer"
 			ObjectEntity(Dest)=CopyEntity(KaboomMesh)
+			
+		Else If ObjectModelName$(Dest)="!Lurker"
+			ObjectEntity(Dest)=CopyEntity(LurkerMesh)
+		Else If ObjectModelName$(Dest)="!Ghost"
+			ObjectEntity(Dest)=CopyEntity(GhostMesh)
+
+		Else If ObjectModelName$(Dest)="!Wraith"
+			ObjectEntity(Dest)=CopyEntity(WraithMesh)
+			EntityTexture ObjectEntity(Dest),WraithTexture(ObjectData(Dest,2))
+			
 			
 		Else If ObjectModelName$(Dest)="!GlowWorm"  Or ObjectModelName$(Dest)="!Zipper"
 			ObjectEntity(Dest)=CreateSphere(12)
@@ -8373,6 +8825,11 @@ Function LoadLevel(levelnumber)
 
 
 		;	RotateEntity ObjectEntity(Dest),0,90*ObjectData(Dest,0),0
+		
+		Else If ObjectModelName$(Dest)="!Suctube"
+			ObjectEntity(Dest)=CreateSucTubeMesh(ObjectData(Dest,3),ObjectData(Dest,0),True)
+		Else If ObjectModelName$(Dest)="!SuctubeX"
+			ObjectEntity(Dest)=CreateSucTubeXMesh(ObjectData(Dest,3))
 		
 		Else If ObjectModelName$(Dest)="!FlipBridge"
 			ObjectEntity(Dest)=CreateCube()
@@ -8457,6 +8914,8 @@ Function LoadLevel(levelnumber)
 
 		Else If ObjectModelName$(Dest)="!Key"
 			ObjectEntity(Dest)=CreateKeyMesh(ObjectData(Dest,0))
+		Else If ObjectModelName$(Dest)="!KeyCard"
+			ObjectEntity(Dest)=CreateKeyCardMesh(ObjectData(Dest,0))
 
 
 		Else If ObjectModelName$(Dest)="!SteppingStone"
@@ -9130,6 +9589,44 @@ Function CreateKeyMesh(col)
 	Return Entity
 End Function
 
+Function CreateKeyCardMesh(col)
+
+	tex=24+col
+
+	entity=CreateMesh()
+
+
+	surface=CreateSurface(entity)
+	
+	AddVertex (surface,-.4,.4,-.1,(tex Mod 8)*0.125+0.000,Floor((tex Mod 64)/8)*0.125+0.000)
+	AddVertex (surface,.4,.4,-.10,(tex Mod 8)*0.125+0.125,Floor((tex Mod 64)/8)*0.125+0.000)
+	AddVertex (surface,-.4,-.4,-.10,(tex Mod 8)*0.125+0.000,Floor((tex Mod 64)/8)*0.125+0.125)
+	AddVertex (surface,.4,-.4,0-.1,(tex Mod 8)*0.125+0.125,Floor((tex Mod 64)/8)*0.125+0.125)
+	
+	AddVertex (surface,-.4,.4,.10,(tex Mod 8)*0.125+0.000,Floor((tex Mod 64)/8)*0.125+0.000)
+	AddVertex (surface,.4,.4,.10,(tex Mod 8)*0.125+0.125,Floor((tex Mod 64)/8)*0.125+0.000)
+	AddVertex (surface,-.4,-.4,.10,(tex Mod 8)*0.125+0.000,Floor((tex Mod 64)/8)*0.125+0.125)
+	AddVertex (surface,.4,-.4,.10,(tex Mod 8)*0.125+0.125,Floor((tex Mod 64)/8)*0.125+0.125)
+
+
+
+	AddTriangle(surface,0,1,2)
+	AddTriangle(surface,1,3,2)
+	
+	AddTriangle(surface,5,4,6)
+	AddTriangle(surface,5,6,7)
+	
+	RotateMesh Entity,90,0,0
+	PositionMesh Entity,0,.3,0
+
+	
+	
+	
+	UpdateNormals Entity
+	EntityTexture Entity,ButtonTexture
+	Return Entity
+End Function
+
 
 Function CreateCustomItemMesh(tex)
 	entity=CreateMesh()
@@ -9206,6 +9703,201 @@ Function CreateCustomItemMesh(tex)
 	Return Entity
 
 End Function
+
+Function CreatePushbotMesh(tex,dir)
+	
+	Entity=CreateMesh()
+	Surface=CreateSurface(Entity)
+	
+	If dir=2 ;(180 turn around)
+		dir=0
+		;front
+		AddVertex (surface,-.4,0,.4,0,.25+.25*dir)
+		AddVertex (surface,+.4,0,.4,0,0+.25*dir)
+		AddVertex (surface,-.2,.3,.2,.25,.20+.25*dir)
+		AddVertex (surface,+.2,.3,.2,.25,.05+.25*dir)
+		AddTriangle (surface,0,1,2)
+		AddTriangle (surface,1,3,2)
+		; Top
+		AddVertex (surface,-.4,.4,-.4,.5,.20+.25*dir)
+		AddVertex (surface,+.4,.4,-.4,.5,.05+.25*dir)
+		AddTriangle (surface,2,3,4)
+		AddTriangle (surface,3,5,4)
+		;Back
+		AddVertex (surface,-.45,0,-.45,.75,.25+.25*dir)
+		AddVertex (surface,+.45,0,-.45,.75,0+.25*dir)
+		AddTriangle (surface,4,5,6)
+		AddTriangle (surface,5,7,6)
+		; Left
+		AddVertex (surface,-.4,0,.4,.75,.25+.25*dir)
+		AddVertex (surface,-.45,0,-.45,.75,0+.25*dir)
+		AddVertex (surface,-.2,.3,.2,1,.25+.25*dir)
+		AddVertex (surface,-.4,.4,-.4,1,0+.25*dir)
+		AddTriangle (surface,10,9,8)
+		AddTriangle (surface,10,11,9)
+		; Right
+		AddVertex (surface,.4,0,.4,.75,.25+.25*dir)
+		AddVertex (surface,.45,0,-.45,.75,0+.25*dir)
+		AddVertex (surface,.2,.3,.2,1,.25+.25*dir)
+		AddVertex (surface,.4,.4,-.4,1,0+.25*dir)
+		AddTriangle (surface,12,13,14)
+		AddTriangle (surface,13,15,14)
+
+	
+	Else
+		dir=1-dir
+		; Front
+		AddVertex (surface,-.4,0,.4,0,.25+.25*dir)
+		AddVertex (surface,+.4,0,.4,0,0+.25*dir)
+		AddVertex (surface,-.2,.3,.2,.25,.25+.25*dir)
+		AddVertex (surface,+.2,.3,.2,.25,0+.25*dir)
+		AddTriangle (surface,0,1,2)
+		AddTriangle (surface,1,3,2)
+		; Top
+		AddVertex (surface,-.4,.4,-.4,.5,.25+.25*dir)
+		AddVertex (surface,+.4,.4,-.4,.5,0+.25*dir)
+		AddTriangle (surface,2,3,4)
+		AddTriangle (surface,3,5,4)
+		;Back
+		AddVertex (surface,-.45,0,-.45,.75,.25+.25*dir)
+		AddVertex (surface,+.45,0,-.45,.75,0+.25*dir)
+		AddTriangle (surface,4,5,6)
+		AddTriangle (surface,5,7,6)
+		; Left
+		AddVertex (surface,-.4,0,.4,.75,.25+.25*dir)
+		AddVertex (surface,-.45,0,-.45,.75,0+.25*dir)
+		AddVertex (surface,-.2,.3,.2,1,.25+.25*dir)
+		AddVertex (surface,-.4,.4,-.4,1,0+.25*dir)
+		AddTriangle (surface,10,9,8)
+		AddTriangle (surface,10,11,9)
+		; Right
+		AddVertex (surface,.4,0,.4,.75,.25+.25*dir)
+		AddVertex (surface,.45,0,-.45,.75,0+.25*dir)
+		AddVertex (surface,.2,.3,.2,1,.25+.25*dir)
+		AddVertex (surface,.4,.4,-.4,1,0+.25*dir)
+		AddTriangle (surface,12,13,14)
+		AddTriangle (surface,13,15,14)
+	EndIf
+
+	
+	
+	; Col
+	AddVertex (surface,-.05,.33,.05,(tex Mod 8)*0.125+.01,(tex/8)*0.125+.51)
+	AddVertex (surface,.05,.33,.05,(tex Mod 8)*0.125+.115,(tex/8)*0.125+.51)
+	AddVertex (surface,-.25,.39,-.35,(tex Mod 8)*0.125+.01,(tex/8)*0.125+.51+.115)
+	AddVertex (surface,.25,.39,-.35,(tex Mod 8)*0.125+.115,(tex/8)*0.125+.51+.115)
+	AddTriangle (surface,16,17,18)
+	AddTriangle (surface,17,19,18)
+	
+		
+	
+	UpdateNormals Entity
+	
+	EntityTexture Entity,PushbotTexture
+	Return Entity
+
+End Function
+
+Function CreateSuctubeMesh(tex,col,active)
+	
+	Entity=CreateMesh()
+	Surface=CreateSurface(Entity)
+	
+	nofsegments#=16
+	
+	i=0
+	angle#=-(360.0/nofsegments)/2.0+i*(360.0/nofsegments)
+	; top triangle
+	AddVertex (surface,-0.3,1.71,-0.3,(col Mod 8)*0.125+.01,(col/8)*0.125+.51)
+	AddVertex (surface,+0.3,1.71,-0.3,(col Mod 8)*0.125+.115,(col/8)*0.125+.51)
+	AddVertex (surface,0,1.71,+0.3,(col Mod 8)*0.125+.01,(col/8)*0.125+.51+.115)
+	AddTriangle (surface,0,1,2)
+	AddTriangle (surface,0,2,1)
+
+	
+	For i=0 To nofsegments-1
+		angle#=-(360.0/nofsegments)/2.0+i*(360.0/nofsegments)
+		AddVertex (surface,1.5*Sin(angle),0.7+1.0*Cos(angle),-0.505,0.25*tex,107.0/512.0)
+		AddVertex (surface,1.5*Sin(angle),0.7+1.0*Cos(angle),+0.505,0.25*tex,88.0/512.0)
+		AddVertex (surface,1.5*Sin(angle+(360.0/nofsegments)),0.7+1.0*Cos(angle+(360.0/nofsegments)),-0.505,0.25*tex+0.25,107.0/512.0)
+		AddVertex (surface,1.5*Sin(angle+(360.0/nofsegments)),0.7+1.0*Cos(angle+(360.0/nofsegments)),+0.505,0.25*tex+0.25,88.0/512.0)
+
+		;i=i+1 ; to account for the first four vertices
+		AddTriangle(surface,i*4+0+3,i*4+1+3,i*4+2+3)
+		AddTriangle(surface,i*4+1+3,i*4+3+3,i*4+2+3)
+		
+		AddTriangle(surface,i*4+2+3,i*4+1+3,i*4+0+3)
+		AddTriangle(surface,i*4+2+3,i*4+3+3,i*4+1+3)
+		;i=i-1
+	Next
+	
+
+	
+
+	UpdateNormals Entity
+	
+	EntityTexture Entity,GateTexture
+	Return Entity
+End Function
+
+Function CreateSuctubeXMesh(tex)
+	
+	Entity=CreateMesh()
+	Surface=CreateSurface(Entity)
+	
+	nofsegments#=16
+	nofarcpoints#=8
+	
+		
+
+	For j=0 To nofarcpoints
+		angle2#=(90.0/nofarcpoints)*j
+		For i=0 To nofsegments-1
+			angle#=-(360.0/nofsegments)/2.0+i*(360.0/nofsegments)
+			height#=0.7+1.0*Cos(angle)
+			radius#=1.5-1.5*Sin(angle)
+			
+			
+			If i Mod 2 =0
+				xtex#=0.25
+			Else
+				xtex#=0.0
+			EndIf
+
+			If j Mod 2 =0
+				ytex#=19.0
+			Else
+				ytex#=0.0
+			EndIf
+			
+			AddVertex (surface,1.5-radius*Cos(angle2),height,-1.5+radius*Sin(angle2),0.25*tex+xtex,(107.0-ytex)/512.0)
+			
+		Next
+	Next
+	
+	For j=0 To nofarcpoints-1
+		For i=0 To nofsegments-1
+		
+			AddTriangle(surface,j*nofsegments+i,j*nofsegments+((i+1) Mod nofsegments),(j+1)*nofsegments+i)
+			AddTriangle(surface,(j+1)*nofsegments+i,j*nofsegments+((i+1) Mod nofsegments),(j+1)*nofsegments+((i+1) Mod nofsegments))
+			
+			AddTriangle(surface,j*nofsegments+((i+1) Mod nofsegments),j*nofsegments+i,(j+1)*nofsegments+i)
+			AddTriangle(surface,(j+1)*nofsegments+((i+1) Mod nofsegments),j*nofsegments+((i+1) Mod nofsegments),(j+1)*nofsegments+i)
+
+
+			
+		Next
+	Next
+	
+
+	
+
+	UpdateNormals Entity
+	
+	EntityTexture Entity,GateTexture
+	Return Entity
+End Function
+
 
 Function GetTextureNames()
 
@@ -12310,7 +13002,7 @@ Include "particles.bb"
 
 
 .winning
-Data "None (e.g. collect star)","Rescue All Stinkers","Capture/Destroy Scritters","Collect All Gems","Destroy All Bricks","Destroy FireFlowers","Race","Capture/Destroy Crabs","Rescue All BabyBoomers"
+Data "None (e.g. collect star)","Rescue All Stinkers","Capture/Destroy Scritters","Collect All Gems","Destroy All Bricks","Destroy FireFlowers","Race","Capture/Destroy Crabs","Rescue All BabyBoomers","Destroy All ZBots"
 Data "Done"
 	
 .Commands

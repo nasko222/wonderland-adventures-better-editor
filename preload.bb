@@ -363,10 +363,10 @@ Function PreLoadModels()
 	Next
 	HideEntity ZbotNPCMesh
 	
-	MothershipMesh=myLoadMesh("data\models\other\starship.3ds",0)
-	Mothershiptexture=myLoadTexture("data\models\other\mothership.jpg",1)
-	EntityTexture Mothershipmesh,Mothershiptexture
-	HideEntity Mothershipmesh
+	StarTexture=myloadTexture("data\graphics\stars.jpg",1)
+ 	RainbowTexture=myloadTexture("data\graphics\rainbow.jpg",1)
+	RainbowTexture2=myloadTexture("data\graphics\rainbow.jpg",1)
+	
 	; Lurker
 	LurkerMesh=MyLoadMesh ("data\models\lurker\lurker.3ds",0)
 	LurkerTexture=MyLoadTexture ("data\models\lurker\lurker.jpg",1)
@@ -389,6 +389,8 @@ Function PreLoadModels()
 	WraithTexture(0)=MyLoadTexture ("data\models\ghost\wraith0.jpg",1)
 	WraithTexture(1)=MyLoadTexture ("data\models\ghost\wraith1.jpg",1)
 	WraithTexture(2)=MyLoadTexture ("data\models\ghost\wraith2.jpg",1)
+	WraithTexture(3)=MyLoadTexture ("data\models\ghost\wraith3.jpg",1)
+	WraithTexture(4)=MyLoadTexture ("data\models\ghost\wraith4.jpg",1)
 	EntityTexture WraithMesh,WraithTexture(0)
 	HideEntity WraithMesh
 	
@@ -540,6 +542,8 @@ Function PreLoadModels()
 
 	ButtonTexture=myLoadTexture("data/graphics/buttons1.bmp",4)
 	GateTexture=myLoadTexture("data/graphics/gates.bmp",1)
+	
+	CloudTexture=myLoadTexture("Data/graphics/cloud.jpg",2)
 	
 	AdventureTitleBackgroundTex=myLoadTexture("data\graphics\logos\starpaper.jpg",1)
 	PlasmaTexture=myLoadTexture("data\models\other\growflower.jpg",1)

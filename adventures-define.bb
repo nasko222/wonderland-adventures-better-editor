@@ -201,7 +201,7 @@ Global AutodoorMesh,AutoDoorTexture
 Global ButtonTexture
 
 ; Gates
-Global GateTexture
+Global GateTexture,CloudTexture
 
 ; FireTrap
 Global FireTrapTexture
@@ -309,7 +309,7 @@ Global PushbotMesh, PushbotTexture
 Global ZbotNPCMesh
 Dim ZbotNPCTexture(8)
 Global NofZBotNPCsInAdventure
-Global MothershipMesh, Mothershiptexture
+Global StarTexture,RainbowTexture,RainbowTexture2
 Global NofZBotsInAdventure
 
 ; Lurker
@@ -317,7 +317,7 @@ Global LurkerMesh,LurkerTexture
 
 ; Ghosts
 Global GhostMesh,WraithMesh,GhostTexture
-Dim WraithTexture(3)
+Dim WraithTexture(5)
 ; Obstacles
 Dim ObstacleMesh(50),ObstacleTexture(50)
 
