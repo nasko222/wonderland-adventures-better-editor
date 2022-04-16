@@ -3087,9 +3087,6 @@ Function LoadObject(file, complete,create)
 	Case "!ZbotNPC"
 		ObjectEntity(Dest)=CopyEntity(ZbotNPCMesh)
 		EntityTexture ObjectEntity(Dest),ZbotNPCTexture(ObjectData(Dest,2))
-		
-	Case "!Mothership"
-		ObjectEntity(Dest)=CopyEntity(MothershipMesh)
 	
 	Case "!None"
 		ObjectEntity(Dest)=CreatePivot()
@@ -4004,8 +4001,6 @@ Function ControlObjects()
 				ControlPushbot(i)
 			Case 433
 				ControlZbotNPC(i)
-			Case 434
-				ControlMothership(i)
 			Case 450
 				ControlLurker(i)
 			Case 460
@@ -4230,6 +4225,7 @@ Function ActivateObject(i)
 		If ObjectActive(i)>1001 Then ObjectActive(i)=1001
 		
 	EndIf
+	If ObjectType(i)=281 		Redosuctubemesh(i)
 End Function
 Function DeActivateObject(i)
 	; turns object toward deactivation (unless it's already deactive)
@@ -4247,7 +4243,7 @@ Function DeActivateObject(i)
 		EndIf
 	EndIf
 	If ObjectActive(i)<0 Then ObjectActive(i)=0
-	
+		If ObjectType(i)=281 		Redosuctubemesh(i)
 
 End Function
 
@@ -4268,6 +4264,7 @@ Function ToggleObject(i)
 			
 		EndIf
 	EndIf
+	If ObjectType(i)=281 		Redosuctubemesh(i)
 	
 End Function
 
@@ -4329,6 +4326,11 @@ Function DestroyObject(i,k)
 		
 	
 	; Special cases
+	
+	
+	If ObjectType(i)=423 Or ObjectTYpe(i)>=430 And ObjectType(i)<=433
+		NofZBotsInAdventure=NofZbotsInAdventure-1
+	EndIf
 	
 	
 	Select ObjectTYpe(i)
@@ -4437,6 +4439,22 @@ Function DestroyObject(i,k)
 		; Scritter
 		NofScrittersInAdventure=NofScrittersInAdventure-1
 		PlaySoundFX(15,-1,-1)
+	Case 151
+		; Rainbowbubble
+		PlaySoundFX(15,ObjectTIleX(i),ObjectTIleY(i))
+		PlaySoundFX(124,ObjectTIleX(i),ObjectTIleY(i))
+
+		If ObjectMovementTimer(i)>250
+			x=ObjectTileX2(i)
+			y=ObjectTileY2(i)
+		Else
+			x=ObjectTileX(i)
+			y=ObjectTIleY(i)
+		EndIf
+		If LevelTileLogic(x,y)=2 And ObjectTileLogic(x,y)=0
+			CreatePlantFloat(x,y)
+		EndIf
+		
 	Case 230
 		; FireFlower
 		NofFireFlowersInAdventure=NofFireFlowersInAdventure-1
@@ -4454,6 +4472,10 @@ Function DestroyObject(i,k)
 		PlaySoundFX(110,ObjectTIleX(i),ObjectTIleY(i))
 
 		NofBricksInAdventure=NofBricksInAdventure-1
+		If ObjectData(i,2)>0
+			ActivateCommand(ObjectData(i,2),ObjectData(i,3),ObjectData(i,4),ObjectData(i,5),ObjectData(i,6))
+		EndIf
+		
 	Case 220,250,260,290
 		; turtle,chomper,bowler,thwart
 		If (WAEpisode<>1 Or AdventureCurrentNumber<>70) ; unless in blue shard level or WA1
@@ -4518,8 +4540,22 @@ Function DestroyObject(i,k)
 			Return
 		EndIf
 
-	Case 420,421,422,423
+	Case 420,421,422,423,430,431,432,433,470,471
 		PlaySoundFX(15,ObjectTIleX(i),ObjectTIleY(i))
+	Case 450
+		;lurker: extra particle explosion
+		If NofParticles<500 
+			k=100
+		Else If NofParticles<1000
+			k=30
+		Else
+			k=15
+		EndIf
+		For j=0 To k
+			AddParticle(8,ObjectX(i),ObjectZ(i)+0.5,-ObjectY(i),0,.92,Rnd(-.05,.05),Rnd(0.01,0.07),Rnd(-.05,.05),1,0,0,0,0,Rand(50,150),3)
+		Next
+	Case 460
+		PlaySoundFX(104,ObjectTIleX(i),ObjectTIleY(i))
 	
 	End Select
 	
@@ -4657,6 +4693,10 @@ Function CanObjectMoveToTile(i,x,y,CheckDiagonal,FinalDestination)
 		EndIf
 	EndIf
 	
+	; check for Weebots - stay on same texture
+	If (ObjectType(i)=430 And ObjectData(i,4)=1) Or (ObjectType(i)=431 And ObjectData(i,4)=1)  Or (ObjectType(i)=422 And ObjectData(i,4)=1)
+		If LevelTileTexture(x,y)<>ObjectData(i,9) Return False
+	EndIf
 	; All Clear - phew!
 	Return True
 	
@@ -4685,6 +4725,7 @@ Function ControlMoveObject(i)
 			ObjectMoveXGoal(i)=ObjectTileX(i)
 			ObjectMoveYGoal(i)=ObjectTileY(i)
 			If ObjectType(i)=120 PlaySoundFX(70,ObjectTileX(i),ObjectTileY(i))
+			If ObjectType(i)=432 ObjectMovementType(i)=0
 		EndIf
 		Return
 	EndIf
@@ -4704,6 +4745,13 @@ Function ControlMoveObject(i)
 			ObjectFlying(i)=0
 			ObjectMoveXGoal(i)=ObjectTileX(i)
 			ObjectMoveYGoal(i)=ObjectTileY(i)
+			If ObjectType(i)=432 ObjectMovementType(i)=0
+		EndIf
+		If ObjectType(i)=432
+			If dy=-1 ObjectData(i,2)=0
+			If dx=1 ObjectData(i,2)=1
+			If dy=1 ObjectData(i,2)=2
+			If dx=-1 ObjectData(i,2)=3
 		EndIf
 		Return
 	EndIf
@@ -5176,6 +5224,68 @@ Function ControlMoveObject(i)
 		If dy=1 And dx=1 ObjectMovementType(i)=74
 		If dy=1 And dx=-1 ObjectMovementType(i)=76
 		If dy=-1 And dx=-1 ObjectMovementType(i)=78
+	Case 81,82,83,84,85,86,87,88     ; 81/82 is left/right,
+		; Push-Bot Algorithm
+		; find current direction
+		dx=0
+		dy=0
+		If ObjectMovementType(i)=81 Or ObjectMovementType(i)=82 
+
+			dy=-1
+		Else If ObjectMovementType(i)=83 Or ObjectMovementType(i)=84  
+
+			dx=1
+		Else If ObjectMovementType(i)=85 Or ObjectMovementType(i)=86  
+
+			dy=1
+		Else If ObjectMovementType(i)=87 Or ObjectMovementType(i)=88 
+
+			dx=-1
+		EndIf
+		
+		
+		If CanObjectMoveToTile(i,ObjectTileX(i)+dx,ObjectTileY(i)+dy,True,True)=True
+			; continue
+			MoveObjectToTile(i,	ObjectTileX(i)+dx,ObjectTileY(i)+dy)
+			
+		Else 
+			SoundPitch (SoundFX(99),Rand(19000,25000))
+			PlaySoundFX(99,ObjectTileX(i),ObjectTileY(i))
+			
+			; or turn left/right and stop
+			If ObjectMovementType(i) Mod 2 = 1 ;left
+				
+				ObjectData(i,2)=(ObjectData(i,2)+3) Mod 4
+			Else 	; right
+				
+				ObjectData(i,2)=(ObjectData(i,2)+1) Mod 4
+			
+
+			EndIf
+			
+			
+			;*********************
+			; special for push-bots. check for 180s
+			
+			If ObjectData(i,3)=2
+			
+				If ObjectMovementType(i) Mod 2 = 1 ;left
+					
+					ObjectData(i,2)=(ObjectData(i,2)+3) Mod 4
+				Else 	; right
+					
+					ObjectData(i,2)=(ObjectData(i,2)+1) Mod 4
+				
+	
+				EndIf
+			EndIf
+			
+			ObjectMovementType(i)=0
+
+			; ************************ end of 2nd check
+		EndIf
+	
+
 	End Select
 
 End Function
@@ -5211,7 +5321,7 @@ Function OccupyObjectTile(i,x,y)
 	
 	If ObjectFrozen(i)>0
 		Select ObjectType(i)
-		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423
+		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423,430,431,432,433,470,471
 			If (ObjectTileLogic(x,y) And 2^10) =0
 				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^10
 			EndIf
@@ -5228,7 +5338,7 @@ Function OccupyObjectTile(i,x,y)
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^1
 		EndIf
 		
-	Case 110,330,290,380,390
+	Case 110,330,290,380,390,433
 		; Stinker NPC/Wisp/Troll/Thwart/Kaboom
 		If ObjectActive(i)>0
 			If ObjectTalkable(i)>0
@@ -5243,7 +5353,7 @@ Function OccupyObjectTile(i,x,y)
 		EndIf
 		
 	Case 120,400
-		; Wee Stinke
+	; Wee Stinker, Baby Boomer
 		If (ObjectTileLogic(x,y) And 2^3) =0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^3
 		EndIf
@@ -5288,12 +5398,12 @@ Function OccupyObjectTile(i,x,y)
 			EndIf
 		EndIf
 
-	Case 230, 290, 310
+	Case 230, 290, 310,432,460
 		; Fireflower, ducky
 		If (ObjectTileLogic(x,y) And 2^7) =0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^7
 		EndIf
-	Case 250,260,420,422,423
+	Case 250,260,420,422,423,430,431,151,470,471
 		; Bowlers, Chompers , Retromonsters,Ghosts
 		If (ObjectTileLogic(x,y) And 2^8) =0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^8
@@ -5354,6 +5464,77 @@ Function EndMoveObject(i)
 	
 	EndMoveTileCheck(i,oldx,oldy)
 	
+	; if flying - check for suctube corners
+	If ObjectFlying(i)/10 = 1
+		For j=0 To nofobjects-1
+			If ObjectType(j)=282
+				If Floor(ObjectX(j))=ObjectTileX(i) And Floor(ObjectY(j))=ObjectTileY(i)
+					; yup
+					Select ObjectData(j,2)
+					Case 0
+						If ObjectFlying(i)=10
+							ObjectFlying(i)=12
+						Else
+							ObjectFlying(i)=14
+						EndIf
+					Case 1
+						If ObjectFlying(i)=12
+							ObjectFlying(i)=14
+						Else
+							ObjectFlying(i)=16
+						EndIf
+					Case 2
+						If ObjectFlying(i)=12
+							ObjectFlying(i)=10
+						Else
+							ObjectFlying(i)=16
+						EndIf
+					Case 3
+						If ObjectFlying(i)=14
+							ObjectFlying(i)=12
+						Else
+							ObjectFlying(i)=10
+						EndIf
+					
+					End Select
+					If i=PlayerObject 
+						If Rand(1,100)<70
+							PlaySoundFX(Rand(180,182),ObjectTileX(i),ObjectTileY(i))
+						Else
+							PlaySoundFX(Rand(170,172),ObjectTileX(i),ObjectTileY(i))
+
+						EndIf
+					EndIf
+
+						
+				EndIf
+			EndIf
+		Next
+	
+	EndIf
+	
+	If i=PlayerObject And ObjectFlying(i)/10 <>1
+		; step conveyors
+		flag=False
+		For j=0 To nofobjects-1
+			If (ObjectType(j)=45 Or ObjectType(j)=46) And ObjectData(j,5)=1 And ObjectTileX(j)=ObjectTileX(i) And ObjectTileY(j)=ObjectTileY(i)
+				col=ObjectData(j,0)
+				subcol=ObjectData(j,1)
+				flag=True
+			EndIf
+		Next
+		If flag=True
+			For j=0 To nofobjects-1
+				If (ObjectType(j)=45) And ObjectData(j,5)=1 And ObjectData(j,0)=col And ObjectData(j,1)=subcol
+					Activateconveyor(j)
+					
+				EndIf
+			Next
+		EndIf
+	EndIf
+
+	
+	
 End Function
 
 Function VacateObjectTile(i)
@@ -5364,7 +5545,7 @@ Function VacateObjectTile(i)
 	
 	If ObjectFrozen(i)>0
 		Select ObjectType(i)
-		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423
+		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423,430,431,432,433,470,471
 			If (ObjectTileLogic(x,y) And 2^10) >0
 				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^10
 			EndIf
@@ -5381,7 +5562,7 @@ Function VacateObjectTile(i)
 			
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^1
 		EndIf
-	Case 110,330,290,380,390
+	Case 110,330,290,380,390,433
 		; Stinker NPC/Wisp/Troll/Thwart/Kaboom
 		If ObjectTalkable(i)>0
 			If (ObjectTileLogic(x,y) And 2^2) >0 
@@ -5395,7 +5576,7 @@ Function VacateObjectTile(i)
 		EndIf
 
 	Case 120,400
-		; Stinker Wee
+		; Stinker Wee, Baby Boomer
 		If (ObjectTileLogic(x,y) And 2^3) >0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^3
 		EndIf
@@ -5447,7 +5628,7 @@ Function VacateObjectTile(i)
 		If (ObjectTileLogic(x,y) And 2^7) >0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^7
 		EndIf
-	Case 250,260,420,422,423
+	Case 250,260,420,422,423,430,431,151,470,471
 		; bolwers, chompers
 		If (ObjectTileLogic(x,y) And 2^8) >0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^8
@@ -5475,7 +5656,7 @@ Function EndMoveTileCheck(i,oldx,oldy)
 	Case 1
 		; Solid Wall
 		; Check if Object can be in solid wall, if not - destroy
-		If ObjectType(i)=1  Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or ObjectType(i)=220 Or ObjectType(i)=250 Or ObjectType(i)=260   Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400  Or ObjectType(i)=420  Or ObjectType(i)=422 Or ObjectType(i)=423
+		If ObjectType(i)=1  Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or ObjectType(i)=250 Or ObjectType(i)=260   Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400  Or ObjectType(i)=420  Or ObjectType(i)=422 Or ObjectType(i)=423 Or ObjectType(i)=430 Or ObjectType(i)=431 Or ObjectType(i)=432 Or ObjectType(i)=433
 			; player - boom
 			DestroyObject(i,0)
 		EndIf
@@ -5485,7 +5666,7 @@ Function EndMoveTileCheck(i,oldx,oldy)
 		If (ObjectFlying(i) =0 Or ObjectFlying(i)>=20) 
 			
 			; anything frozen? Destroy
-			If ObjectType(i)=1 Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or (ObjectType(i)=250 And ObjectData(i,1)<>1) Or ObjectType(i)=260 Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400 Or ObjectType(i)=423
+			If ObjectType(i)=1 Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or (ObjectType(i)=250 And ObjectData(i,1)<>1) Or ObjectType(i)=260 Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400 Or ObjectType(i)=423 Or ObjectType(i)=432 Or ObjectType(i)=433 Or ObjectTYpe(i)=470 Or ObjectType(i)=471
 				DestroyObject(i,2)
 			EndIf
 				If (ObjectType(i)=220 Or ObjectType(i)=370) And ObjectStatus(i)=0
@@ -5643,7 +5824,7 @@ Function EndMoveTileCheck(i,oldx,oldy)
 
 				
 	Case 11,14
-	If ObjectType(i)<>422 And ObjectType(i)<>423
+	If ObjectType(i)<>422 And ObjectType(i)<>423 And ObjectType(i)<>430 And ObjectType(i)<>431
 			; Ice Straight
 			If ObjectFlying(i)=0
 	
@@ -5700,7 +5881,7 @@ Function EndMoveTileCheck(i,oldx,oldy)
 		EndIf	
 	Case 12
 	
-	If ObjectType(i)<>422 And ObjectType(i)<>423
+	If ObjectType(i)<>422 And ObjectType(i)<>423 And ObjectType(i)<>430 And ObjectType(i)<>431
 
 			; Ice Corner
 			oldflying=ObjectFLying(i)
@@ -6632,7 +6813,7 @@ Function ControlPlayerInGame(i)
 				
 					; yep - check which one, and is it talkable
 					For j=0 To NofObjects-1
-						If ObjectExists(j)=True And (ObjectType(j)=110 Or ObjectType(j)=180 Or ObjectType(j)=290 Or ObjectType(j)=330 Or ObjectType(j)=380 Or ObjectType(j)=390)
+						If ObjectExists(j)=True And (ObjectType(j)=110 Or ObjectType(j)=180 Or ObjectType(j)=290 Or ObjectType(j)=330 Or ObjectType(j)=380 Or ObjectType(j)=390 Or ObjectType(j)=433)
 							If ObjectMovementTimer(j)=0 And ObjectTalkable(j)>0 And ObjectActive(j)=1001
 							
 								If ObjectTileX(j)=MX And ObjectTileY(j)=MY
@@ -8357,7 +8538,7 @@ Function ControlGate(i)
 
 
 
-	Else
+	Else If ObjectSubType(i)<>9 ; not for autodoor (preset and then controlled in activationtype)
 		ObjectTileX(i)=Floor(ObjectX(i))
 		ObjectTileY(i)=Floor(ObjectY(i))
 	EndIf
@@ -8376,11 +8557,59 @@ Function ControlGate(i)
 	EndIf
 	
 	
+	; auto door controls
+	autoflag=False ;false=keep door closing/closed
+	If ObjectSubType(i)=9 Then autoflag=True ;And (ObjectData(i,4)<>0 Or ObjectData(i,5)<>0 Or ObjectData(i,6)<>0 Or ObjectData(i,7)<>0) Then autoflag=True
+	
+	If ObjectSubType(i)=9 
+		For k=4 To 6
+			;If ObjectData(i,k)<>0
+				For j=0 To nofobjects-1
+				ot=ObjectType(j)
+					If (ObjectData(i,k)>0 And ObjectData(i,k)=ObjectID(j)) Or (ObjectData(i,k)<0 And ObjectData(i,k)=-ObjectType(j)) Or (ObjectData(i,k)=0 And (ot=1 Or ot=110 Or ot=120 Or ot=150 Or ot=220 Or ot=250 Or ot=260 Or ot=290 Or ot=330 Or ot=370 Or ot=380 Or ot=390 Or ot=400 Or ot=420 Or ot=422 Or ot=423 Or ot=430 Or ot=431 Or ot=432 Or ot=433))
+						
+						; got one
+						
+						If Abs(ObjectTileX(i)-ObjectTileX(j))<3 And Abs(ObjectTileY(i)-ObjectTileY(j))<3
+							; close enough, just make sure it's not behind (lower range)
+							If ObjectActivationType(i)=17 And ObjectTileY(i)-ObjectTileY(j)=2
+								;
+							Else If ObjectActivationType(i)=19 And ObjectTileY(i)-ObjectTileY(j)=-2
+								;
+							Else If ObjectActivationType(i)=18 And ObjectTileX(i)-ObjectTileX(j)=-2
+								;
+							Else If ObjectActivationType(i)=20 And ObjectTileX(i)-ObjectTileX(j)=2
+								;
+							Else
+							
+								DeActivateObject(i)
+								
+
+								ObjectData(i,8)=ObjectData(i,7)
+								autoflag=False
+							EndIf
+						EndIf
+					EndIf
+				Next
+			;EndIf
+		Next
+		
+		
+	EndIf
+	If autoflag=True
+		If ObjectData(i,8)>0 ObjectData(i,8)=ObjectData(i,8)-1
+		If ObjectData(i,8)<=0 
+			ActivateObject(i)
+			
+		EndIf
+	EndIf
 	; Sound Effect Controls
 
 		If (ObjectLastActive(i) Mod 2 =0 And ObjectLastActive(i)>0) And ObjectActive(i) Mod 2 =1
 			If ObjectSubType(i)=0
 				PlaySoundFX(36,	ObjectTileX(i),ObjectTileY(i))	
+			Else If ObjectSubType(i)=9
+				PlaySoundFX(39,	ObjectTileX(i),ObjectTileY(i))
 			Else
 				
 				PlaySoundFX(37,	ObjectTileX(i),ObjectTileY(i))	
@@ -8389,6 +8618,8 @@ Function ControlGate(i)
 		If ObjectLastActive(i) Mod 2 =1 And ObjectActive(i) Mod 2 =0
 			If ObjectSubType(i)=0
 				PlaySoundFX(35,	ObjectTileX(i),ObjectTileY(i))
+			Else If ObjectSubType(i)=9
+				PlaySoundFX(38,	ObjectTileX(i),ObjectTileY(i))
 			Else
 				PlaySoundFX(37,	ObjectTileX(i),ObjectTileY(i))	
 			EndIf
@@ -9258,8 +9489,17 @@ Function ControlButton(i)
 											If ObjectType(k)=10 Or ObjectType(k)=140 Or ObjectType(k)=20 Or ObjectType(k)=424
 			
 												ActivateObject(k)
-											Else If ObjectType(k)=210
+											Else If ObjectType(k)=210 Or ObjectType(k)=432
 												; do nothing for transporters
+											Else If ObjectType(k)=45 
+													If ObjectData(k,5)=0 
+														DeActivateObject(k) ; mover - just turns off
+				
+													EndIf
+												
+											Else If ObjectType(k)=46
+												; do nothing!
+												
 											Else 
 												DeActivateObject(k)
 											EndIf
@@ -9356,6 +9596,9 @@ Function ControlButton(i)
 									Else If ObjectType(k)=210
 										; transporters
 										ObjectID(k)=500+ObjectData(i,j+0)*5+ObjectData(i,j+2)
+									Else If ObjectType(k)=45 Or objecttype(k)=46
+										; conveyors
+										ObjectID(k)=500+ObjectData(i,j+0)*5+ObjectData(i,j+2)
 										ReDoTransporterTexture(k)
 										
 									Else If ObjectType(k)=410
@@ -9371,6 +9614,18 @@ Function ControlButton(i)
 											ObjectData(k,1)=ObjectData(i,j+2)
 											EntityTexture ObjectEntity(k),SteppingStoneTexture(ObjectData(k,0))
 										EndIf
+									Else If ObjectType(k)=432
+										; pushbot
+										ObjectID(k)=500+ObjectData(i,j+0)*5+ObjectData(i,j+2)
+										RedoPushbotTexture(k)
+									Else If ObjectType(k)=281
+										; suctube
+										ObjectID(k)=500+ObjectData(i,j+0)*5+ObjectData(i,j+2)
+
+										Redosuctubemesh(k)
+	
+	
+										
 									EndIf
 								EndIf
 							Next
@@ -9507,6 +9762,23 @@ Function ActivateButton(i)
 								Else If ObjectType(k)=210
 							
 									ActivateTransporter(k)
+								Else If ObjectType(k)=45
+									
+									If  ObjectData(k,5)=1 And ObjectActive(k)=1001 And ObjectMovementTimer(k)=0
+										ActivateConveyor(k) ; stepper- makes one move
+									Else If ObjectData(k,5)=0 
+										ActivateObject(k) ; mover - just turns on
+
+									EndIf
+
+								
+								Else If ObjectType(k)=46
+									; do nothing!
+								Else If ObjectType(k)=432
+									SoundPitch (SoundFX(98),Rand(19000,25000))
+									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+
+									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
 								Else
 									ActivateObject(k)
 								EndIf
@@ -9551,6 +9823,23 @@ Function ActivateButton(i)
 									DeActivateObject(k)
 								Else If ObjectType(k)=210
 									ActivateTransporter(k)
+								Else If ObjectType(k)=45
+									
+									If  ObjectData(k,5)=1 And ObjectActive(k)=1001 And ObjectMovementTimer(k)=0
+										ActivateConveyor(k) ; stepper- makes one move
+									Else If ObjectData(k,5)=0 
+										ActivateObject(k) ; mover - just turns on
+
+									EndIf
+
+								Else If ObjectType(k)=46
+									; do nothing!
+								Else If ObjectType(k)=432
+									SoundPitch (SoundFX(98),Rand(19000,25000))
+									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+
+									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
+
 								Else 
 									ActivateObject(k)
 								EndIf
@@ -9588,7 +9877,25 @@ Function ActivateButton(i)
 							If ObjectExists(k)=True And ObjectID(k)=500+ObjectData(i,j)*5+ObjectData(i,j+4)
 								If ObjectType(k)=210
 									ActivateTransporter(k)
+								Else If ObjectType(k)=432
+									SoundPitch (SoundFX(98),Rand(19000,25000))
+									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
 
+									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
+								Else If ObjectType(k)=45
+									
+									If  ObjectData(k,5)=1 And ObjectActive(k)=1001 And ObjectMovementTimer(k)=0
+										ActivateConveyor(k) ; stepper- makes one move
+									Else If ObjectData(k,5)=0 
+										ToggleObject(k) ; mover - just toggles
+
+									EndIf
+
+								
+							
+	
+								Else If ObjectType(k)=46
+									; do nothing!
 								Else
 									ToggleObject(k)
 								EndIf
@@ -9624,6 +9931,26 @@ Function ActivateButton(i)
 							If ObjectExists(k)=True And ObjectID(k)=500+ObjectData(i,j)*5+ObjectData(i,j+4)
 								If ObjectType(k)=210
 									ActivateTransporter(k)
+								Else If ObjectType(k)=432
+									SoundPitch (SoundFX(98),Rand(19000,25000))
+									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+
+									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
+								
+								Else If ObjectType(k)=45
+									
+									If  ObjectData(k,5)=1 And ObjectActive(k)=1001 And ObjectMovementTimer(k)=0
+										ActivateConveyor(k) ; stepper- makes one move
+									Else If ObjectData(k,5)=0 
+										ToggleObject(k) ; mover - just toggles
+
+									EndIf
+
+
+								
+								
+								Else If ObjectType(k)=46
+									; do nothing!
 								Else
 									ToggleObject(k)
 								EndIf
@@ -9659,7 +9986,24 @@ Function ActivateButton(i)
 								If ObjectType(k)=10 Or ObjectType(k)=140 Or ObjectType(k)=20 Or ObjectType(k)=424
 
 									DeActivateObject(k)
+								Else If ObjectType(k)=432
+									SoundPitch (SoundFX(98),Rand(19000,25000))
+									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
 
+									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
+								Else If ObjectType(k)=45
+									
+									If  ObjectData(k,5)=1 And ObjectActive(k)=1001 And ObjectMovementTimer(k)=0
+										ActivateConveyor(k) ; stepper- makes one move
+									Else If ObjectData(k,5)=0 
+										ActivateObject(k) ; mover - just turns on
+
+									EndIf
+
+								
+																
+								Else If ObjectType(k)=46
+									; do nothing!
 								Else If ObjectType(k)=210
 									ActivateTransporter(k)
 
@@ -9712,7 +10056,7 @@ Function ActivateButton(i)
 									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
 									EntityTexture ObjectEntity(k),TeleporterTexture((ObjectID(k)-500)/5)
 
-								Else If ObjectType(k)=210
+								Else If ObjectType(k)=210 Or ObjectType(k)=45 Or ObjectType(k)=46
 									; transporters
 									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
 									RedoTransporterTexture(k)
@@ -9729,6 +10073,16 @@ Function ActivateButton(i)
 										ObjectData(k,1)=ObjectData(i,j+3)
 										EntityTexture ObjectEntity(k),SteppingStoneTexture(ObjectData(k,0))
 									EndIf
+								Else If ObjectType(k)=432 ; pushbot
+									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
+						
+									RedoPushbotTexture(k)
+								Else If ObjectType(k)=281 ; suctube
+									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
+							
+									Redosuctubemesh(k)
+
+
 									
 								EndIf
 								
@@ -9797,6 +10151,16 @@ Function ActivateButton(i)
 										ObjectData(k,1)=ObjectData(i,j+3)
 										EntityTexture ObjectEntity(k),SteppingStoneTexture(ObjectData(k,0))
 									EndIf
+								Else If ObjectType(k)=432
+									; pushbots
+									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
+									RedoPushbotTexture(k)
+								Else If ObjectType(k)=281
+									; suctube
+									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
+									Redosuctubemesh(k)
+
+
 
 									
 								EndIf
@@ -9813,7 +10177,7 @@ Function ActivateButton(i)
 									; teleporters
 									ObjectID(k)=500+ObjectData(i,j)*5+ObjectData(i,j+2)
 									EntityTexture ObjectEntity(k),TeleporterTexture((ObjectID(k)-500)/5)
-								Else If ObjectType(k)=210
+								Else If ObjectType(k)=210 Or ObjectType(k)=45 Or ObjectType(k)=46
 
 									; transporters
 									ObjectID(k)=500+ObjectData(i,j)*5+ObjectData(i,j+2)
@@ -9831,6 +10195,18 @@ Function ActivateButton(i)
 										ObjectData(k,1)=ObjectData(i,j+2)
 										EntityTexture ObjectEntity(k),SteppingStoneTexture(ObjectData(k,0))
 									EndIf
+								Else If ObjectType(k)=432
+									; pushbots
+									ObjectID(k)=500+ObjectData(i,j)*5+ObjectData(i,j+2)
+
+									RedoPushbotTexture(k)
+								Else If ObjectType(k)=281
+									; suctube
+									ObjectID(k)=500+ObjectData(i,j)*5+ObjectData(i,j+2)
+
+									Redosuctubemesh(k)
+
+
 									
 								EndIf
 
@@ -9878,7 +10254,7 @@ Function ActivateButton(i)
 									; teleporters
 									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
 									EntityTexture ObjectEntity(k),TeleporterTexture((ObjectID(k)-500)/5)
-								Else If ObjectType(k)=210
+								Else If ObjectType(k)=210 Or ObjectType(k)=45 Or ObjectType(k)=46
 
 									; transporters
 									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
@@ -9897,6 +10273,22 @@ Function ActivateButton(i)
 										ObjectData(k,1)=ObjectData(i,j+3)
 										EntityTexture ObjectEntity(k),SteppingStoneTexture(ObjectData(k,0))
 									EndIf
+								Else If ObjectType(k)=432
+									; pushbot
+									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
+									
+									RedoPushbotTexture(k)
+								Else If ObjectType(k)=281
+									; suctube
+									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
+									
+									Redosuctubemesh(k)
+
+
+
+
+
+									
 								EndIf						
 							EndIf
 						Next
@@ -9936,9 +10328,34 @@ Function ActivateButton(i)
 									ObjectData(k,2)=(ObjectData(k,2)+1) Mod 4
 								EndIf
 							EndIf
+							If ObjectType(k)=45
+								If ObjectData(i,2)=0
+									ObjectData(k,2)=(ObjectData(k,2)-1+4) Mod 4
+								Else
+									ObjectData(k,2)=(ObjectData(k,2)+1) Mod 4
+								EndIf
+
+							
+							EndIf
 							If ObjectType(k)=410
 								TurnFlipBridge(k,ObjectData(i,2))
 							EndIf
+							If ObjectType(k)=432 And ObjectMovementType(k)=0
+								;pushbots
+								If ObjectData(i,2)=0 ; left
+									ObjectData(k,2)=(ObjectData(k,2)+3) Mod 4
+								Else
+									ObjectData(k,2)=(ObjectData(k,2)+1) Mod 4
+								EndIf
+								
+							EndIf
+							If ObjectType(k)=281
+								;suctube
+								ObjectData(k,2)=ObjectData(k,2)-2
+								If ObjectData(k,2)<0 Then ObjectData(k,2)=ObjectData(k,2)+4
+								Redosuctubemesh(k)
+
+							EndIf					
 						EndIf
 					Next
 					
@@ -10219,6 +10636,59 @@ Function CreateKeyMesh(col)
 	Return Entity
 End Function
 
+Function CreateKeyCardMesh(col)
+
+
+	tex=24+col
+
+	entity=CreateMesh()
+
+
+	surface=CreateSurface(entity)
+	
+	AddVertex (surface,-.4,.4,-.021,(tex Mod 8)*0.125+0.000,Floor((tex Mod 64)/8)*0.125+0.000)
+	AddVertex (surface,.4,.4,-.0210,(tex Mod 8)*0.125+0.125,Floor((tex Mod 64)/8)*0.125+0.000)
+	AddVertex (surface,-.4,-.4,-.0210,(tex Mod 8)*0.125+0.000,Floor((tex Mod 64)/8)*0.125+0.125)
+	AddVertex (surface,.4,-.4,0-.021,(tex Mod 8)*0.125+0.125,Floor((tex Mod 64)/8)*0.125+0.125)
+	
+	AddVertex (surface,-.4,.4,.0210,(tex Mod 8)*0.125+0.000,Floor((tex Mod 64)/8)*0.125+0.000)
+	AddVertex (surface,.4,.4,.0210,(tex Mod 8)*0.125+0.125,Floor((tex Mod 64)/8)*0.125+0.000)
+	AddVertex (surface,-.4,-.4,.0210,(tex Mod 8)*0.125+0.000,Floor((tex Mod 64)/8)*0.125+0.125)
+	AddVertex (surface,.4,-.4,.0210,(tex Mod 8)*0.125+0.125,Floor((tex Mod 64)/8)*0.125+0.125)
+
+
+	AddTriangle(surface,0,1,2)
+	AddTriangle(surface,1,3,2)
+	
+	;AddTriangle(surface,0,4,1)
+	;AddTriangle(surface,4,5,1)
+	;AddTriangle(surface,1,5,7)
+	;AddTriangle(surface,1,7,3)
+	;AddTriangle(surface,4,0,6)
+	;AddTriangle(surface,0,2,6)
+	
+;	AddTriangle(surface,5,4,6)
+;	AddTriangle(surface,5,6,7)
+	
+;	AddTriangle(surface,0,2,1)
+;	AddTriangle(surface,1,2,3)
+	
+	AddTriangle(surface,5,4,6)
+	AddTriangle(surface,5,6,7)
+
+	
+;	RotateMesh Entity,90,0,0
+;	PositionMesh Entity,0,.3,0
+
+	
+	
+	
+	UpdateNormals Entity
+	
+	EntityTexture Entity,ButtonTexture
+	
+	Return Entity
+End Function
 Function ControlKey(i)
 	
 	If ObjectActive(i)<1001 
@@ -10249,9 +10719,11 @@ Function ControlKey(i)
 		
 	Else
 	;	ObjectYaw(i)=ObjectYaw(i)+2
-		
-		ObjectRoll2(i)=30*Sin((leveltimer) Mod 360)
-		
+		If ObjectModelName$(i)="!KeyCard"
+			ObjectYaw2(i)=((leveltimer) Mod 90)*4
+		Else
+			ObjectRoll2(i)=30*Sin((leveltimer) Mod 360)
+		EndIf	
 		ObjectZ(i)=.4
 	
 		dist=Maximum2(Abs(ObjectTileX(i)-ObjectTileX(PlayerObject)),Abs(ObjectTileY(i)-ObjectTileY(PlayerObject)))
@@ -10269,10 +10741,12 @@ Function ControlKey(i)
 			
 								
 				; and add to inventory
-				
-				AddItemToInventory(-1,3001,500+ObjectData(i,0)*5+ObjectData(i,1),ObjectData(i,0)+48,"Key","Use")
-				
-								
+				If ObjectModelName$(i)="!Key"	
+					AddItemToInventory(-1,3001,500+ObjectData(i,0)*5+ObjectData(i,1),ObjectData(i,0)+48,"Key","Use")
+				Else
+					AddItemToInventory(-1,3001,500+ObjectData(i,0)*5+ObjectData(i,1),ObjectData(i,0)+32,"KeyCard","Use")
+
+				EndIf								
 				; Do a little blip around the Rucksack
 				IconSize(8)=601
 				For j=0 To 359 Step 10
@@ -10780,6 +11254,118 @@ Function ControlParticleEmitters(i)
 		Case 5
 			If Rand(0,12)<ObjectData(i,1)*3-2 AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,Rnd(-.01,.01),Rnd(.02,.01),-Rnd(.05,.07),0,.001,0,-.001,0,100,3)
 		End Select
+	Case 4
+		; sparks
+		If Rand(0,1000)<ObjectData(i,1)*ObjectData(i,1)
+			If ObjectData(i,3)>=1
+				SoundPitch SoundFX(16),Rand(24000,29000)
+				PlaySoundFX(16,ObjectTileX(i)+.5,ObjectTileY(i)+.5)
+			EndIf
+			For j=0 To ObjectData(i,1)*30
+				Select ObjectData(i,2)
+				Case 0
+					AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0.01,.2,Rnd(-.01,.01),Rnd(.09,.11),Rnd(-.01,.01),0,.0001,0,-.0015,0,50,3)
+				Case 1
+					AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0.01,.2,Rnd(-.01,.01),-Rnd(0,.02),Rnd(-.01,.01),0,.0001,0,-.0015,0,50,3)
+				Case 2
+					AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0.01,.2,Rnd(.01,.04),Rnd(.03,.01),Rnd(-.01,.01),0,.0001,0,-.0015,0,50,3)
+				Case 3
+					AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0.01,.2,-Rnd(.01,.04),Rnd(.03,.01),Rnd(-.01,.01),0,.0001,0,-.0015,0,50,3)
+				Case 4
+					AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0.01,.2,Rnd(-.01,.01),Rnd(.03,.01),Rnd(.01,.04),0,.0001,0,-.0015,0,50,3)
+				Case 5
+					AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0.01,.2,Rnd(-.01,.01),Rnd(.03,.01),-Rnd(.01,.04),0,.0001,0,-.0015,0,50,3)
+				End Select
+			Next
+		EndIf
+	Case 5
+		; blinker
+		If (ObjectData(i,4)=0 And Rand(0,200)<ObjectData(i,1)) Or (ObjectData(i,4)=1 And LevelTimer Mod (500-ObjectData(i,1)*100)=0)
+			If ObjectData(i,3)>=1
+				If ObjectData(i,3)=1 ; quiet magic
+					SoundPitch SoundFX(90),Rand(16000,20000)
+					PlaySoundFX(90,ObjectTileX(i)+.5,ObjectTileY(i)+.5)
+				EndIf
+				If ObjectData(i,3)=2 ; loud mecha
+					
+					PlaySoundFX(35,ObjectTileX(i)+.5,ObjectTileY(i)+.5)
+				EndIf
+
+				If ObjectData(i,3)=3 ; variable gong
+					SoundPitch SoundFX(13),Rand(24000,44000)
+					PlaySoundFX(13,ObjectTileX(i)+.5,ObjectTileY(i)+.5)
+				EndIf
+				If ObjectData(i,3)=4 ; grow
+					
+					PlaySoundFX(92,ObjectTileX(i)+.5,ObjectTileY(i)+.5)
+				EndIf
+				
+				If ObjectData(i,3)=5 ; floing
+					
+					PlaySoundFX(93,ObjectTileX(i)+.5,ObjectTileY(i)+.5)
+				EndIf
+				
+				If ObjectData(i,3)=6 ; gem
+					
+					PlaySoundFX(11,ObjectTileX(i)+.5,ObjectTileY(i)+.5)
+				EndIf
+
+
+
+			EndIf
+			AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0.01,.4,0,0,0,0,.0005,0,0,0,100,3)
+			
+		EndIf
+		
+	Case 6
+		; circle
+		If (ObjectData(i,4)=0 And Rand(0,200)<ObjectData(i,1)) Or (ObjectData(i,4)=1 And LevelTimer Mod (500-ObjectData(i,1)*100)=0)
+
+			For j=0 To 44
+				Select ObjectData(i,2)
+				Case 0,1
+					AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,.01*ObjectData(i,1)*Cos(j*8),0,.01*ObjectData(i,1)*Sin(j*8),0,.001,0,0,0,100,3)
+				Case 2,3
+					AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,0,.01*ObjectData(i,1)*Cos(j*8),.01*ObjectData(i,1)*Sin(j*8),0,.001,0,0,0,100,3)
+				Case 4,5
+					AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,.01*ObjectData(i,1)*Cos(j*8),.01*ObjectData(i,1)*Sin(j*8),0,0,.001,0,0,0,100,3)
+				
+				End Select
+			Next
+		EndIf
+
+		
+	Case 7
+		; spiral
+		Select ObjectData(i,2)
+		Case 0
+			AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,.02*ObjectData(i,1)*Cos((Leveltimer*ObjectData(i,1)) Mod 360),0,.02*ObjectData(i,1)*Sin((Leveltimer*ObjectData(i,1)) Mod 360),0,.001,0,0,0,100,3)
+		Case 2
+			AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,0,.02*ObjectData(i,1)*Cos((Leveltimer*ObjectData(i,1)) Mod 360),.02*ObjectData(i,1)*Sin((Leveltimer*ObjectData(i,1)) Mod 360),0,.001,0,0,0,100,3)
+		Case 4
+			AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,.02*ObjectData(i,1)*Cos((Leveltimer*ObjectData(i,1)) Mod 360),.02*ObjectData(i,1)*Sin((Leveltimer*ObjectData(i,1)) Mod 360),0,0,.001,0,0,0,100,3)
+		
+		Case 1
+			AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,-.02*ObjectData(i,1)*Cos((Leveltimer*ObjectData(i,1)) Mod 360),0,.02*ObjectData(i,1)*Sin((Leveltimer*ObjectData(i,1)) Mod 360),0,.001,0,0,0,100,3)
+		Case 3
+			AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,0,-.02*ObjectData(i,1)*Cos((Leveltimer*ObjectData(i,1)) Mod 360),.02*ObjectData(i,1)*Sin((Leveltimer*ObjectData(i,1)) Mod 360),0,.001,0,0,0,100,3)
+		Case 5
+			AddParticle(ObjectData(i,0),ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,-.02*ObjectData(i,1)*Cos((Leveltimer*ObjectData(i,1)) Mod 360),.02*ObjectData(i,1)*Sin((Leveltimer*ObjectData(i,1)) Mod 360),0,0,.001,0,0,0,100,3)
+
+		End Select
+	
+
+
+		
+	
+
+
+
+
+	
+
+
+	
 	End Select
 
 End Function
@@ -11199,6 +11785,588 @@ Function ActivateTransporter(i)
 	EndIf
 End Function
 
+Function ControlConveyor(i)
+
+	ObjectMovementSpeed(i)=60
+	
+	
+	If ObjectID(i)=-1
+		; first time 
+		ObjectID(i)=500+ObjectData(i,0)*5+ObjectData(i,1)
+		ObjectTileX(i)=Floor(ObjectX(i))
+		ObjectTileY(i)=Floor(ObjectY(i))
+		x=ObjectTileX(i)
+		y=ObjectTileY(i)
+		ObjectData(i,8)=LevelTileLogic(x,y)
+		Leveltilelogic(x,y)=4
+		
+		; chase the tail
+		noftails=0
+		Repeat
+			
+			; Check the four directions
+			foundtail=False
+			For x2=-1 To 1
+				For y2=-1 To 1
+					If (x2=0 And y2<>0) Or (x2<>0 And y2=0)
+						; is there a matching tail there
+						For j=0 To nofobjects-1
+							If ObjectType(j)=46
+								If Floor(ObjectX(j))=x+x2 And Floor(ObjectY(j))=y+y2 
+									If ObjectData(j,0)=ObjectData(i,0) And ObjectData(j,1)=ObjectData(i,1) And ObjectData(j,3)=-1
+											foundtail=True
+											noftails=noftails+1
+											ObjectID(j)=500+ObjectData(j,0)*5+ObjectData(j,1)
+											ObjectData(j,3)=noftails
+											;ObjectData(j,4)=ObjectData(i,4)
+											ObjectData(j,8)=LevelTileLogic(x+x2,y+y2)
+											ObjectData(i,9)=noftails+1
+											LevelTileLogic(x+x2,y+y2)=4
+											ObjectData(j,5)=ObjectData(i,5)
+											ObjectData(j,6)=-x2
+											Objectdata(j,7)=-y2
+											ObjectData(j,9)=Rand(-5,5)
+											ObjectTileX(j)=x+x2
+											ObjectTileY(j)=y+y2
+											ObjectActivationspeed(j)=60
+											ObjectMovementSpeed(j)=20
+
+											If x2=0
+												If y2=+1
+													ObjectData(j,2)=0
+												Else
+													ObjectData(j,2)=2
+												EndIf
+											Else
+												If x2=+1
+													objectData(j,2)=3
+												Else
+													ObjectData(j,2)=1
+												EndIf
+											EndIf
+											
+											If ObjectData(j,4)=3	ObjectYaw(j)=-90*ObjectData(j,2)
+											x=x+x2
+											y=y+y2
+									EndIf
+								EndIf
+							EndIf
+						Next
+					EndIf
+				Next
+			Next
+		Until foundtail=False
+		
+		If noftails>0
+			; now go backwards to increase length of tail
+		;	foundtail=False
+		;	tailcount=2
+		;	Repeat
+		;		For y2=1 To -1 Step -1
+		;			For x2=1 To -1 Step -1
+		;				If (x2=0 And y2<>0) Or (x2<>0 And y2=0)
+							; is there a matching tail there
+							For j=0 To nofobjects-1
+								If ObjectType(j)=46
+		;							If Floor(ObjectX(j))=x+x2 And Floor(ObjectY(j))=y+y2 
+										If ObjectData(j,0)=ObjectData(i,0) And ObjectData(j,1)=ObjectData(i,1) ;And ObjectData(j,3)=1
+											ObjectData(j,3)=noftails+1-ObjectData(j,3)
+		;										foundtail=True
+		;										ObjectData(j,3)=noftails+1
+		;										x=x+x2
+		;										y=y+y2
+		;										tailcount=tailcount+1
+										EndIf
+		;							EndIf
+								EndIf
+							Next
+		;				EndIf
+		;			Next
+		;		Next
+		;	Until foundtail=False
+		EndIf
+	
+
+	EndIf
+	x=ObjectTileX(i)
+	y=ObjectTileY(i)
+
+	
+	If ObjectFrozen(i)=10001
+		; freeze in foing
+		;ObjectPitch(i)=-30
+		;ObjectRoll(i)=Rnd(-30,30)
+		;ObjectZ(i)=.3
+		ObjectFrozen(i)=ObjectFrozen(i)+999
+		
+			
+	EndIf
+	If ObjectFrozen(i)=10002
+		; revert
+		ObjectFrozen(i)=0
+		
+	EndIf
+	If ObjectFrozen(i)>2
+		; frozen
+		ObjectFrozen(i)=ObjectFrozen(i)-1
+		
+		Return
+	EndIf
+
+
+	
+
+
+	
+	
+	
+	Select (ObjectData(i,2)+40) Mod 4
+	Case 0
+		dx=0
+		dy=-1
+	Case 1
+		dx=1
+		dy=0
+	Case 2
+		dx=0
+		dy=1
+	Case 3
+		dx=-1
+		dy=0
+	End Select
+	
+	If ObjectData(i,4)=3 TurnobjectTowardDirection(i,dx,dy,20,180)
+	
+	If ObjectData(i,4)=4 ObjectYaw(i)=(ObjectYaw(i)+ObjectData(i,9)/10.0) Mod 360
+	
+	If objectMovementTimer(i)=0 
+		size#=1.0
+	Else
+		size#=Float(1001-ObjectMovementTimer(i))/Float(1001)
+		If size<0 Then size=0.0
+		size=1.0-size
+	EndIf
+	If ObjectData(i,4)=4
+		ObjectXScale(i)=1.5*size*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+		objectYScale(i)=1.5*size*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+		ObjectZScale(i)=1.5*size
+
+	Else
+		ObjectXScale(i)=size*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+		objectYScale(i)=size*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+		ObjectZScale(i)=size
+	EndIf
+	
+	If ObjectActive(i)=1001 And ObjectData(i,5)=0
+		
+		
+			
+		
+			; standing
+			If ObjectMovementTimer(i)=0
+				
+
+				ObjectData(i,7)=ObjectData(i,7)-1
+				If ObjectData(i,7)<=0
+					; time to move
+					
+					ObjectData(i,7)=ObjectData(i,6)
+					ActivateConveyor(i)
+					
+					
+					
+				
+				EndIf
+			EndIf
+
+		
+		
+		
+	EndIf
+End Function
+
+
+Function ActivateConveyor(i)
+
+	x=ObjectTileX(i)
+	y=ObjectTileY(i)
+
+	Select (ObjectData(i,2)+40) Mod 4
+	Case 0
+		dx=0
+		dy=-1
+	Case 1
+		dx=1
+		dy=0
+	Case 2
+		dx=0
+		dy=1
+	Case 3
+		dx=-1
+		dy=0
+	End Select
+
+
+	movedflag=False
+		; figure out direction
+		If (LevelTileLogic(x+dx,y+dy)=2 Or LevelTileLogic(x+dx,y+dy)=5) And (ObjectTileLogic(x+dx,y+dy)=0 Or ObjectTileLogic(x+dx,y+dy)=2^4)
+			; yep - go!
+			
+			MoveConveyorToTile(i,x,y,dx,dy,ObjectData(i,2))
+
+			movedflag=True
+		Else 
+			; turn?
+			olddir=ObjectData(i,2)
+			If ObjectData(i,3)=0
+				; pref direction left
+				ObjectData(i,2)=(ObjectData(i,2)+3) Mod 4
+				Select (ObjectData(i,2)+40) Mod 4
+				Case 0
+					dx=0
+					dy=-1
+				Case 1
+					dx=1
+					dy=0
+				Case 2
+					dx=0
+					dy=1
+				Case 3
+					dx=-1
+					dy=0
+				End Select
+				If (LevelTileLogic(x+dx,y+dy)=2 Or LevelTileLogic(x+dx,y+dy)=5) And (ObjectTileLogic(x+dx,y+dy)=0 Or ObjectTileLogic(x+dx,y+dy)=2^4)
+
+					; yep - go!
+			
+					MoveConveyorToTile(i,x,y,dx,dy,olddir)
+
+					movedflag=True
+				Else
+					; try right
+					ObjectData(i,2)=(olddir+1) Mod 4
+					Select (ObjectData(i,2)+40) Mod 4
+					Case 0
+						dx=0
+						dy=-1
+					Case 1
+						dx=1
+						dy=0
+					Case 2
+						dx=0
+						dy=1
+					Case 3
+						dx=-1
+						dy=0
+					End Select
+					If (LevelTileLogic(x+dx,y+dy)=2 Or LevelTileLogic(x+dx,y+dy)=5) And (ObjectTileLogic(x+dx,y+dy)=0 Or ObjectTileLogic(x+dx,y+dy)=2^4)
+
+						; yep - go!
+				
+						MoveConveyorToTile(i,x,y,dx,dy,olddir)
+
+						movedflag=True
+					EndIf
+				EndIf
+				If movedflag=False
+					ObjectData(i,2)=olddir
+				EndIf
+			Else
+				; pref direction right
+				ObjectData(i,2)=(ObjectData(i,2)+1) Mod 4
+				Select (ObjectData(i,2)+40) Mod 4
+				Case 0
+					dx=0
+					dy=-1
+				Case 1
+					dx=1
+					dy=0
+				Case 2
+					dx=0
+					dy=1
+				Case 3
+					dx=-1
+					dy=0
+				End Select
+				If (LevelTileLogic(x+dx,y+dy)=2 Or LevelTileLogic(x+dx,y+dy)=5) And (ObjectTileLogic(x+dx,y+dy)=0 Or ObjectTileLogic(x+dx,y+dy)=2^4)
+
+					; yep - go!
+			
+					MoveConveyorToTile(i,x,y,dx,dy,olddir)
+
+					movedflag=True
+				Else
+					; try left
+					ObjectData(i,2)=(olddir+3) Mod 4
+					Select (ObjectData(i,2)+40) Mod 4
+					Case 0
+						dx=0
+						dy=-1
+					Case 1
+						dx=1
+						dy=0
+					Case 2
+						dx=0
+						dy=1
+					Case 3
+						dx=-1
+						dy=0
+					End Select
+					If (LevelTileLogic(x+dx,y+dy)=2 Or LevelTileLogic(x+dx,y+dy)=5) And (ObjectTileLogic(x+dx,y+dy)=0 Or ObjectTileLogic(x+dx,y+dy)=2^4)
+
+						; yep - go!
+				
+						MoveConveyorToTile(i,x,y,dx,dy,olddir)
+						movedflag=True
+					EndIf
+				EndIf
+				If movedflag=False
+					ObjectData(i,2)=olddir
+				EndIf
+
+
+
+				
+			EndIf
+			
+		EndIf
+					
+End Function
+
+Function MoveConveyorToTile(i,x,y,dx,dy,olddir)
+
+
+
+	MoveObjectToTile(i,x+dx,y+dy)
+	Leveltilelogic(x+dx,y+dy)=4	
+	; create new tail
+	CreateConveyorTail(i,x,y,dx,dy,olddir)	
+	
+	
+	
+	; and go through all other conveyor tails - decrease them
+	For j=0 To nofobjects-1
+		If ObjectType(j)=46
+			If ObjectData(j,0)=ObjectData(i,0) And ObjectData(j,1)=ObjectData(i,1) And (ObjectActive(j) Mod 2 = 1)
+				; matching colours
+				ObjectData(j,3)=ObjectData(j,3)-1
+				If ObjectData(j,3)<=0
+					; all done - disappear
+					
+					LevelTileLogic(ObjectTileX(j),ObjectTileY(j))=ObjectData(j,8)
+					MoveObjectToTile(j,ObjectTileX(j)+ObjectData(j,6),ObjectTileY(j)+ObjectData(j,7))
+					DeActivateObject(j)
+					
+				EndIf
+			EndIf
+		EndIf
+	Next
+					
+	
+	
+End Function
+
+Function CreateConveyorTail(parent,x,y,dx,dy,olddir)
+
+	i=CreateNewObject()
+	
+	ObjectModelName$(i)="!Conveyor"
+	ObjectTextureName$(i)="!None"
+	If ObjectData(parent,4)=4
+		ObjectEntity(i)=CreateCloudMesh(.7,ObjectData(parent,0))
+	Else
+		ObjectEntity(i)=CreateTransporterMesh(ObjectData(Parent,0),ObjectData(Parent,4))
+		ObjectXScale(i)=.8
+		ObjectYScale(i)=.8
+	EndIf
+	ObjectX(i)=x+0.5
+	ObjectY(i)=y+0.5
+	ObjectTileX(i)=x
+	ObjectTileY(i)=y
+	ObjectID(i)=-1
+	ObjectType(i)=46
+	ObjectActive(i)=1001
+	ObjectActivationType(i)=2
+	ObjectActivationSpeed(i)=20
+	ObjectMovementSpeed(i)=20
+	ObjectYaw(i)=ObjectYaw(parent)
+	ObjectChild(i)=-1
+	ObjectParent(i)=-1
+	ObjectData(i,0)=ObjectData(parent,0)
+	ObjectData(i,1)=ObjectData(parent,1)
+	ObjectData(i,2)=ObjectData(parent,2)
+	ObjectData(i,3)=ObjectData(parent,9) ; tail length
+	ObjectData(i,4)=ObjectData(parent,4)
+	ObjectData(i,5)=ObjectData(parent,5)
+	ObjectData(i,6)=dx
+	ObjectData(i,7)=dy
+	ObjectData(i,8)=ObjectData(parent,8)
+	ObjectData(i,9)=Rand(-5,5)
+	ObjectActivationSpeed(i)=60
+	ObjectDestructionType(i)=1
+		ObjectID(i)=500+ObjectData(i,0)*5+ObjectData(i,1)
+
+	If ObjectData(i,4)=3	ObjectYaw(i)=-90*olddir
+	
+
+	If ObjectData(i,4)=4
+		ObjectXScale(i)=1.5*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+		objectYScale(i)=1.5*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+
+	
+	Else
+		ObjectXScale(i)=1*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+		objectYScale(i)=1*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+	EndIf
+	
+
+
+End Function
+
+Function ControlConveyorTail(i)
+	
+	
+	
+	If objectactive(i)=1001 
+	
+	
+			
+	
+		Select (ObjectData(i,2)+40) Mod 4
+		Case 0
+			dx=0
+			dy=-1
+		Case 1
+			dx=1
+			dy=0
+		Case 2
+			dx=0
+			dy=1
+		Case 3
+			dx=-1
+			dy=0
+		End Select
+		
+		If ObjectData(i,4)=3 TurnobjectTowardDirection(i,dx,dy,6,180)
+		If ObjectData(i,4)=4 ObjectYaw(i)=(ObjectYaw(i)+ObjectData(i,9)/10.0) Mod 360
+	
+		If ObjectData(i,4)=4
+			ObjectXScale(i)=1.5*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+			objectYScale(i)=1.5*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+	
+		
+		Else
+			ObjectXScale(i)=.8*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+			objectYScale(i)=.8*(0.9+0.095*Sin((leveltimer*4) Mod 360))
+		EndIf
+
+		
+		
+		ObjectZScale(i)=1
+	EndIf
+	
+	If objectactive(i)=0 Then ObjectExists(i)=False	
+
+		
+
+
+End Function
+
+Function CreateCloudMesh(bigr#,col)
+
+	Select col
+	Case 0
+		red=255
+		green=0
+		blue=0
+	Case 1
+		red=255
+		green=128
+		blue=0
+	Case 2
+		red=255
+		green=255
+		blue=100
+	Case 3
+		red=0
+		green=255
+		blue=0
+	Case 4
+		red=0
+		green=255
+		blue=255
+	Case 5
+		red=0
+		green=0
+		blue=255
+	Case 6
+		red=255
+		green=0
+		blue=255
+	Default
+		red=255
+		green=255
+		blue=255
+	End Select
+
+
+
+
+
+	
+	Entity=CreateMesh()
+	Surface=CreateSurface(Entity)
+	
+	
+	
+	r#=.4*bigr
+	angle=0;Rand(0,359)
+	
+	AddVertex (surface,r*Cos(angle+135),0.01,r*Sin(angle+135),0,0)
+	AddVertex (surface,r*Cos(angle+45),0.01,r*Sin(angle+45),1,0)
+	AddVertex (surface,r*Cos(angle+225),0.01,r*Sin(angle+225),0,1)
+	AddVertex (surface,r*Cos(angle+315),0.01,r*Sin(angle+315),1,1)
+
+	
+	
+	AddTriangle (surface,0,1,2)
+	AddTriangle (surface,1,3,2)
+	
+	r#=.3*bigr
+	angle=Rand(0,359)
+	
+	AddVertex (surface,r*Cos(angle+135),0.01,r*Sin(angle+135),0,0)
+	AddVertex (surface,r*Cos(angle+45),0.01,r*Sin(angle+45),1,0)
+	AddVertex (surface,r*Cos(angle+225),0.01,r*Sin(angle+225),0,1)
+	AddVertex (surface,r*Cos(angle+315),0.01,r*Sin(angle+315),1,1)
+
+	AddTriangle (surface,4,5,6)
+	AddTriangle (surface,5,7,6)
+
+
+	r#=.2*bigr
+	angle=Rand(0,359)
+	
+	AddVertex (surface,r*Cos(angle+135),0.01,r*Sin(angle+135),0,0)
+	AddVertex (surface,r*Cos(angle+45),0.01,r*Sin(angle+45),1,0)
+	AddVertex (surface,r*Cos(angle+225),0.01,r*Sin(angle+225),0,1)
+	AddVertex (surface,r*Cos(angle+315),0.01,r*Sin(angle+315),1,1)
+
+	AddTriangle (surface,8,9,10)
+	AddTriangle (surface,9,11,10)
+
+
+
+	UpdateNormals Entity
+	
+	EntityTexture Entity,CloudTexture
+	EntityColor Entity,red,green,blue
+	EntityAlpha Entity,.8
+	EntityFX Entity,1
+	Return Entity
+
+
+End Function
 Function RedoTransporterTexture(i)
 	
 	Surface=GetSurface(ObjectEntity(i),1)
@@ -11715,6 +12883,117 @@ Function ControlButterfly(i)
 ;	ObjectYaw(i)=ObjectYaw(i)+1
 End Function
 
+Function ControlZipper(i)
+
+	
+
+	ObjectTileX(i)=Floor(ObjectX(i))
+	ObjectTileY(i)=Floor(ObjectY(i))
+	If ObjectData(i,0)=-1 Then ObjectData(i,0)=Leveltiletexture(ObjectTileX(i),ObjectTileY(i))
+	
+	
+	
+	If ObjectTileTypeCollision(i)=0
+		ObjectTileTypeCollision(i)=-1 ; not really used
+		
+		
+		EntityBlend ObjectEntity(i),3
+		
+		
+		ObjectMoveXGoal(i)=ObjectTileX(i)
+		ObjectMoveYGoal(i)=ObjectTileY(i)
+		
+		ObjectData(i,1)=Rand(0,360)
+		ObjectData(i,2)=Rand(1,4)
+		
+		
+	EndIf
+	
+	
+	
+
+	xx#=ObjectX(i)-Floor(ObjectX(i))
+	yy#=Objecty(i)-Floor(Objecty(i))
+	If ObjectTIleX(i)=ObjectMoveXGoal(i) And ObjectTileY(i)=ObjectMoveYGoal(i) And xx>.45 And xx<.55 And yy>.45 And yy<.55
+	
+		flag=False
+		; first check current direction
+		If (ObjectDX(i)<>0 Or ObjectDY(i)<>0) And Rand(0,20)>0
+			x=ObjectTileX(i)+ObjectDX(i)
+			y=ObjectTileY(i)+ObjectDY(i)	
+
+			
+			
+			If x>=0 And y>=0 And x<LevelWidth And y<LevelHeight
+				If (LevelTileTexture(x,y)=objectdata(i,0))
+					
+					ObjectMoveXGoal(i)=x
+					ObjectMoveYGoal(i)=y
+					flag=True	
+				EndIf
+			EndIf
+		EndIf
+		
+		If flag=False
+	
+	
+	
+			ObjectDX(i)=0
+			ObjectDY(i)=0
+	
+			If Rand(0,100)<50
+				ObjectDx(i)=Rand(-1,1)
+			Else
+				ObjectDy(i)=Rand(-1,1)
+			EndIf
+	
+			x=ObjectTileX(i)+ObjectDX(i)
+			y=ObjectTileY(i)+ObjectDY(i)	
+	
+			flag=False
+			
+			If x>=0 And y>=0 And x<LevelWidth And y<LevelHeight
+				If (LevelTileTexture(x,y)=objectdata(i,0))
+					
+					ObjectMoveXGoal(i)=x
+					ObjectMoveYGoal(i)=y
+					flag=True	
+				EndIf
+			EndIf
+			
+			If flag=False
+				ObjectDX(i)=0
+				ObjectDY(i)=0
+			EndIf
+		EndIf
+	EndIf
+	
+	
+		
+		
+		ObjectX(i)=ObjectX(i)+ObjectDX(i)*.05
+		ObjectY(i)=ObjectY(i)+ObjectDY(i)*.05
+
+	
+	
+	
+
+	
+		;zz#=.05*Sin(((Leveltimer+ObjectData(i,1))) Mod 360)
+		ObjectZ(i)=0
+		size#=.7+.1*Sin(leveltimer Mod 360) 
+		If size<0 Then size=0
+
+		ObjectXScale(i)=size
+		ObjectYScale(i)=size
+		ObjectZScale(i)=size
+		If leveltimer Mod 4=1		AddParticle(Rand(24,30),ObjectX(i),ObjectZ(i),-ObjectY(i),0,.4*size,0,0.00,0,3,0,0,0,0,25,3)
+
+
+
+
+End Function
+
 Function ControlSpring(i)
 	ObjectYawAdjust(i)=0
 	ObjectZ(i)=.5
@@ -11765,6 +13044,429 @@ Function ControlSpring(i)
 	
 End Function
 
+Function CreateSuctubeMesh(tex,col,active)
+
+	If active Mod 2 =1
+		active=0
+	Else
+		active=1
+	EndIf
+	
+	Entity=CreateMesh()
+	Surface=CreateSurface(Entity)
+	
+	nofsegments#=16
+	
+	i=0
+	angle#=-(360.0/nofsegments)/2.0+i*(360.0/nofsegments)
+	; top triangle
+	AddVertex (surface,-0.3,1.71,-0.3,(col Mod 8)*0.125+.01,(col/8)*0.125+.51+.25*active)
+	AddVertex (surface,+0.3,1.71,-0.3,(col Mod 8)*0.125+.115,(col/8)*0.125+.51+.25*active)
+	AddVertex (surface,0,1.71,+0.3,(col Mod 8)*0.125+.01,(col/8)*0.125+.51+.115+.25*active)
+	;AddTriangle (surface,0,1,2)
+	AddTriangle (surface,0,2,1)
+	
+	
+	
+	
+	; point arrow
+	If dir=0
+		VertexCoords surface,0,-0.3,1.71,-0.3
+		VertexCoords surface,1,+0.3,1.71,-0.3
+		VertexCoords surface,2,0,1.71,+0.3
+	Else
+		VertexCoords surface,0,-0.3,1.71,+0.3
+		VertexCoords surface,2,+0.3,1.71,+0.3
+		VertexCoords surface,1,0,1.71,-0.3
+	EndIf
+
+
+	
+	For i=0 To nofsegments-1
+		angle#=-(360.0/nofsegments)/2.0+i*(360.0/nofsegments)
+		AddVertex (surface,1.5*Sin(angle),0.7+1.0*Cos(angle),-0.505,0.25*tex,107.0/512.0)
+		AddVertex (surface,1.5*Sin(angle),0.7+1.0*Cos(angle),+0.505,0.25*tex,88.0/512.0)
+		AddVertex (surface,1.5*Sin(angle+(360.0/nofsegments)),0.7+1.0*Cos(angle+(360.0/nofsegments)),-0.505,0.25*tex+0.25,107.0/512.0)
+		AddVertex (surface,1.5*Sin(angle+(360.0/nofsegments)),0.7+1.0*Cos(angle+(360.0/nofsegments)),+0.505,0.25*tex+0.25,88.0/512.0)
+
+		;i=i+1 ; to account for the first four vertices
+		AddTriangle(surface,i*4+0+3,i*4+1+3,i*4+2+3)
+		AddTriangle(surface,i*4+1+3,i*4+3+3,i*4+2+3)
+		
+		AddTriangle(surface,i*4+2+3,i*4+1+3,i*4+0+3)
+		AddTriangle(surface,i*4+2+3,i*4+3+3,i*4+1+3)
+		;i=i-1
+	Next
+	
+
+	
+
+	UpdateNormals Entity
+	
+	EntityTexture Entity,GateTexture
+	Return Entity
+End Function
+
+Function RedoSuctubeMesh(i)
+
+	Surface=GetSurface(ObjectEntity(i),1)
+	col=ObjectData(i,0) 
+	If objectactive(i) Mod 2 = 1
+		active=0
+	Else
+		active=1
+	EndIf
+	If ObjectYawAdjust(i)=(-90*ObjectData(i,2) +3600) Mod 360
+		; in original position
+		dir=0
+	Else
+		; switched from original
+		dir=1
+	EndIf
+	
+	; point arrow
+	If dir=0
+		VertexCoords surface,0,-0.3,1.71,-0.3
+		VertexCoords surface,1,+0.3,1.71,-0.3
+		VertexCoords surface,2,0,1.71,+0.3
+	Else
+		VertexCoords surface,0,-0.3,1.71,+0.3
+		VertexCoords surface,2,+0.3,1.71,+0.3
+		VertexCoords surface,1,0,1.71,-0.3
+	EndIf
+	
+	; and give colour
+	
+	VertexTexCoords surface,0,(col Mod 8)*0.125+.01,(col/8)*0.125+.51+.25*active
+	VertexTexCoords surface,1,(col Mod 8)*0.125+.115,(col/8)*0.125+.51+.25*active
+	VertexTexCoords surface,2,(col Mod 8)*0.125+.051,(col/8)*0.125+.51+.115+.25*active
+
+	UpdateNormals ObjectEntity(i)
+	
+
+
+End Function
+
+
+Function ControlSuctube(i)
+	ObjectTileX(i)=Floor(ObjectX(i))
+	ObjectTileY(i)=Floor(ObjectY(i))
+	ObjectID(i)=500+ObjectData(i,0)*5+ObjectData(i,1)
+	; Check if an object is in front of it
+	dx=0
+	dy=0
+	Select ObjectData(i,2)
+	Case 0
+		dy=1
+	Case 1
+		dx=-1
+	Case 2
+		dy=-1
+	Case 3
+		dx=1
+	End Select
+	
+	
+	x=Floor(ObjectX(i))
+	y=Floor(ObjectY(i))
+	
+	; make walls left and right (only for standard sizes)
+	If ObjectZAdjust(i)=0.0 And ObjectScaleAdjust(i)=1.0
+		Select ObjectData(i,2)
+		Case 0,2
+			LevelTileLogic(x+1,y)=1
+			LevelTileLogic(x-1,y)=1
+		Case 1,3
+			LevelTileLogic(x,y-1)=1
+			Leveltilelogic(x,y+1)=1
+		End Select
+	EndIf
+	
+	If ObjectActive(i)<>1001 Then Return
+	
+	
+	suck=True
+	blow=True
+
+	
+	; check if sucking/blowing active (e.g. if another tube in front of it)
+	For j=0 To NofObjects-1
+		If ObjectType(j)=281 And i<>j
+			; found another suctube
+			If ObjectData(i,2)=ObjectData(j,2) And ObjectData(i,0)=ObjectData(j,0) And ObjectData(i,1)=ObjectData(j,1)
+				; same direction
+				If ObjectData(i,2)=0 
+					If ObjectTileX(i)=ObjectTileX(j) And ObjectTileY(i)=ObjectTileY(j)-1
+						suck=False
+					EndIf
+					If ObjectTileX(i)=ObjectTileX(j) And ObjectTileY(i)=ObjectTileY(j)+1
+						blow=False
+					EndIf
+				Else If ObjectData(i,2)=1 
+					If ObjectTileX(i)=ObjectTileX(j)+1 And ObjectTileY(i)=ObjectTileY(j)
+						suck=False
+					EndIf
+					If  ObjectTileX(i)=ObjectTileX(j)-1 And ObjectTileY(i)=ObjectTileY(j)
+						blow=False
+					EndIf
+				Else If ObjectData(i,2)=2 
+					If ObjectTileX(i)=ObjectTileX(j) And ObjectTileY(i)=ObjectTileY(j)+1
+						suck=False
+					EndIf
+					If ObjectTileX(i)=ObjectTileX(j) And ObjectTileY(i)=ObjectTileY(j)-1
+						blow=False
+					EndIf
+				Else If ObjectData(i,2)=3 
+					If ObjectTileX(i)=ObjectTileX(j)-1 And ObjectTileY(i)=ObjectTileY(j)
+						suck=False
+					EndIf
+					If ObjectTileX(i)=ObjectTileX(j)+1 And ObjectTileY(i)=ObjectTileY(j)
+						blow=False
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	Next
+	
+	If ObjectData(i,5)=0
+		; particle effects
+		If Rand(0,100)<30
+			psize#=Rnd(0.1,0.2)
+			pspeed#=Rnd(1,2)
+			parttex=Rand(16,23)
+			If suck=True
+				Select ObjectData(i,2)
+				Case 0
+					AddParticle(parttex,ObjectX(i)+Rnd(-1,1),Rnd(0.5,1.4),-ObjectY(i)-Rnd(1.0,1.9),0,psize,0.0,0.0,-Rnd(-0.01,-0.02)*pspeed,0,0,0,0,0,Rand(10,50),3)
+		 		Case 1
+					AddParticle(parttex,ObjectX(i)-Rnd(1.0,1.5),Rnd(0.5,1.4),-ObjectY(i)+Rnd(-1,1),0,psize,Rnd(0.01,0.02)*pspeed,0.0,0.0,0,0,0,0,0,Rand(10,50),3)
+		 		Case 2
+				;	AddParticle(0,0,Rnd(0.5,5.5),0,0,5,0.0,0.0,Rnd(-0.01,-0.02),0,0,0,0,0,Rand(10,50),3)
+		
+					AddParticle(parttex,ObjectX(i)+Rnd(-1,1),Rnd(0.5,1.4),-ObjectY(i)+Rnd(1.0,1.9),0,psize,0.0,0.0,Rnd(-0.01,-0.02)*pspeed,0,0,0,0,0,Rand(10,50),3)
+		 		Case 3
+					AddParticle(parttex,ObjectX(i)+Rnd(1.0,1.5),Rnd(0.5,1.4),-ObjectY(i)+Rnd(-1,1),0,psize,-Rnd(0.01,0.02)*pspeed,0.0,0.0,0,0,0,0,0,Rand(10,50),3)
+		 		End Select
+			EndIf
+			If blow=True
+				Select ObjectData(i,2)
+				Case 0
+					AddParticle(parttex,ObjectX(i)+Rnd(-1,1),Rnd(0.5,1.4),-ObjectY(i)+Rnd(0.0,0.5),0,psize,0.0,0.0,-Rnd(-0.01,-0.02)*pspeed,0,0,0,0,0,Rand(10,50),3)
+		 		Case 1
+					AddParticle(parttex,ObjectX(i)+Rnd(0,0.5),Rnd(0.5,1.4),-ObjectY(i)+Rnd(-1,1),0,psize,Rnd(0.01,0.02)*pspeed,0.0,0.0,0,0,0,0,0,Rand(10,50),3)
+		 		Case 2
+					AddParticle(parttex,ObjectX(i)+Rnd(-1,1),Rnd(0.5,1.4),-ObjectY(i)-Rnd(0.0,0.5),0,psize,0.0,0.0,Rnd(-0.01,-0.02)*pspeed,0,0,0,0,0,Rand(10,50),3)
+		 		Case 3
+					AddParticle(parttex,ObjectX(i)-Rnd(0.0,0.5),Rnd(0.5,1.4),-ObjectY(i)+Rnd(-1,1),0,psize,-Rnd(0.01,0.02)*pspeed,0.0,0.0,0,0,0,0,0,Rand(10,50),3)
+		 		End Select
+			EndIf
+		EndIf
+	EndIf
+	
+	
+		
+
+
+	For j=0 To NofObjects-1
+		If ObjectButtonPush(j)=True And ObjectMovementTimer(j)=0 And ObjectFrozen(j)<10000
+		
+			; special case for submerged waterchomps
+			If ObjectType(j)=250 And ObjectSubType(j)=1 And ObjectData(j,5)=1
+			
+			Else
+				;suck 
+				If ObjectTileX(j)=x+dx And ObjectTileY(j)=y+dy And ObjectDead(j)=0 And ObjectExists(j)=True
+					; got it
+					; (no checking if blocked)
+					If ObjectFlying(j)=0 
+						If ObjectData(i,4)=0
+						 	PlaySoundFX(43,ObjectTileX(j),ObjectTileY(j))
+					    Else
+							;portal sound
+							PlaySoundFX(80,ObjectTileX(j),ObjectTileY(j))
+							PlaySoundFX(81,ObjectTileX(j),ObjectTileY(j))
+							PlaySoundFX(82,ObjectTileX(j),ObjectTileY(j))
+							PlaySoundFX(42,ObjectTileX(j),ObjectTileY(j))
+							PlaySoundFX(43,ObjectTileX(j),ObjectTileY(j))
+
+						EndIf
+
+						
+						If j=PlayerObject  And objectdata(i,4)=0
+							If Rand(1,100)<70
+								PlaySoundFX(Rand(180,182),ObjectTileX(j),ObjectTileY(j))
+							Else
+								PlaySoundFX(Rand(170,172),ObjectTileX(j),ObjectTileY(j))
+							EndIf
+						EndIf
+
+								
+					EndIf
+					ObjectFlying(j)=10+ObjectData(i,2)*2
+					
+				EndIf
+				;blow
+				If ObjectTileX(j)=x-dx And ObjectTileY(j)=y-dy And ObjectDead(j)=0 And ObjectExists(j)=True
+					; got it
+					; check if it can fly in that direction (one step)
+					OldTile=ObjectTileTypeCollision(j)
+					If (ObjectTileTypeCollision(j) And 4)=0 Then ObjectTileTypeCollision(j)=ObjectTileTypeCollision(j)+4 ; add water and lava
+					If (ObjectTileTypeCollision(j) And 32)=0 Then ObjectTileTypeCollision(j)=ObjectTileTypeCollision(j)+32
+					If CanObjectMoveToTile(j,x-2*dx,y-2*dy,True,True)=True
+						If ObjectFlying(j)<>10+ObjectData(i,2)*2 
+							PlaySoundFX(44,ObjectTileX(j),ObjectTileY(j))
+							If j=PlayerObject 
+								If Rand(1,100)<70
+									PlaySoundFX(Rand(180,182),ObjectTileX(j),ObjectTileY(j))
+								Else
+									PlaySoundFX(Rand(170,172),ObjectTileX(j),ObjectTileY(j))
+								EndIf
+							EndIf
+	
+			
+						EndIf
+						ObjectFlying(j)=10+ObjectData(i,2)*2
+					Else
+					;	DestroyObject(j,0)
+					EndIf
+					
+					ObjectTileTypeCollision(j)=OldTile
+				
+					
+				EndIf
+			EndIf
+
+			
+		EndIf
+	Next
+
+
+		For j=0 To NofObjects-1
+			If ObjectButtonPush(j)=True And ObjectMovementTimer(j)=0 And ObjectFrozen(j)<10000
+				If ObjectTileX(j)=x+dx And ObjectTileY(j)=y+dy And ObjectDead(j)=0 And ObjectExists(j)=True
+					; got it
+					; check if it can fly in that direction (one step)
+								
+					; special case for submerged waterchomps
+					If ObjectType(j)=250 And ObjectSubType(j)=1 And ObjectData(j,5)=1
+
+					Else
+						If ObjectFlying(j)=0 	PlaySoundFX(44,ObjectTileX(j),ObjectTileY(j))
+						ObjectFlying(j)=10+ObjectData(i,2)*2
+					EndIf
+			
+				EndIf
+			EndIf
+		Next
+
+
+	
+
+	
+End Function
+
+Function CreateSuctubeXMesh(tex)
+	
+	Entity=CreateMesh()
+	Surface=CreateSurface(Entity)
+	
+	nofsegments#=16
+	nofarcpoints#=8
+	
+		
+
+	For j=0 To nofarcpoints
+		angle2#=(90.0/nofarcpoints)*j
+		For i=0 To nofsegments-1
+			angle#=-(360.0/nofsegments)/2.0+i*(360.0/nofsegments)
+			height#=0.7+1.0*Cos(angle)
+			radius#=1.5-1.5*Sin(angle)
+			
+			
+			If i Mod 2 =0
+				xtex#=0.25
+			Else
+				xtex#=0.0
+			EndIf
+
+			If j Mod 2 =0
+				ytex#=19.0
+			Else
+				ytex#=0.0
+			EndIf
+			
+			AddVertex (surface,1.5-radius*Cos(angle2),height,-1.5+radius*Sin(angle2),0.25*tex+xtex,(107.0-ytex)/512.0)
+			
+		Next
+	Next
+	
+	For j=0 To nofarcpoints-1
+		For i=0 To nofsegments-1
+		
+			AddTriangle(surface,j*nofsegments+i,j*nofsegments+((i+1) Mod nofsegments),(j+1)*nofsegments+i)
+			AddTriangle(surface,(j+1)*nofsegments+i,j*nofsegments+((i+1) Mod nofsegments),(j+1)*nofsegments+((i+1) Mod nofsegments))
+			
+			AddTriangle(surface,j*nofsegments+((i+1) Mod nofsegments),j*nofsegments+i,(j+1)*nofsegments+i)
+			AddTriangle(surface,(j+1)*nofsegments+((i+1) Mod nofsegments),j*nofsegments+((i+1) Mod nofsegments),(j+1)*nofsegments+i)
+
+
+			
+		Next
+	Next
+	
+
+	
+
+	UpdateNormals Entity
+	
+	EntityTexture Entity,GateTexture
+	Return Entity
+End Function
+
+Function ControlSucTubeX(i)
+
+	; build walls and ice corner
+	x=Floor(objectX(i))
+	y=Floor(ObjectY(i))
+	Select ObjectData(i,2) ; direction
+	
+	Case 0
+		LevelTileLogic(x-1,y-1)=1
+		LevelTileLogic(x-1,y-0)=1
+		LevelTileLogic(x-1,y+1)=1
+		LevelTileLogic(x,y-1)=1
+		LevelTileLogic(x+1,y-1)=1
+		LevelTileLogic(x+1,y+1)=1
+		
+	Case 1
+		LevelTileLogic(x-1,y-1)=1
+		LevelTileLogic(x,y-1)=1
+		LevelTileLogic(x-1,y+1)=1
+		LevelTileLogic(x+1,y-1)=1
+		LevelTileLogic(x+1,y)=1
+		LevelTileLogic(x+1,y+1)=1
+		
+	Case 2
+		LevelTileLogic(x-1,y-1)=1
+		LevelTileLogic(x+1,y-1)=1
+		LevelTileLogic(x+1,y)=1
+		LevelTileLogic(x,y+1)=1
+		LevelTileLogic(x,y+1)=1
+		LevelTileLogic(x+1,y+1)=1
+		
+	Case 3
+		LevelTileLogic(x-1,y-1)=1
+		LevelTileLogic(x+1,y-1)=1
+		LevelTileLogic(x-1,y)=1
+		LevelTileLogic(x-1,y+1)=1
+		LevelTileLogic(x,y+1)=1
+		LevelTileLogic(x+1,y+1)=1
+		
+	End Select
+	
+	
+	
+End Function
 
 Function CreatePickUpItemMesh(tex)
 	entity=CreateMesh()
@@ -11886,7 +13588,11 @@ Function CreateSpellBall(x#,y#,z#,dx#,dy#,subtype,goalx,goaly,player,timer)
 	EndIf
 	
 	; note - Timer>0 is really only used for explosions (eg tnt barrels, as some other rules apply to them)
-	PlaySoundFX(82,x,y)
+	If player=-99
+		PlaySoundFX(82,ObjectX(PlayerObject),ObjectY(PlayerObject))
+	Else
+		PlaySoundFX(82,x,y)
+	EndIf
 	i=CreateNewObject()
 	
 	ObjectModelName$(i)="!SpellBall"
@@ -11894,6 +13600,16 @@ Function CreateSpellBall(x#,y#,z#,dx#,dy#,subtype,goalx,goaly,player,timer)
 
 	
 	ObjectEntity(i)=CreateSpellBallMesh(subtype Mod 10)
+	If player=-99
+		; special code (e.g. from zapbots) to make laser shape
+		If dx=0
+			ScaleMesh ObjectEntity(i),.3,.3,10
+		Else If dy=0
+			ScaleMesh ObjectEntity(i),10,.3,.3
+		EndIf
+		ObjectData(i,8)=-99
+		player=False
+	EndIf
 			
 	
 	ObjectX(i)=x
@@ -12085,6 +13801,17 @@ Function ControlSpellBall(i)
 					EndIf
 					If ObjectSubType(i)=4 ; ice
 						CreateIceBlock(ObjectX(j),ObjectY(j),j)
+				Case 433
+					; zbot npc
+					If ObjectSubType(i<2  And ObjectData(j,0)=0 ; fire 
+						PlaySoundFX(Rand(144,146),ObjectX(j),ObjectY(j))
+						ObjectData(j,0)=1
+					EndIf
+					If ObjectSubType(i)=4 And ObjectData(j,0)=0; ice
+						CreateIceBlock(ObjectX(j),ObjectY(j),j,0,ObjectStatus(i))
+					EndIf
+							
+						
 					EndIf
 				
 					destructoflag=True
@@ -12111,6 +13838,14 @@ Function ControlSpellBall(i)
 						
 					EndIf
 					
+				Case 151
+					;rainbwobubble
+					If ObjectSubType(i)<=2 Or ObjectSubType(i)=4; fire 
+						destroyobject(j,1)
+					EndIf
+							
+						
+					EndIf
 					destructoflag=True
 				
 				Case 170,171,172,173,174,175,176,177,178,179,425
@@ -12135,6 +13870,20 @@ Function ControlSpellBall(i)
 					EndIf
 					If ObjectSubType(i)=4 ; ice
 						CreateIceBlock(ObjectX(j),ObjectY(j),j)
+				Case 460
+					; burstflower
+					If ObjectSubType(i)<2 ; fire 
+						destroyobject(j,1)
+					EndIf
+					If ObjectSubType(i)=4 ; ice
+						CreateIceBlock(ObjectX(j),ObjectY(j),j,0,ObjectStatus(i))
+					EndIf
+							
+						
+					EndIf
+	
+					destructoflag=True
+
 					EndIf
 					destructoflag=True
 				Case 240,241,242
@@ -12190,13 +13939,47 @@ Function ControlSpellBall(i)
 		
 						destructoflag=True
 					EndIf
+
+				Case 470,471
+					; Ghosts: only if active
+					If ObjectStatus(j)=1
+					
+						If ObjectSubType(i)<2 ; fire 
+							destroyobject(j,1)
+						EndIf
+						
+						If ObjectSubType(i)=4 ; ice
+							CreateIceBlock(ObjectX(j),ObjectY(j),j,0,ObjectStatus(i))
+						EndIf
+		
+						destructoflag=True
+					EndIf
 					
 				Case 250,260,290,420,422,423
 					If ObjectSubType(i)<2 Then DestroyObject(j,1)
 						If ObjectSubType(i)=4 ; ice
 							CreateIceBlock(ObjectX(j),ObjectY(j),j)
 						EndIf
+				Case 432
+					; pushbot (not harmed by fire, activated by pop)
+					
+					If ObjectSubtype(i)=2; pop
+						SoundPitch (SoundFX(98),Rand(19000,25000))
+						PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+
+						ObjectMovementType(j)=81+2*ObjectData(j,2)+(ObjectData(j,3) Mod 2)
+						
+					EndIf
+					If ObjectSubType(i)=4; ice
+						CreateIceBlock(ObjectX(j),ObjectY(j),j,0,ObjectStatus(i))
+						
+	
+					EndIf
+						
+					EndIf
+
 					destructoflag=True
+
 				Case 330
 					; wysp
 					If ObjectSubType(i)<2 ; fire 
@@ -12250,6 +14033,42 @@ Function ControlSpellBall(i)
 					EndIf
 				EndIf
 				; stepper converyor
+			If (ObjectType(j)=45 Or ObjectType(j)=46) And ObjectData(j,5)=1 And ObjectActive(j)=1001 And ObjectMovementTimer(j)=0
+					If ObjectTileX(j)=ObjectData(i,0) And ObjectTileY(j)=ObjectData(i,1)
+						If ObjectType(j)=45
+							ActivateConveyor(j)
+							
+							j=nofobjects
+						Else
+							For k=0 To NofObjects-1
+								If ObjectType(k)=45 And ObjectData(k,0)=ObjectData(j,0) And ObjectData(k,1)=ObjectData(j,1) And ObjectMovementTimer(k)=0
+									ActivateConveyor(k)
+									
+								EndIf
+							Next
+						EndIf
+									
+					EndIf
+				EndIf
+				; mover conveyor
+				If (ObjectType(j)=45 Or ObjectType(j)=46) And ObjectData(j,5)=0 
+					If ObjectTileX(j)=ObjectData(i,0) And ObjectTileY(j)=ObjectData(i,1)
+						If ObjectType(j)=45 
+							ActivateObject(j)
+							
+							j=nofobjects
+						Else
+							For k=0 To NofObjects-1
+								If ObjectType(k)=45 And ObjectData(k,0)=ObjectData(j,0) And ObjectData(k,1)=ObjectData(j,1)
+									ActivateObject(k)
+									
+								EndIf
+							Next
+						EndIf
+									
+					EndIf
+				EndIf
+
 
 				If ObjectType(j)=210 And ObjectActive(j)=1001 
 					If ObjectTileX(j)=ObjectData(i,0) And ObjectTileY(j)=ObjectData(i,1)
@@ -12259,6 +14078,14 @@ Function ControlSpellBall(i)
 				If ObjectType(j)=40 And ObjectActive(j)=1001 
 					If ObjectTileX(j)=ObjectData(i,0) And ObjectTileY(j)=ObjectData(i,1)
 						DeActivateObject(j)
+					EndIf
+				EndIf
+			If ObjectType(j)=450 And ObjectData(j,0)=0
+					If Floor(ObjectX(j))=ObjectData(i,0) And Floor(ObjectY(j))=ObjectData(i,1)
+						ObjectData(j,0)=1
+						ObjectData(j,1)=0
+						PlaySoundFX(97,ObjectTileX(j),ObjectTileY(j))
+
 					EndIf
 				EndIf
 			Next
@@ -13032,6 +14859,184 @@ Function ControlTentacle(i)
 
 End Function
 
+Function ControlRainbowBubble(i)
+
+	
+
+
+	EntityAlpha ObjectEntity(i),.8
+	EntityBlend ObjectEntity(i),3	
+
+	If ObjectTileTypeCollision(i)=0
+		; First time (should later be put into object creation at level editor)
+		ObjectTileTypeCollision(i)=2^0+2^2+2^3+2^4+2^5+2^9+2^10+2^11+2^12+2^14
+		ObjectTileX(i)=Floor(ObjectX(i))
+		ObjectTileY(i)=Floor(ObjectY(i))
+		ObjectTileX2(i)=Floor(ObjectX(i))
+		ObjectTileY2(i)=Floor(ObjectY(i))
+		ObjectMovementTimer(i)=0
+		ObjectMovementSpeed(i)=25
+		ObjectMovementType(i)=33
+		ObjectYawAdjust(i)=Rand(0,360)
+		ObjectRollAdjust(i)=Rand(0,360)
+		ObjectPitchAdjust(i)=Rand(0,360)
+
+
+		
+		;ObjectObjectTypeCollision(i)=2^6
+		
+		ObjectData(i,2)=Rand(0,360)
+
+		
+	EndIf
+	
+	
+	
+	l=leveltimer/4+objectData(i,2)
+	
+	ObjectXScale(i)=0.5-0.1*Sin((leveltimer + objectData(i,2)) Mod 360)
+
+	ObjectYScale(i)=0.5-0.1*Sin((leveltimer + objectData(i,2)) Mod 360)
+
+	ObjectZScale(i)=0.6+0.2*Sin((leveltimer + objectData(i,2)) Mod 360)
+
+	
+	ObjectPitch(i)=(ObjectPitch(i)+1) Mod 360
+	ObjectYaw2(i)=360*Sin(l Mod 360)
+	ObjectRoll(i)=180*Cos(l Mod 360)
+
+	
+
+	
+	
+	ObjectZ(i)=0.5+0.3*Abs(Sin((leveltimer + objectData(i,2)) Mod 360))
+	
+	
+
+
+End Function
+
+
+
+Function CreatePlantFloat(x,y)
+	
+	i=CreateNewObject()
+	
+	
+	ObjectModelName$(i)="!PlantFloat"
+	ObjectTextureName$(i)=""
+
+	
+	ObjectEntity(i)=CreatePlantFloatMesh()
+	
+	ObjectTexture(i)=0
+	;EntityTexture ObjectEntity(i),ObjectTexture(i)
+	
+	ObjectDestructionType(i)=0
+	ObjectActive(i)=901
+	ObjectActivationSpeed(i)=20
+	ObjectActivationType(i)=2
+
+	LevelTileLogic(x,y)=4
+	
+	ObjectType(i)=301
+
+	
+	ObjectX(i)=x+.5
+	ObjectY(i)=y+.5
+	ObjectTileX(i)=x
+	ObjectTileY(i)=y
+	
+	ObjectData(i,1)=Rand(0,360)
+	Objectdata(i,2)=Rand(-3,3)
+	ObjectData(i,3)=Rand(-3,3)
+
+End Function
+
+Function CreatePlantFloatMesh()
+	Entity=CreateCylinder(9,True)
+	;For i=1 To CountVertices (GetSurface(entity,1))-1
+	;	VertexCoords GetSurface(entity,1),i,VertexX(GetSurface(entity,1),i)+Rnd(-.1,.1),VertexY(GetSurface(entity,1),i),VertexZ(GetSurface(entity,1),i)+Rnd(-.1,.1)
+	;Next
+	ScaleMesh Entity,.45,.05,.45
+	PositionMesh Entity,0,-.1,0
+	EntityAlpha Entity,.7
+	EntityBlend Entity,3
+	EntityColor Entity,0,255,0
+	Return Entity
+End Function
+Function ControlPlantFloat(i)
+
+	If ObjectData(i,2)=0 Then ObjectData(i,2)=Rand(1,360)
+
+	l=leveltimer+ObjectData(i,2)
+	EntityColor ObjectEntity(i),128+120*Cos(l Mod 360),128+120*Sin(l Mod 360),200+50*Cos(l Mod 360)
+	If ObjectData(i,0)>0
+		; deactivating
+		ObjectData(i,0)=ObjectData(i,0)-1
+		If ObjectData(i,0)=1
+			If LevelTileLogic(ObjectTileX(i),ObjectTileY(i))=4 Then LevelTileLogic(ObjectTileX(i),ObjectTileY(i))=2
+			destroyObject(i,0)
+		EndIf
+	Else
+		LevelTileLogic(ObjectTileX(i),ObjectTileY(i))=4
+	EndIf
+	
+	;ObjectPitch(i)=4*ObjectData(i,2)*Sin((LevelTimer + ObjectData(i,1)) Mod 360)
+	;Objectroll(i)=6*ObjectData(i,3)*Cos((LevelTimer+ ObjectData(i,1))  Mod 360)
+	ObjectYaw(i)=leveltimer Mod 360
+	
+	
+	If ObjectID(i)=-1
+		ObjectID(i)=500+(8+ObjectData(i,0))*5+ObjectData(i,1)
+	EndIf
+
+	x=Floor(ObjectX(i))
+	y=Floor(ObjectY(i))
+	ObjectTileX(i)=x
+	ObjectTileY(i)=y
+
+
+	If ObjectData(i,0)=0
+		; Collapse?
+	
+		; check if there's weight on it
+		
+		Weight=False
+		
+		For j=0 To NofObjects-1
+			If ObjectExists(j)=True And ObjectButtonPush(j)=True And i<>j
+				; check if object is on tile - either first part of movement (or rest) and x/y, or last part of movement and x2/y2
+				If (ObjectTileX(j)=ObjectTileX(i) And ObjectTileY(j)=ObjectTileY(i) And ObjectMovementTimer(j)<500) Or (ObjectTileX2(j)=ObjectTileX(i) And ObjectTileY2(j)=ObjectTileY(i) And ObjectMovementTimer(j)>=500)
+					If ObjectFlying(j) /10 <>1
+						; Yup
+						
+						weight=True
+					EndIf
+				
+				EndIf
+			EndIf
+						
+		Next
+
+		
+		
+		If ObjectStatus(i)=1
+			If weight=False
+				ObjectStatus(i)=0
+				ObjectData(i,0)=40
+				ObjectActive(i)=400
+				PlaySoundFX(124,ObjectX(i),ObjectY(i))
+			EndIf
+		Else
+			If weight=True
+				ObjectStatus(i)=1
+			EndIf
+		EndIf
+	EndIf
+
+
+End Function
 Function ControlCrab(i)
 
 	;subtype -0-male, 1-female
@@ -14470,7 +16475,15 @@ Function ControlRetroZbotUfo(i)
 		ObjectPitch(i)=Rand(-30,30)
 		ObjectRoll(i)=Rand(-30,30)
 		ObjectZ(i)=.3
-		PlaySoundFX(86,ObjectX(i),ObjectY(i))
+		
+		
+		If Objecttype(i)=431
+		
+			PlaySoundFX(143+Rand(1,4),ObjectX(i),ObjectY(i))
+
+		Else
+			PlaySoundFX(86,ObjectX(i),ObjectY(i))
+		EndIf
 	
 	EndIf
 	If ObjectFrozen(i)=2
@@ -14494,8 +16507,12 @@ Function ControlRetroZbotUfo(i)
 	;	ObjectZ(i)=.5
 		If ObjectType(i)=423
 			ObjectMovementSpeed(i)=60
-		Else
+		Else If ObjectType(i)=422
 			ObjectMovementSpeed(i)=20
+		Else If ObjectType(i)=430
+			ObjectMovementSpeed(i)=120
+		Else If ObjectType(i)=431
+			ObjectMovementSpeed(i)=20*ObjectData(i,2)
 
 
 		EndIf
@@ -14522,6 +16539,17 @@ Function ControlRetroZbotUfo(i)
 		Else If ObjectData(i,0)=3
 			TurnObjectTowardDirection(i,ObjectTileX2(i)-ObjectTileX(i),ObjectTileY2(i)-ObjectTileY(i),4,90)
 		EndIf
+	Else If ObjectType(i)=430
+		If ObjectData(i,0)=0
+			TurnObjectTowardDirection(i,ObjectTileX2(i)-ObjectTileX(i),ObjectTileY2(i)-ObjectTileY(i),12,-180)
+		Else If ObjectData(i,0)=1
+			TurnObjectTowardDirection(i,ObjectTileX2(i)-ObjectTileX(i),ObjectTileY2(i)-ObjectTileY(i),12,-90)
+		Else If ObjectData(i,0)=2
+			TurnObjectTowardDirection(i,ObjectTileX2(i)-ObjectTileX(i),ObjectTileY2(i)-ObjectTileY(i),12,0)
+		Else If ObjectData(i,0)=3
+			TurnObjectTowardDirection(i,ObjectTileX2(i)-ObjectTileX(i),ObjectTileY2(i)-ObjectTileY(i),12,90)
+		EndIf
+
 	Else 
 		ObjectYaw(i)=ObjectYaw(i)+2
 	EndIf
@@ -14559,13 +16587,114 @@ Function ControlRetroZbotUfo(i)
 						CreateSpellBall(ObjectX(i)-.5,ObjectY(i),0.5,-0.1,0,1,-1,-1,False,300)
 						ObjectData(i,3)=60
 					EndIf
-				EndIf
+				EndIf	
 			EndIf
+
 			
 		
 		EndIf
 	EndIf
+	flag=True
+	If ObjectType(i)=431 And (LevelTimer<1000001000); zapbot
+	
+		If LevelTimer Mod 50 =0 PlaySoundFX(91,ObjectX(i),ObjectY(i))
+		
+		If Leveltimer Mod 1000 <20 And leveltimer Mod 4 = 0 AddParticle(32,ObjectX(i),0.7,-ObjectY(i),0,1,0,.01,0,0,0.02,0,0,0,2,4)
+		
+		If LevelTimer Mod 1000 = 0 
+			
 
+			If Rand(0,100)<50
+				PlaySoundFX(140,ObjectX(i),ObjectY(i))
+			Else
+				PlaySoundFX(159,ObjectX(i),ObjectY(i))
+			EndIf
+		EndIf
+		
+		If ObjectData(i,3)>0
+			ObjectData(i,3)=ObjectData(i,3)-1
+		Else
+			;shoot
+			If ObjectTileX(i)=ObjectTileX(PlayerObject) Or ObjectTileX(i)=ObjectTileX2(PlayerObject)
+				If ObjectTileY(i)<ObjectTileY(PlayerObject) 
+					If ObjectTileY(PlayerObject)-ObjectTileY(i)>ObjectData(i,3)
+						flag=False
+					EndIf
+					k=ObjectTileY(PlayerObject)-ObjectTileY(i)
+					For j=1 To k
+						If LevelTileLogic(ObjectTileX(i),ObjectTileY(i)+j)=1
+							flag =False
+						EndIf
+					Next
+					If flag=True 
+						CreateSpellBall(ObjectX(i),ObjectY(i)+.2,0.5,0,1.0,1,-1,-1,-99,300)
+						ObjectYaw(i)=0
+						ObjectData(i,3)=1;60
+					EndIf
+				Else 
+					If ObjectTileY(i)-ObjectTileY(PlayerObject)>ObjectData(i,3)
+						flag=False
+					EndIf
+					k=ObjectTileY(i)-ObjectTileY(PlayerObject)
+					For j=1 To k
+
+						If LevelTileLogic(ObjectTileX(i),ObjectTileY(i)-j)=1
+							flag =False
+						EndIf
+					Next
+					If flag=True 
+						CreateSpellBall(ObjectX(i),ObjectY(i)-.2,0.5,0,-1.0,1,-1,-1,-99,300)
+						ObjectYaw(i)=0
+						ObjectData(i,3)=1;60
+					EndIf
+
+					
+				EndIf	
+			EndIf
+			If ObjectTileY(i)=ObjectTileY(PlayerObject) Or ObjectTileY(i)=ObjectTileY2(PlayerObject)
+				If ObjectTileX(i)<ObjectTileX(PlayerObject) 
+					If ObjectTileX(PlayerObject)-ObjectTileX(i)>ObjectData(i,3)
+						flag=False
+					EndIf
+					k=ObjectTileX(PlayerObject)-ObjectTileX(i)
+					For j=1 To k
+
+						If LevelTileLogic(ObjectTileX(i)+j,ObjectTileY(i))=1
+							flag =False
+						EndIf
+					Next
+					If flag=True 
+						CreateSpellBall(ObjectX(i)+.2,ObjectY(i),0.5,1.0,0,1,-1,-1,-99,300)
+						ObjectYaw(i)=0
+
+						ObjectData(i,3)=1;60
+					EndIf
+
+				
+				Else 
+					If ObjectTileX(i)-ObjectTileX(PlayerObject)>ObjectData(i,3)
+						flag=False
+					EndIf
+					k=ObjectTileX(i)-ObjectTileX(PlayerObject)
+					For j=1 To k
+
+						If LevelTileLogic(ObjectTileX(i)-j,ObjectTileY(i))=1
+							flag =False
+						EndIf
+					Next
+					If flag=True 
+						CreateSpellBall(ObjectX(i)-.2,ObjectY(i),0.5,-1.0,0,1,-1,-1,-99,300)
+						ObjectYaw(i)=0
+
+						ObjectData(i,3)=1;60
+					EndIf
+
+				EndIf	
+			EndIf
+
+			
+		EndIf
+	EndIf
 	
 	
 		
@@ -14832,6 +16961,305 @@ Function CreateRetroLaserGateMesh(col)
 	
 End Function
 
+
+Function ControlPushbot(i)
+
+
+
+	
+
+	If ObjectFrozen(i)=1
+		; freeze
+		ObjectFrozen(i)=1000*ObjectFrozen(i)
+
+		
+
+		ObjectPitch(i)=Rand(-30,30)
+		ObjectRoll(i)=Rand(-30,30)
+		ObjectZ(i)=.3
+
+		PlaySoundFX(86,ObjectX(i),ObjectY(i))
+
+	
+	EndIf
+	If ObjectFrozen(i)=2
+		; revert
+		ObjectFrozen(i)=0
+	
+		ObjectPitch(i)=0
+		ObjectRoll(i)=0
+		ObjectZ(i)=0
+	EndIf
+	If ObjectFrozen(i)>2 Or ObjectFrozen(i)<0
+		; frozen
+		ObjectFrozen(i)=ObjectFrozen(i)-1
+		
+		
+		Return
+	EndIf
+
+	
+	If ObjectTileTypeCollision(i)=0
+	
+		ObjectMovementSpeed(i)=60
+		
+		ObjectTileX(i)=Floor(ObjectX(i))
+		ObjectTileY(i)=Floor(ObjectY(i))
+		
+		ObjectObjectTypeCollision(i)=2^6
+		
+		ObjectTileTypeCollision(i) =2^0+2^3+2^4+2^9+2^10+2^11+2^12+2^14
+		
+		ObjectMovementType(i)=0;81+2*ObjectData(i,2)+ObjectData(i,3)
+		
+		ObjectID(i)=500+ObjectData(i,0)*5+ObjectData(i,1)
+
+		
+	EndIf
+	
+	If ObjectData(i,2)=0
+		TurnObjectTowardDirection(i,0,1,8,0)
+	Else If ObjectData(i,2)=1
+		TurnObjectTowardDirection(i,-1,0,8,00)
+	Else If ObjectData(i,2)=2
+		TurnObjectTowardDirection(i,0,-1,8,0)
+	Else If ObjectData(i,2)=3
+		TurnObjectTowardDirection(i,1,0,8,00)
+	EndIf
+	
+
+		
+	ObjectData10(i)=ObjectMovementTimer(i)
+	
+
+	
+
+End Function
+
+Function RedoPushbotTexture(i)
+	
+	
+	Surface=GetSurface(ObjectEntity(i),1)
+	tex=(ObjectID(i)-500)/5
+	
+	For j=0 To 0 
+		VertexTexCoords surface,j*8+16,(tex Mod 8)*0.125+.01,(tex/8)*0.125+.51
+		VertexTexCoords surface,j*8+17,(tex Mod 8)*0.125+.115,(tex/8)*0.125+.51
+		VertexTexCoords surface,j*8+18,(tex Mod 8)*0.125+.01,(tex/8)*0.125+.51+.115
+		VertexTexCoords surface,j*8+19,(tex Mod 8)*0.125+.115,(tex/8)*0.125+.51+.115
+	
+	Next
+	
+	UpdateNormals ObjectEntity(i)
+	
+	
+	
+	
+
+End Function
+
+Function ControlZbotNPC(i)
+
+	If ObjectData(i,0)>0
+		ObjectData(i,0)=ObjectData(i,0)+1
+		If ObjectData(i,0)=120 
+			DestroyObject(i,0)
+			Return
+		EndIf
+	EndIf
+
+
+	If ObjectFrozen(i)=1
+		; freeze
+		ObjectFrozen(i)=1000*ObjectFrozen(i)
+
+	;	AnimateMD2 objectentity(i),3,.5,121,135
+		
+		PlaySoundFX(143+Rand(1,4),ObjectX(i),ObjectY(i))
+
+
+	EndIf
+	If ObjectFrozen(i)=2
+		; revert
+	;	AnimateMD2 objectentity(i),2,0.005,81,82
+		playsoundfx(Rand(141,142),ObjectX(i),ObjectY(i))
+		ObjectCurrentAnim(i)=10
+		ObjectTimer(i)=ObjectData(i,7)
+		ObjectFrozen(i)=0
+	EndIf
+	If ObjectFrozen(i)>2 Or ObjectFrozen(i)<0
+		; frozen
+		ObjectFrozen(i)=ObjectFrozen(i)-1
+		
+		Return
+	EndIf
+	
+	If ObjectData(i,0)>0
+		ObjectYaw(i)=ObjectYaw(i)+Float(ObjectData(i,0))/10.0
+		ObjectZ(i)=ObjectZ(i)+0.002
+		Return
+	EndIf
+	
+	
+	; particle effects
+	If ObjectActive(i)>0 And ObjectActive(i)<1001 ; in process
+		If Rand(0,100)<50
+			a=Rand(0,360)
+			b#=Rnd(0.002,0.006)
+			AddParticle(23,ObjectX(i)+0.5*Sin(a),0,-ObjectY(i)-0.5*Cos(a),0,.2,b*Sin(a),0.015,-b*Cos(a),1,0,0,0,0,150,3)
+		EndIf
+
+	
+	EndIf
+
+
+
+	If ObjectTileTypeCollision(i)=0
+		; First time (should later be put into object creation at level editor)
+		ObjectData10(i)=-1
+
+		ObjectTileTypeCollision(i)=2^0+2^3+2^4+2^9+2^11+2^12+2^14
+		ObjectObjectTypeCollision(i)=2^6
+		ObjectTileX(i)=Floor(ObjectX(i))
+		ObjectTileY(i)=Floor(ObjectY(i))
+		ObjectTileX2(i)=Floor(ObjectX(i))
+		ObjectTileY2(i)=Floor(ObjectY(i))
+		If ObjectMoveXGoal(i)=0 And ObjectMoveYGoal(i)=0
+			ObjectMoveXGoal(i)=Floor(ObjectX(i))
+			ObjectMoveYGoal(i)=Floor(ObjectY(i))
+	;		AnimateMD2 objectentity(i),2,0.005,81,82
+
+			ObjectCurrentAnim(i)=10
+			
+		EndIf
+		
+				
+		
+	EndIf
+	
+	
+	
+	If ObjectActive(i)>0 And ObjectLastActive(i)=0 Then Playsoundfx(143,-1,-1)
+
+	
+	If Rand(1,10000)=1 playsoundfx(Rand(141,143),-1,-1)
+	
+	; Calculate distance to player - used several times
+	Dist=maximum2(Abs(ObjectTileX(i)-ObjectTileX(PlayerObject)),Abs(ObjectTileY(i)-ObjectTileY(PlayerObject)))
+		
+	If ((GameMode<>8 Or DialogObject1<>i) And ObjectLinked(i)=-1) And ObjectData10(i)>=0
+		
+		; just restarted after talking and/or after transporter
+		ObjectMoveXGoal(i)=ObjectData10(i) Mod 200
+		ObjectMoveYGoal(i)=ObjectData10(i) / 200
+		ObjectMovementType(i)=10
+
+		ObjectData10(i)=-1
+	EndIf
+	
+
+		
+	If ObjectMovementType(i)>0
+		; Moving
+		If ObjectMovementTimer(i)=0 Then ObjectData(i,9)=ObjectData(i,9)+1
+		If ObjectMovementTimer(i)>0 Then ObjectData(i,9)=0
+		
+		If ObjectData(i,9)>10 ; has been standing for a bit
+		;	AnimateMD2 objectentity(i),2,0.005,81,82
+
+		;	ObjectCurrentAnim(i)=10
+			TurnObjectTowardDirection(i,(ObjectTileX(i)-ObjectMoveXGoal(i)),(ObjectTileY(i)-ObjectMoveYGoal(i)),4,-ObjectYawAdjust(i))
+		Else
+			
+			
+			TurnObjectTowardDirection(i,(ObjectTileX(i)-ObjectTileX2(i)),(ObjectTileY(i)-ObjectTileY2(i)),4,-ObjectYawAdjust(i))
+		EndIf
+			
+		; At Goal?
+		If ObjectMovementTimer(i)=0 And ObjectTileX(i)=ObjectMoveXGoal(i) And ObjectTileY(i)=ObjectMoveYGoal(i)
+			; Done - revert to standing
+			ObjectMovementType(i)=0
+			ObjectCurrentAnim(i)=10
+			;AnimateMD2 objectentity(i),2,0.005,81,82
+
+		EndIf
+		
+	Else If ObjectFlying(i)/10=1
+		; flying
+		
+		TurnObjectTowardDirection(i,(ObjectTileX(i)-ObjectTileX2(i)),(ObjectTileY(i)-ObjectTileY2(i)),10,-ObjectYawAdjust(i))
+	Else If ObjectFlying(i)/10=2
+		; on ice
+		
+
+	Else 
+		; standing controls
+		
+		; turn towart player - if present!
+		If ObjectType(playerobject)=1 And playerobject<nofobjects
+			If ObjectData(i,2)=0
+				TurnObjectTowardDirection(i,-ObjectX(PlayerObject)+ObjectX(i),-ObjectY(PlayerObject)+ObjectY(i),6,-ObjectYawAdjust(i))
+			EndIf
+		Else
+			If Objectstatus(i)=0
+				ObjectYaw(i)=ObjectYaw(i)+180
+				Objectstatus(i)=1
+			EndIf
+		EndIf
+		; shooting?
+		If ObjectData(i,6)>0
+			dx#=ObjectX(PlayerObject)-ObjectX(i)
+			dy#=ObjectY(PlayerObject)-ObjectY(i)
+			total#=Sqr(dx^2+dy^2)
+			dx=dx/total
+			dy=dy/total
+			
+			ObjectTimer(i)=ObjectTimer(i)-1
+			
+			If ObjectTimer(i)<0
+				If ObjectTimer(i)=-10
+					; aquire target now
+					ObjectData(i,4)=dx*10000
+					ObjectData(i,5)=dy*10000
+				EndIf
+				
+			
+				If ObjectTimer(i)=-40
+					ObjectTimer(i)=ObjectData(i,7)
+				EndIf
+				
+				; and fire
+				If ObjectTimer(i)=-30
+					dx#=Float(ObjectData(i,4))/10000.0
+					dy#=Float(ObjectData(i,5))/10000.0
+					If ObjectTileX(i)+dx>=0 And ObjectTileY(i)+dy>=0
+						If LevelTileLogic(ObjectTileX(i)+dx,ObjectTileY(i)+dy)<>1
+							CreateSpellBall(ObjectTileX(i)+.5+.6*dx,ObjectTileY(i)+.5+.6*dy,1.1,.1*dx,.1*dy,1,-1,-1,False,300)
+						EndIf
+					EndIf
+					PlaySoundFX(103,ObjectTIleX(i),ObjectTIleY(i))
+		
+					
+				EndIf
+		
+				
+			EndIf
+		EndIf
+
+
+
+	EndIf
+
+	
+	
+	ObjectData(i,3)=ObjectMovementTimer(i)
+	
+
+
+	
+
+End Function
+
 Function ControlRetroLaserGate(i)
 
 	If ObjectID(i)=-1
@@ -14868,6 +17296,481 @@ Function ControlRetroLaserGate(i)
 			
 End Function
 
+Function ControlLurker(i)
+
+	x=Floor(ObjectX(i))
+	y=Floor(ObjectY(i))
+	If ObjectData(i,0)=0
+		; lurking
+		If ObjectYawAdjust(i)<>0
+			ObjectYaw(i)=ObjectYawAdjust(i)
+			ObjectYawAdjust(i)=0
+		EndIf
+		ObjectPitch2(i)=180
+		ObjectZ(i)=-0.1
+		ObjectData(i,2)=-1
+		
+		
+		For j=0 To NofObjects-1
+			If ObjectFlying(j)=0 And ObjectDead(j)=0 
+				If ObjectType(j)=1 Or ObjectType(j)=110 Or ObjectType(j)=120 Or ObjectType(j)=150 Or ObjectType(j)=220 Or ObjectType(j)=230 Or ObjectType(j)=240 Or ObjectType(j)=241 Or ObjectType(j)=242 Or ObjectType(j)=250 Or ObjectType(j)=260 Or ObjectType(j)=290 Or ObjectType(j)=230 Or ObjectType(j)=340 Or ObjectType(j)=370 Or ObjectType(j)=380 Or ObjectType(j)=390 Or ObjectType(j)=400 Or ObjectType(j)=420 Or ObjectType(j)=421 Or ObjectType(j)=422 Or ObjectType(j)=423 Or ObjectType(j)=430 Or ObjectType(j)=431 Or ObjectType(j)=432 Or ObjectType(j)=433 Or ObjectType(j)=460 
+					If (ObjectTileX(j)=x And Abs(objecttileY(j)-y)<=1) Or (ObjectTileY(j)=y And Abs(objecttileX(j)-x)<=1)
+						; gotcha
+						PlaySoundFX(97,x,y)
+						ObjectData(i,0)=1
+						ObjectData(i,1)=0
+						ObjectData(i,2)=j  ;changed April 20/2012: Try this - do a seek'n'destroy for the surrounding area immediately after closing
+					EndIf
+				EndIf
+			EndIf
+		Next
+	EndIf
+	lurkerdead=False
+	If ObjectData(i,0)=1
+		; snapping
+		ObjectData(i,1)=ObjectData(i,1)+1
+		If ObjectData(i,1)<20
+			ObjectPitch2(i)=ObjectPitch2(i)-9
+		Else If ObjectData(i,1)=20
+			CameraShakeTimer=30
+			If ObjectData(i,2)>=0
+				
+				
+				
+				
+				
+				
+				; deleted April 20/2012
+				; HideEntity ObjectEntity(ObjectData(i,2))
+				; DestroyObject(ObjectData(i,2),0)
+				
+				; replaced with
+				For j=0 To NofObjects-1
+					If ObjectFlying(i)=0 And ObjectDead(i)=0
+						If ObjectType(j)=1 Or ObjectType(j)=110 Or ObjectType(j)=120 Or ObjectType(j)=150 Or ObjectType(j)=220 Or ObjectType(j)=230 Or ObjectType(j)=240 Or ObjectType(j)=241 Or ObjectType(j)=242 Or ObjectType(j)=250 Or ObjectType(j)=260 Or ObjectType(j)=290 Or ObjectType(j)=330 Or ObjectType(j)=340 Or ObjectType(j)=370 Or ObjectType(j)=380 Or ObjectType(j)=390 Or ObjectType(j)=400 Or ObjectType(j)=420 Or ObjectType(j)=421 Or ObjectType(j)=422 Or ObjectType(j)=423 Or ObjectType(j)=430 Or ObjectType(j)=431 Or ObjectType(j)=432 Or ObjectType(j)=433 Or ObjectType(j)=460 
+							If ((Abs(objecttileY(j)-y)<=1) And (Abs(objecttileX(j)-x)<=1)) Or ((Abs(objecttileY2(j)-y)<=1) And (Abs(objecttileX2(j)-x)<=1))
+								; gotcha
+								HideEntity ObjectEntity(j)
+								DestroyObject(j,0)
+								
+								; special case: TNT
+								If objectType(j)=241
+									; BIG BANG
+									DestroyObject(i,0)
+									lurkerdead=True
+									CameraShakeTimer=60
+
+								EndIf
+
+							EndIf
+						EndIf
+					EndIf
+				Next
+ 				; end add
+				
+			EndIf
+			If lurkerdead=False
+				For x2=-1 To 1
+					For y2=-1 To 1
+						LevelTileLogic(x+x2,y+y2)=1
+					Next
+				Next
+			EndIf
+			
+		Else If ObjectData(i,1)<100
+		
+		Else If ObjectData(i,1)<175
+			ObjectZ(i)=ObjectZ(i)-0.02
+		Else If ObjectData(i,1)=175
+			For x2=-1 To 1
+				For y2=-1 To 1
+					LevelTileLogic(x+x2,y+y2)=0
+				Next
+			Next
+
+		Else If ObjectData(i,1)<400
+		
+		Else If ObjectData(i,1)=400
+			;reset
+			ObjectData(i,0)=0
+		EndIf
+		
+	EndIf
+	
+
+
+End Function
+
+
+Function ControlBurstFlower(i)
+	
+
+	If ObjectFrozen(i)=1 
+		; freeze
+			ObjectFrozen(i)=1000*ObjectFrozen(i)
+
+		
+	EndIf
+	If ObjectFrozen(i)=2
+		; revert
+		ObjectFrozen(i)=0
+		
+	;	ObjectTimer(i)=ObjectTimerMax1(i)
+	;	ObjectData(i,2)=0
+		
+
+	EndIf
+	If ObjectFrozen(i)>2 Or ObjectFrozen(i)<0
+		; frozen
+		ObjectFrozen(i)=ObjectFrozen(i)-1
+		
+		
+		Return
+	EndIf
+	
+	
+
+	
+	
+	ObjectData(i,0)=(ObjectData(i,0)+1) Mod 720
+	objectYaw(i)=ObjectYaw(i)+.5*Sin(ObjectData(i,0)/2)
+	Objectxscale(i)=0.3+0.02*Cos(ObjectData(i,0)*2)
+	Objectyscale(i)=0.3+0.02*Cos(ObjectData(i,0)*2)
+
+	If ObjectData(i,1)>=0 And Rand(0,100)<2 AddParticle(7,ObjectX(i),0.5,-ObjectY(i),Rand(0,360),0.4,0,0.02,0,Rnd(0,2),.01,0,0,0,50,4)
+
+		
+	If ObjectData(i,1)<0 Then ObjectData(i,1)=ObjectData(i,1)+1
+
+	
+	
+	x=ObjectTileX(i)
+	y=ObjectTileY(i)
+	; player near or other stinkers near? increase burst timer
+		flag=0
+		For j=0 To nofobjects-1
+			If Objecttype(j)=1 Or ObjectType(j)=110 Or ObjectType(j)=120
+				If Abs(x-objectTileX(j))<4 And Abs(y-ObjectTileY(j))<4
+					; close enough
+					flag=1
+					objectdata(i,1)=ObjectData(i,1)+1
+					If ObjectData(i,1)>0 And ObjectData(i,1) Mod 3 =0
+						 AddParticle(8,ObjectX(i),0.8,-ObjectY(i),Rand(0,360),ObjectData(i,1)/200.0+.5,0,0,0,Rnd(0,2),0,0,0,0,30,4)
+					EndIf
+					If ObjectData(i,1)>0 And ObjectData(i,1) Mod 30 =0
+						SoundPitch SoundFX(90),18000+ObjectData(i,1)*200
+						PlaySoundFX(90,ObjectTileX(i)+.5,ObjectTIleY(i)+.5)
+					EndIf
+
+					If ObjectData(i,1)=150
+						ObjectData(i,1)=-1000
+						For k=0 To 7
+							dx#=Sin(k*45)
+							dy#=Cos(k*45)
+							CreateSpellBall(ObjectTileX(i)+.5+.6*dx,ObjectTileY(i)+.5+.6*dy,1.1,.1*dx,.1*dy,1,-1,-1,False,300)
+						Next
+					EndIf
+				EndIf
+			EndIf
+		Next
+		
+		If flag=0 And ObjectData(i,1)>0
+			ObjectData(i,1)=ObjectData(i,1)-1
+		EndIf
+		
+			
+
+
+End Function
+
+Function ControlGhost(i)
+
+
+
+	If ObjectActive(i)=1001
+			EntityAlpha ObjectEntity(i),1
+		;	HideEntity ObjectEntity(ObjectChild(i))
+			;Return
+	EndIf
+	
+
+	; check if biting someone
+		For j=0 To NofObjects-1
+			If ObjectActive(j)=1001
+				If ObjectType(j)=1 Or ObjectType(j)=120  Or ObjectType(j)=400 Or ObjectType(j)=110 Or ObjectType(j)=390 Or ObjectType(j)=433
+					If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2<.5
+						DestroyObject(j,0)
+					EndIf
+				EndIf
+			EndIf
+		Next
+
+	If ObjectFrozen(i)=1
+		; freeze
+			ObjectFrozen(i)=1000*ObjectFrozen(i)
+
+		
+
+		
+
+		
+
+	
+	EndIf
+	If ObjectFrozen(i)=2
+		; revert
+		ObjectFrozen(i)=0
+		
+		ObjectPitch(i)=0
+		ObjectRoll(i)=0
+		ObjectZ(i)=0
+	EndIf
+	If ObjectFrozen(i)>2 Or ObjectFrozen(i)<0
+		; frozen
+		ObjectFrozen(i)=ObjectFrozen(i)-1
+		
+		
+		Return
+	EndIf
+	
+	
+	ObjectMoveXGoal(i)=ObjectTileX2(PlayerObject)
+	ObjectMoveYGoal(i)=ObjectTileY2(PlayerObject)
+	
+	If ObjectMovementTimer(i)>0
+		TurnObjectTowardDirection(i,ObjectTileX2(i)-ObjectTileX(i),ObjectTileY2(i)-ObjectTileY(i),3,180)
+	Else
+		TurnObjectTowardDirection(i,ObjectTileX(PlayerObject)-ObjectTileX(i),ObjectTileY(PlayerObject)-ObjectTileY(i),1,180)
+	EndIf
+	
+	If ObjectMovementTimer(i)>0 And ObjectData10(i)=0 
+		If Rand(1,100)<20
+			SoundPitch SoundFX(28),Rand(18000,30000)
+			PlaySoundFX(28,ObjectX(i),ObjectY(i))
+		EndIf
+		
+	EndIf
+	ObjectData10(i)=ObjectMovementTimer(i)
+	
+
+	If ObjectStatus(i)=0
+		If Rand(0,100)<5
+			If ObjectData(i,8)=1
+				a=Rand(0,360)
+				b#=Rnd(0.002,0.003)
+	
+				AddParticle(30,ObjectX(i)+0.2*Sin(a),0,-ObjectY(i)-0.2*Cos(a),0,.2,b*Sin(a),0.005,-b*Cos(a),1,0,0,0,0,80,3)
+	
+			EndIf
+		EndIf
+			
+		EntityAlpha ObjectEntity(i),Float(ObjectData(i,9))/60.0
+		If ObjectData(i,9)>0 Then ObjectData(i,9)=ObjectData(i,9)-1
+		
+		ObjectMovementType(i)=0
+		If Abs(ObjectX(i)-ObjectX(PlayerObject))<=ObjectData(i,0) And Abs(ObjectY(i)-ObjectY(PlayerObject))<=ObjectData(i,0)
+
+			; in range
+			ObjectStatus(i)=1
+			SoundPitch SoundFX(28),21000
+
+			PlaySoundFX(28,ObjectX(i),ObjectY(i))
+		EndIf
+			
+	
+	Else If ObjectStatus(i)=1
+		ObjectData(i,8)=1
+		ObjectMovementTYpe(i)=13
+		EntityAlpha ObjectEntity(i),Float(ObjectData(i,9))/60.0
+		If ObjectData(i,9)<50 Then ObjectData(i,9)=ObjectData(i,9)+2
+		
+		If Abs(ObjectX(i)-ObjectX(PlayerObject))>ObjectData(i,0) Or Abs(ObjectY(i)-ObjectY(PlayerObject))>ObjectData(i,0)
+
+			; in range
+			ObjectStatus(i)=0
+			;PlaySoundFX(102,ObjectX(i),ObjectY(i))
+		EndIf
+
+
+	EndIf
+		
+	
+		
+End Function
+
+Function ControlWraith(i)
+
+
+
+	If ObjectActive(i)=1001
+			EntityAlpha ObjectEntity(i),1
+		;	HideEntity ObjectEntity(ObjectChild(i))
+			;Return
+	EndIf
+	
+
+	; check if biting someone
+		For j=0 To NofObjects-1
+			If ObjectActive(j)=1001
+				If ObjectType(j)=1 Or ObjectType(j)=120  Or ObjectType(j)=400 Or ObjectType(j)=110 Or ObjectType(j)=390 Or ObjectType(j)=433
+					If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2<.5
+						DestroyObject(j,0)
+					EndIf
+				EndIf
+			EndIf
+		Next
+
+	If ObjectFrozen(i)=1
+		; freeze
+		ObjectFrozen(i)=1000*ObjectFrozen(i)
+
+		
+		
+
+	
+	EndIf
+	If ObjectFrozen(i)=2
+		; revert
+		ObjectFrozen(i)=0
+		
+		ObjectPitch(i)=0
+		ObjectRoll(i)=0
+		ObjectZ(i)=0
+	EndIf
+	If ObjectFrozen(i)>2 Or ObjectFrozen(i)<0
+		; frozen
+		ObjectFrozen(i)=ObjectFrozen(i)-1
+		
+		
+		Return
+	EndIf
+	
+	
+	ObjectMoveXGoal(i)=ObjectTileX2(PlayerObject)
+	ObjectMoveYGoal(i)=ObjectTileY2(PlayerObject)
+	
+	If ObjectMovementTimer(i)>0
+		TurnObjectTowardDirection(i,ObjectTileX2(i)-ObjectTileX(i),ObjectTileY2(i)-ObjectTileY(i),3,180)
+	Else
+		TurnObjectTowardDirection(i,ObjectTileX(PlayerObject)-ObjectTileX(i),ObjectTileY(PlayerObject)-ObjectTileY(i),1,180)
+	EndIf
+	
+	
+	ObjectData10(i)=ObjectMovementTimer(i)
+	
+
+	If ObjectStatus(i)=0
+		EntityAlpha ObjectEntity(i),Float(ObjectData(i,9))/60.0
+		If ObjectData(i,9)>0 Then ObjectData(i,9)=ObjectData(i,9)-1
+		
+		ObjectMovementType(i)=0
+		If Abs(ObjectX(i)-ObjectX(PlayerObject))<=ObjectData(i,0) And Abs(ObjectY(i)-ObjectY(PlayerObject))<=ObjectData(i,0)
+
+
+			; in range
+			ObjectStatus(i)=1
+			PlaySoundFX(29,ObjectX(i),ObjectY(i))
+		EndIf
+		ObjectData(i,8)=0
+
+			
+	
+	Else If ObjectStatus(i)=1
+		
+		
+		EntityAlpha ObjectEntity(i),Float(ObjectData(i,9))/60.0
+		If ObjectData(i,9)<50 Then ObjectData(i,9)=ObjectData(i,9)+2
+		
+		If ObjectData(i,8)<ObjectData(i,1)
+			ObjectData(i,8)=ObjectData(i,8)+1
+		 	If ObjectData(i,8)=ObjectData(i,1)-20
+				Select ObjectData(i,2)
+					
+					Case 0
+						part=25
+					Case 1
+						part=28
+					Case 2
+						part=27
+					
+				End Select
+				
+				For xx=1 To 30
+					AddParticle(part,ObjectX(i)+Sin(xx*12),1.1,-ObjectY(i)+Cos(xx*12),Rand(0,360),.3,-0.05*Sin(xx*12),0,-0.05*Cos(xx*12),Rnd(0,2),0,0,0,0,30,4)
+				Next
+				If ObjectData(i,2)=2
+					ObjectData(i,6)=ObjectTileX2(PlayerObject)*100+50
+					ObjectData(i,7)=ObjectTileY2(PlayerObject)*100+50
+				Else
+					ObjectData(i,6)=(ObjectX(PlayerObject)*100+0)
+					ObjectData(i,7)=ObjectY(PlayerObject)*100+0
+				EndIf
+
+				
+
+			EndIf	
+		Else
+			;fire
+			If ObjectData(i,6)=-1
+				If ObjectData(i,2)=2
+					ObjectData(i,6)=ObjectTileX2(PlayerObject)*100+50
+
+					ObjectData(i,7)=ObjectTileY2(PlayerObject)*100+50
+
+				Else
+					ObjectData(i,6)=(ObjectX(PlayerObject)*100+0)
+					ObjectData(i,7)=ObjectY(PlayerObject)*100+0
+				EndIf
+
+			EndIf
+			ObjectData(i,8)=0
+			
+			dx#=(ObjectData(i,6)/100.0)-ObjectX(i)
+			dy#=(ObjectData(i,7)/100.0)-ObjectY(i)
+			
+			total#=Sqr(dx^2+dy^2)
+			dx=dx/total
+			dy=dy/total
+			
+			
+
+			
+			If ObjectTileX(i)+dx>=0 And ObjectTileY(i)+dy>=0 And ObjectTileX(i)+dx<levelwidth And ObjectTileY(i)+dy<levelheight
+				If LevelTileLogic(ObjectTileX(i)+dx,ObjectTileY(i)+dy)<>1
+					If ObjectData(i,2)=0
+						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,1,-1,-1,False,300)
+					Else If ObjectData(i,2)=1
+						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,4,-1,-1,False,300)
+					Else If ObjectData(i,2)=2
+						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,3,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+					EndIf
+				EndIf
+			EndIf
+			PlaySoundFX(103,ObjectTIleX(i),ObjectTIleY(i))
+
+			ObjectData(i,6)=-1
+
+			
+		EndIf
+		
+		If Abs(ObjectX(i)-ObjectX(PlayerObject))>ObjectData(i,0) Or Abs(ObjectY(i)-ObjectY(PlayerObject))>ObjectData(i,0)
+
+			ObjectData(i,8)=0
+			; in range
+			ObjectStatus(i)=0
+			;PlaySoundFX(102,ObjectX(i),ObjectY(i))
+		EndIf
+
+
+	EndIf
+		
+
+	
+
+	
+	
+		
+End Function
 
 
 
