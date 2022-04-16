@@ -2995,7 +2995,7 @@ Function LoadObject(file, complete,create)
 		If ObjectData(Dest,4)=4
 			ObjectEntity(Dest)=CreateCloudMesh(convsize,ObjectData(Dest,0))
 		Else
-			ObjectEntity(Dest)=CreateTransporterMesh(ObjectData(Dest,0),ObjectData(Dest,4))
+			ObjectEntity(Dest)=CreateTransporterMesh(ObjectData(Dest,0))
 			If ObjectType(Dest)=46
 				ObjectXScale(Dest)=.8
 				ObjectYScale(Dest)=.8
@@ -12175,7 +12175,7 @@ Function CreateConveyorTail(parent,x,y,dx,dy,olddir)
 	If ObjectData(parent,4)=4
 		ObjectEntity(i)=CreateCloudMesh(.7,ObjectData(parent,0))
 	Else
-		ObjectEntity(i)=CreateTransporterMesh(ObjectData(Parent,0),ObjectData(Parent,4))
+		ObjectEntity(i)=CreateTransporterMesh(ObjectData(Parent,0))
 		ObjectXScale(i)=.8
 		ObjectYScale(i)=.8
 	EndIf
@@ -13801,18 +13801,18 @@ Function ControlSpellBall(i)
 					EndIf
 					If ObjectSubType(i)=4 ; ice
 						CreateIceBlock(ObjectX(j),ObjectY(j),j)
+					EndIf
 				Case 433
 					; zbot npc
-					If ObjectSubType(i<2  And ObjectData(j,0)=0 ; fire 
+					If ObjectSubType(i)<2  And ObjectData(j,0)=0 ; fire 
 						PlaySoundFX(Rand(144,146),ObjectX(j),ObjectY(j))
 						ObjectData(j,0)=1
 					EndIf
 					If ObjectSubType(i)=4 And ObjectData(j,0)=0; ice
-						CreateIceBlock(ObjectX(j),ObjectY(j),j,0,ObjectStatus(i))
+						CreateIceBlock(ObjectX(j),ObjectY(j),j)
 					EndIf
 							
 						
-					EndIf
 				
 					destructoflag=True
 
@@ -13844,8 +13844,7 @@ Function ControlSpellBall(i)
 						destroyobject(j,1)
 					EndIf
 							
-						
-					EndIf
+					
 					destructoflag=True
 				
 				Case 170,171,172,173,174,175,176,177,178,179,425
@@ -13870,20 +13869,14 @@ Function ControlSpellBall(i)
 					EndIf
 					If ObjectSubType(i)=4 ; ice
 						CreateIceBlock(ObjectX(j),ObjectY(j),j)
+					EndIf
 				Case 460
 					; burstflower
 					If ObjectSubType(i)<2 ; fire 
 						destroyobject(j,1)
 					EndIf
 					If ObjectSubType(i)=4 ; ice
-						CreateIceBlock(ObjectX(j),ObjectY(j),j,0,ObjectStatus(i))
-					EndIf
-							
-						
-					EndIf
-	
-					destructoflag=True
-
+						CreateIceBlock(ObjectX(j),ObjectY(j),j)
 					EndIf
 					destructoflag=True
 				Case 240,241,242
@@ -13949,7 +13942,7 @@ Function ControlSpellBall(i)
 						EndIf
 						
 						If ObjectSubType(i)=4 ; ice
-							CreateIceBlock(ObjectX(j),ObjectY(j),j,0,ObjectStatus(i))
+							CreateIceBlock(ObjectX(j),ObjectY(j),j)
 						EndIf
 		
 						destructoflag=True
@@ -13971,13 +13964,10 @@ Function ControlSpellBall(i)
 						
 					EndIf
 					If ObjectSubType(i)=4; ice
-						CreateIceBlock(ObjectX(j),ObjectY(j),j,0,ObjectStatus(i))
+						CreateIceBlock(ObjectX(j),ObjectY(j),j)
 						
 	
 					EndIf
-						
-					EndIf
-
 					destructoflag=True
 
 				Case 330
@@ -16959,6 +16949,101 @@ Function CreateRetroLaserGateMesh(col)
 	
 	Return Entity
 	
+End Function
+
+Function CreatePushbotMesh(tex,dir)
+	
+	Entity=CreateMesh()
+	Surface=CreateSurface(Entity)
+	If dir=2
+		; special for turn-around
+		dir=0
+		; Front
+		AddVertex (surface,-.4,0,.4,0,.25+.25*dir)
+		AddVertex (surface,+.4,0,.4,0,0+.25*dir)
+		AddVertex (surface,-.2,.3,.2,.25,.20+.25*dir)
+		AddVertex (surface,+.2,.3,.2,.25,.05+.25*dir)
+		AddTriangle (surface,0,1,2)
+		AddTriangle (surface,1,3,2)
+		; Top
+		AddVertex (surface,-.4,.4,-.4,.5,.20+.25*dir)
+		AddVertex (surface,+.4,.4,-.4,.5,.05+.25*dir)
+		AddTriangle (surface,2,3,4)
+		AddTriangle (surface,3,5,4)
+		;Back
+		AddVertex (surface,-.45,0,-.45,.75,.25+.25*dir)
+		AddVertex (surface,+.45,0,-.45,.75,0+.25*dir)
+		AddTriangle (surface,4,5,6)
+		AddTriangle (surface,5,7,6)
+		; Left
+		AddVertex (surface,-.4,0,.4,.75,.25+.25*dir)
+		AddVertex (surface,-.45,0,-.45,.75,0+.25*dir)
+		AddVertex (surface,-.2,.3,.2,1,.25+.25*dir)
+		AddVertex (surface,-.4,.4,-.4,1,0+.25*dir)
+		AddTriangle (surface,10,9,8)
+		AddTriangle (surface,10,11,9)
+		; Right
+		AddVertex (surface,.4,0,.4,.75,.25+.25*dir)
+		AddVertex (surface,.45,0,-.45,.75,0+.25*dir)
+		AddVertex (surface,.2,.3,.2,1,.25+.25*dir)
+		AddVertex (surface,.4,.4,-.4,1,0+.25*dir)
+		AddTriangle (surface,12,13,14)
+		AddTriangle (surface,13,15,14)
+
+	Else
+	
+		dir=1-dir
+		
+		; Front
+		AddVertex (surface,-.4,0,.4,0,.25+.25*dir)
+		AddVertex (surface,+.4,0,.4,0,0+.25*dir)
+		AddVertex (surface,-.2,.3,.2,.25,.25+.25*dir)
+		AddVertex (surface,+.2,.3,.2,.25,0+.25*dir)
+		AddTriangle (surface,0,1,2)
+		AddTriangle (surface,1,3,2)
+		; Top
+		AddVertex (surface,-.4,.4,-.4,.5,.25+.25*dir)
+		AddVertex (surface,+.4,.4,-.4,.5,0+.25*dir)
+		AddTriangle (surface,2,3,4)
+		AddTriangle (surface,3,5,4)
+		;Back
+		AddVertex (surface,-.45,0,-.45,.75,.25+.25*dir)
+		AddVertex (surface,+.45,0,-.45,.75,0+.25*dir)
+		AddTriangle (surface,4,5,6)
+		AddTriangle (surface,5,7,6)
+		; Left
+		AddVertex (surface,-.4,0,.4,.75,.25+.25*dir)
+		AddVertex (surface,-.45,0,-.45,.75,0+.25*dir)
+		AddVertex (surface,-.2,.3,.2,1,.25+.25*dir)
+		AddVertex (surface,-.4,.4,-.4,1,0+.25*dir)
+		AddTriangle (surface,10,9,8)
+		AddTriangle (surface,10,11,9)
+		; Right
+		AddVertex (surface,.4,0,.4,.75,.25+.25*dir)
+		AddVertex (surface,.45,0,-.45,.75,0+.25*dir)
+		AddVertex (surface,.2,.3,.2,1,.25+.25*dir)
+		AddVertex (surface,.4,.4,-.4,1,0+.25*dir)
+		AddTriangle (surface,12,13,14)
+		AddTriangle (surface,13,15,14)
+	EndIf
+
+	
+	
+	; Col
+	AddVertex (surface,-.05,.33,.05,(tex Mod 8)*0.125+.01,(tex/8)*0.125+.51)
+	AddVertex (surface,.05,.33,.05,(tex Mod 8)*0.125+.115,(tex/8)*0.125+.51)
+	AddVertex (surface,-.25,.4,-.35,(tex Mod 8)*0.125+.01,(tex/8)*0.125+.51+.115)
+	AddVertex (surface,.25,.4,-.35,(tex Mod 8)*0.125+.115,(tex/8)*0.125+.51+.115)
+	AddTriangle (surface,16,17,18)
+	AddTriangle (surface,17,19,18)
+	
+		
+	
+	UpdateNormals Entity
+	
+	EntityTexture Entity,PushbotTexture
+	Return Entity
+
 End Function
 
 
