@@ -8541,6 +8541,12 @@ Function ControlTrap(i)
 							DestroyObject(j,1)
 						EndIf
 					EndIf
+					
+					If ObjectActive(j)=1001 And ObjectType(j)=400
+						If (ObjectMovementTimer(j)>(ObjectMovementSpeed(j)/2) And ObjectTileX(i)=ObjectTileX(j) And ObjectTileY(i)=ObjectTIleY(j)) Or (ObjectMovementTimer(j)<=(ObjectMovementSpeed(j)/2) And ObjectTileX(i)=ObjectTileX2(j) And ObjectTileY(i)=ObjectTIleY2(j))
+							ObjectData(j,8)=1
+						EndIf
+					EndIf
 						
 				EndIf
 			Next

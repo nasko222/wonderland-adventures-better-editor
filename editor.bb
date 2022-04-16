@@ -11,7 +11,7 @@
 
 Include "particles-define.bb"
 
-Global VersionText$="WA 0.96 Editor (BetterEditor Mod Build 10)"
+Global VersionText$="WA 0.96 Editor (BetterEditor Mod)"
 
 Global MASTERUSER=False
 Global LeftMouse,LeftMouseReleased,RightMouse,RightMouseReleased
@@ -1896,6 +1896,22 @@ Function EditorControls()
 		Text 719,115,"  Retro  "
 	Case 12
 		Text 719,115,"  Cave  "
+	Case 13
+		Text 719,115,"POTZ Intro"
+	Case 14
+		Text 719,115," Uo Sound"
+	Case 15
+		Text 719,115,"Z-Ambience"
+	Case 16
+		Text 719,115,"Z-Synchron"
+	Case 17
+		Text 719,115,"RetroScary"
+	Case 18
+		Text 719,115,"DesertWind"
+	Case 19
+		Text 719,115,"DesertCave"
+	Case 20
+		Text 719,115,"Star World"
 	Default
 		Text 719-5,115,"Custom:" + LevelMusic
 
