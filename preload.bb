@@ -200,6 +200,11 @@ Function PreLoadModels()
 	EntityTexture CrabMesh,CrabTexture1
 	HideEntity CrabMesh
 
+	; Ice Troll
+	TrollMesh=myLoadMD2("data\models\thwart\ice troll.md2")
+	TrollTexture=myLoadTexture("data\models\thwart\icetroll01.bmp",1)
+	EntityTexture TrollMesh,TrollTexture
+	HideEntity TrollMesh
 	; Kaboom
 	KaboomMesh=myLoadMD2("data\models\kaboom\kaboom.md2")
 	For i=1 To 5

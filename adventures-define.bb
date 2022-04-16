@@ -250,6 +250,8 @@ Global TurtleMesh, TurtleTexture
 ; Crabs
 Global CrabMesh, CrabTexture1, CrabTexture2, NofCrabsInAdventure
 
+; Trolls
+Global TrollMesh, TrollTexture
 ; Kabooms
 Global KaboomMesh, KaboomTextureSquint
 Dim KaboomTexture(5)

@@ -113,8 +113,8 @@ Function CreateNewPlayer()
 	WriteInt file,0;NofGemsInAdventure
 	WriteInt file,0;NofBricksInAdventure
 	WriteInt file,0;NofFireFlowersInAdventure
-	WriteInt file,future;NofCrabsInAdventure
-	WriteInt file,future;NofBabyBoomersInAdventure
+	WriteInt file,0;NofCrabsInAdventure
+	WriteInt file,0;NofBabyBoomersInAdventure
 	WriteInt file,future
 	WriteInt file,future
 	WriteInt file,future
@@ -2796,6 +2796,9 @@ Function LoadObject(file, complete,create)
 			AnimateMD2 ObjectEntity(Dest),3,1,46,49
 		EndIf
 		
+	Case "!Troll"
+		ObjectEntity(Dest)=CopyEntity(TrollMesh)
+		AnimateMD2 objectentity(dest),2,0.005,81,82
 	Case "!Kaboom"
 		ObjectEntity(Dest)=CopyEntity(KaboomMesh)
 		EntityTexture ObjectEntity(Dest),KaboomTexture(ObjectData(dest,0))
@@ -3070,7 +3073,7 @@ Function LoadObject(file, complete,create)
 
 	Case "!StinkerWee","!Scritter","!BabyBoomer"
 		CreateShadow(Dest,.5)
-	Case "!Turtle","!Thwart"
+	Case "!Turtle","!Thwart","!Troll"
 		CreateShadow(Dest,.9)
 	Case "!Chomper","!Bowler","!Kaboom"
 		CreateShadow(Dest,.6)
@@ -3276,7 +3279,7 @@ Function AdjustLevelTileLogic(x,y,i)
 
 	If ObjectFrozen(i)>0 
 		Select ObjectType(i)
-		Case 1,110,120,150,220,230,250,260, 290,370,390,400
+		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400
 			If (ObjectTileLogic(x,y) And 2^10) =0
 				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^10
 			EndIf
@@ -3411,7 +3414,7 @@ Function AdjustLevelTileLogic(x,y,i)
 		If (ObjectTileLogic(x,y) And 2^7) =0 And ObjectActive(i)>0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^7
 		EndIf
-	Case 290,390
+	Case 290,380,390
 		; thwart, Troll, Kaboom
 		If ObjectTalkable(i)>0
 			If (ObjectTileLogic(x,y) And 2^2) =0 And ObjectActive(i)>0
@@ -3566,7 +3569,7 @@ Function ControlObjects()
 			If ObjectActive(i)>1001 ObjectActive(i)=1001
 			
 			If ObjectLastActive(i)=0 And ObjectActive(i)>0
-				If ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=60 Or ObjectType(i)=230 Or ObjectType(i)=390
+				If ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=60 Or ObjectType(i)=230 Or ObjectType(i)=380 Or ObjectType(i)=390
 					; turn on npc, thwart, iceblock, flower
 					OccupyObjectTile(i,ObjectTileX(i),ObjectTileY(i))
 				EndIf
@@ -3861,7 +3864,8 @@ Function ControlObjects()
 				ControlFlashBubble(i)
 			Case 370 
 				ControlCrab(i)
-
+			Case 380
+				ControlTroll(i)
 			Case 390
 				ControlKaboom(i)
 			Case 400
@@ -3946,7 +3950,7 @@ Function ControlObjects()
 					TurnEntity ObjectEntity(i),0,ObjectYaw(i)+ObjectYawAdjust(i),0
 					
 					TurnEntity ObjectEntity(i),ObjectPitch2(i),ObjectYaw2(i),ObjectRoll2(i)
-					If ObjectModelName$(i)="!Crab" 
+					If ObjectModelName$(i)="!Troll" Or ObjectModelName$(i)="!Crab" 
 						TurnEntity ObjectEntity(i),0,-90,0
 					EndIf
 					If ObjectModelName$(i)="!Kaboom" Or ObjectModelName$(i)="!BabyBoomer"
@@ -5071,7 +5075,7 @@ Function OccupyObjectTile(i,x,y)
 	
 	If ObjectFrozen(i)>0
 		Select ObjectType(i)
-		Case 1,110,120,150,220,230,250,260, 290,370,390,400,420,421,422,423
+		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423
 			If (ObjectTileLogic(x,y) And 2^10) =0
 				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^10
 			EndIf
@@ -5088,7 +5092,7 @@ Function OccupyObjectTile(i,x,y)
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^1
 		EndIf
 		
-	Case 110,330,290,390
+	Case 110,330,290,380,390
 		; Stinker NPC/Wisp/Troll/Thwart/Kaboom
 		If ObjectActive(i)>0
 			If ObjectTalkable(i)>0
@@ -5224,7 +5228,7 @@ Function VacateObjectTile(i)
 	
 	If ObjectFrozen(i)>0
 		Select ObjectType(i)
-		Case 1,110,120,150,220,230,250,260, 290,370,390,400,420,421,422,423
+		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423
 			If (ObjectTileLogic(x,y) And 2^10) >0
 				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^10
 			EndIf
@@ -5241,7 +5245,7 @@ Function VacateObjectTile(i)
 			
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^1
 		EndIf
-	Case 110,330,290,390
+	Case 110,330,290,380,390
 		; Stinker NPC/Wisp/Troll/Thwart/Kaboom
 		If ObjectTalkable(i)>0
 			If (ObjectTileLogic(x,y) And 2^2) >0 
@@ -5335,7 +5339,7 @@ Function EndMoveTileCheck(i,oldx,oldy)
 	Case 1
 		; Solid Wall
 		; Check if Object can be in solid wall, if not - destroy
-		If ObjectType(i)=1  Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or ObjectType(i)=220 Or ObjectType(i)=250 Or ObjectType(i)=260   Or ObjectType(i)=290 Or ObjectType(i)=390 Or ObjectType(i)=400  Or ObjectType(i)=420  Or ObjectType(i)=422 Or ObjectType(i)=423
+		If ObjectType(i)=1  Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or ObjectType(i)=220 Or ObjectType(i)=250 Or ObjectType(i)=260   Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400  Or ObjectType(i)=420  Or ObjectType(i)=422 Or ObjectType(i)=423
 			; player - boom
 			DestroyObject(i,0)
 		EndIf
@@ -5345,7 +5349,7 @@ Function EndMoveTileCheck(i,oldx,oldy)
 		If (ObjectFlying(i) =0 Or ObjectFlying(i)>=20) 
 			
 			; anything frozen? Destroy
-			If (((((((((objecttype(i)=1 Or (objecttype(i)=110)) Or (objecttype(i)=120)) Or (objecttype(i)=150)) Or ((objecttype(i)=250 And (objectdata(i,1)<>1)))) Or (objecttype(i)=260)) Or (objecttype(i)=290)) Or (objecttype(i)=390)) Or (objecttype(i)=400)) Or (objecttype(i)=423)) Then
+			If ObjectType(i)=1 Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or (ObjectType(i)=250 And ObjectData(i,1)<>1) Or ObjectType(i)=260 Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400 Or ObjectType(i)=423
 				DestroyObject(i,2)
 			EndIf
 				If (ObjectType(i)=220 Or ObjectType(i)=370) And ObjectStatus(i)=0
@@ -6492,7 +6496,7 @@ Function ControlPlayerInGame(i)
 				
 					; yep - check which one, and is it talkable
 					For j=0 To NofObjects-1
-						If ObjectExists(j)=True And (ObjectType(j)=110 Or ObjectType(j)=180 Or ObjectType(j)=290 Or ObjectType(j)=330 Or ObjectType(j)=390)
+						If ObjectExists(j)=True And (ObjectType(j)=110 Or ObjectType(j)=180 Or ObjectType(j)=290 Or ObjectType(j)=330 Or ObjectType(j)=380 Or ObjectType(j)=390)
 							If ObjectMovementTimer(j)=0 And ObjectTalkable(j)>0 And ObjectActive(j)=1001
 							
 								If ObjectTileX(j)=MX And ObjectTileY(j)=MY
@@ -13152,6 +13156,216 @@ Function ControlCrab(i)
 
 End Function
 
+Function ControlTroll(i)
+
+	If ObjectFrozen(i)=1
+		ObjectFrozen(i)=1000*ObjectFrozen(i)
+		AnimateMD2 objectentity(i),3,.5,121,135
+		PlaySoundFX(114,ObjectX(i),ObjectY(i))
+
+	EndIf
+	If ObjectFrozen(i)=2
+		; revert
+		AnimateMD2 objectentity(i),2,0.005,81,82
+		ObjectCurrentAnim(i)=10
+		ObjectTimer(i)=ObjectData(i,7)
+		ObjectFrozen(i)=0
+	EndIf
+	If ObjectFrozen(i)>2 Or ObjectFrozen(i)<=-1
+		; frozen
+		ObjectFrozen(i)=ObjectFrozen(i)-1
+		
+		Return
+	EndIf
+
+
+	If ObjectTileTypeCollision(i)=0
+		; First time (should later be put into object creation at level editor)
+		ObjectData10(i)=-1
+
+		ObjectTileTypeCollision(i)=2^0+2^3+2^4+2^9+2^11+2^12+2^14
+		ObjectObjectTypeCollision(i)=2^4+2^6
+		ObjectTileX(i)=Floor(ObjectX(i))
+		ObjectTileY(i)=Floor(ObjectY(i))
+		ObjectTileX2(i)=Floor(ObjectX(i))
+		ObjectTileY2(i)=Floor(ObjectY(i))
+		If ObjectMoveXGoal(i)=0 And ObjectMoveYGoal(i)=0
+			ObjectMoveXGoal(i)=Floor(ObjectX(i))
+			ObjectMoveYGoal(i)=Floor(ObjectY(i))
+			AnimateMD2 objectentity(i),2,0.005,81,82
+
+			ObjectCurrentAnim(i)=10
+			
+		EndIf
+		
+				
+		
+	EndIf
+	If objectdata(i,2)>0
+		EntityTexture objectentity(i),thwarttexture((objectdata(i,2)) Mod 8)
+	EndIf
+	
+	If ObjectActive(i)=0
+		HideEntity(ObjectEntity(i))
+	Else
+		ShowEntity(ObjectEntity(i))
+	EndIf
+	
+	; Calculate distance to player - used several times
+	Dist=maximum2(Abs(ObjectTileX(i)-ObjectTileX(PlayerObject)),Abs(ObjectTileY(i)-ObjectTileY(PlayerObject)))
+		
+	If ((GameMode<>8 Or DialogObject1<>i) And ObjectLinked(i)=-1) And ObjectData10(i)>=0
+		
+		; just restarted after talking and/or after transporter
+		ObjectMoveXGoal(i)=ObjectData10(i) Mod 200
+		ObjectMoveYGoal(i)=ObjectData10(i) / 200
+		ObjectMovementType(i)=10
+
+		ObjectData10(i)=-1
+	EndIf
+		
+	; stop moving when the NPC is talking
+	If GameMode=8 And DialogObject1=i
+		If ObjectCurrentAnim(i)<>10 And ObjectData(i,8)<>7 
+			ObjectCurrentAnim(i)=10
+			;Animate GetChild(objectentity(i),3),1,.05,10
+		EndIf
+	Else If ObjectMovementType(i)>0
+		; Moving
+		If ObjectMovementTimer(i)=0 Then ObjectData(i,9)=ObjectData(i,9)+1
+		If ObjectMovementTimer(i)>0 Then ObjectData(i,9)=0
+		
+		If ObjectData(i,9)>10 ; has been standing for a bit
+			AnimateMD2 objectentity(i),2,0.005,81,82
+
+			ObjectCurrentAnim(i)=10
+			TurnObjectTowardDirection(i,(ObjectTileX(i)-ObjectMoveXGoal(i)),(ObjectTileY(i)-ObjectMoveYGoal(i)),4,-ObjectYawAdjust(i))
+		Else
+			
+			If ObjectCurrentAnim(i)<>1
+				If ObjectData(i,1)=1
+					; hands up running
+					AnimateMD2 objectentity(i),2,1,42,79
+				Else
+					; normal
+					AnimateMD2 objectentity(i),2,1,2,39
+
+				EndIf
+				ObjectCurrentAnim(i)=1
+			EndIf
+			TurnObjectTowardDirection(i,(ObjectTileX(i)-ObjectTileX2(i)),(ObjectTileY(i)-ObjectTileY2(i)),4,-ObjectYawAdjust(i))
+		EndIf
+			
+		; At Goal?
+		If ObjectMovementTimer(i)=0 And ObjectTileX(i)=ObjectMoveXGoal(i) And ObjectTileY(i)=ObjectMoveYGoal(i)
+			; Done - revert to standing
+			ObjectMovementType(i)=0
+			ObjectCurrentAnim(i)=10
+			AnimateMD2 objectentity(i),2,0.005,81,82
+
+		EndIf
+		
+	Else If ObjectFlying(i)/10=1
+		; flying
+		If ObjectCurrentAnim(i)<>11
+		;	Animate GetChild(objectentity(i),3),1,1,11
+			ObjectCurrentAnim(i)=11
+		EndIf
+		TurnObjectTowardDirection(i,(ObjectTileX(i)-ObjectTileX2(i)),(ObjectTileY(i)-ObjectTileY2(i)),10,-ObjectYawAdjust(i))
+	Else If ObjectFlying(i)/10=2
+		; on ice
+		If ObjectCurrentAnim(i)<>13
+		;	Animate GetChild(objectentity(i),3),3,2,13
+			ObjectCurrentAnim(i)=13
+		EndIf
+
+	Else 
+		; standing controls
+		
+		; turn towart player - if present!
+		If ObjectType(playerobject)=1 And playerobject<nofobjects
+			TurnObjectTowardDirection(i,-ObjectX(PlayerObject)+ObjectX(i),-ObjectY(PlayerObject)+ObjectY(i),6,-ObjectYawAdjust(i))
+		Else
+			If Objectstatus(i)=0
+				ObjectYaw(i)=ObjectYaw(i)+180
+				Objectstatus(i)=1
+			EndIf
+		EndIf
+		; shooting?
+		If ObjectData(i,6)>0 And ObjectActive(i)=1001
+			dx#=ObjectX(PlayerObject)-ObjectX(i)
+			dy#=ObjectY(PlayerObject)-ObjectY(i)
+			total#=Sqr(dx^2+dy^2)
+			dx=dx/total
+			dy=dy/total
+			
+			ObjectTimer(i)=ObjectTimer(i)-1
+			
+			If ObjectTimer(i)<0
+				If ObjectTimer(i)=-10
+					; aquire target now
+					ObjectData(i,4)=dx*10000
+					ObjectData(i,5)=dy*10000
+				EndIf
+				If ObjectTimer(i)=-1
+					AnimateMD2 ObjectEntity(i),3,1,81,119,1
+					
+				EndIf
+			
+				If ObjectTimer(i)=-40
+					ObjectTimer(i)=ObjectData(i,7)
+				EndIf
+				
+				; and fire
+				If ObjectTimer(i)=-30
+					dx#=Float(ObjectData(i,4))/5000.0
+					dy#=Float(ObjectData(i,5))/5000.0
+					If LevelTileLogic(ObjectTileX(i)+dx,ObjectTileY(i)+dy)<>1
+						CreateSpellBall(ObjectTileX(i)+.5+.6*dx,ObjectTileY(i)+.5+.6*dy,1.1,.1*dx,.1*dy,4,-1,-1,False,300)
+					EndIf
+					PlaySoundFX(103,ObjectTIleX(i),ObjectTIleY(i))
+					PlaySoundFX(113,ObjectX(i),ObjectY(i))
+
+					
+				EndIf
+		
+				
+			EndIf
+		EndIf
+
+
+
+	EndIf
+
+	; check if a pickup has occured
+	If (ObjectTileLogic(ObjectTileX(i),ObjectTileY(i)) And 2^4) >0
+		; standing on item
+		
+		For j=0 To NofObjects-1
+			If objecttype(j)/10=17 And ObjectActive(j)=1001
+				If ObjectTileX(j)=ObjectTileX(i) And ObjectTileY(j)=ObjectTileY(i)
+					; got something - pick it up!
+					PlaySoundFX(107,ObjectX(i),ObjectY(i))
+
+					ObjectTileLogic(ObjectTileX(i),ObjectTileY(i))=ObjectTileLogic(ObjectTileX(i),ObjectTileY(i))-2^4
+									
+					ObjectActivationType(j)=0
+					ObjectActivationSpeed(j)=20
+			
+					DeActivateObject(j)
+					
+				EndIf
+			EndIf
+		Next
+	EndIf
+						
+					
+	If ObjectMovementTimer(i)>0 And ObjectData(i,3)=0 Then PlaySoundFX(106,ObjectX(i),ObjectY(i))
+
+	ObjectData(i,3)=ObjectMovementTimer(i)
+
+
+End Function
 Function ControlKaboom(i)
 	
 	If ObjectFrozen(i)=1
@@ -14863,7 +15077,7 @@ Function ActivateCommand(command,data1,data2,data3,data4)
 		; Move NPC with ID data1 to point (data2,data3) - ALSO WORKS FOR THWARTS/WISP
 		
 		For i=0 To NofObjects-1
-			If ObjectExists(i)=True And (ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=330 Or ObjectType(i)=390)
+			If ObjectExists(i)=True And (ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=330 Or ObjectType(i)=380 Or ObjectType(i)=390)
 				If ObjectID(i)=data1 And (ObjectMovementTimer(i)>0 Or (data2<>ObjectTileX(i) Or data3<>ObjectTileY(i)))
 					
 					If i=dialogObject1 And gamemode=8
@@ -14884,7 +15098,7 @@ Function ActivateCommand(command,data1,data2,data3,data4)
 		
 
 		For i=0 To NofObjects-1
-			If ObjectExists(i)=True  And (ObjectType(i)=110 Or ObjectType(i)=330 Or ObjectType(i)=180 Or ObjectType(i)=390)
+			If ObjectExists(i)=True  And (ObjectType(i)=110 Or ObjectType(i)=330 Or ObjectType(i)=180 Or ObjectType(i)=380 Or ObjectType(i)=390)
 				If ObjectID(i)=data1 
 					
 					If data2>=0 
