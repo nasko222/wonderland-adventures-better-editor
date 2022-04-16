@@ -2804,6 +2804,24 @@ Function LoadObject(file, complete,create)
 	Case "!Scritter"
 		ObjectEntity(Dest)=CopyEntity(ScritterMesh)
 		
+	Case "!RainbowBubble"
+		ObjectEntity(Dest)=CreateSphere()
+		ScaleMesh ObjectEntity(Dest),.5,.5,.5
+		
+		EntityTexture ObjectEntity(Dest),Rainbowtexture2
+
+		
+	Case "!Lurker"
+		ObjectEntity(Dest)=CopyEntity(LurkerMesh)
+		
+	Case "!Ghost"
+		ObjectEntity(Dest)=CopyEntity(GhostMesh)
+		EntityFX ObjectEntity(Dest),1
+
+	Case "!Wraith"
+		ObjectEntity(Dest)=CopyEntity(WraithMesh)
+		EntityTexture ObjectEntity(Dest),WraithTexture(ObjectData(Dest,2))
+		EntityFX ObjectEntity(Dest),1
 	Case "!Turtle"
 		ObjectEntity(Dest)=CopyEntity(TurtleMesh)
 		If ObjectStatus(Dest)=2 Then AnimateMD2 ObjectEntity(Dest),3,.2,31,49	
@@ -2835,6 +2853,8 @@ Function LoadObject(file, complete,create)
 		ObjectEntity(Dest)=CopyEntity(FireFlowerMesh)
 		;;If ObjectData(Dest,1)=-3 EntityTexture ObjectEntity(Dest),FireFlowerTExture2
 		
+	Case "!BurstFlower"
+		ObjectEntity(Dest)=CopyEntity(BurstFlowerMesh)
 	Case "!Chomper"
 		ObjectEntity(Dest)=CopyEntity(ChomperMesh)
 		AnimateMD2 ObjectEntity(Dest),1,.6,1,29	
@@ -3001,6 +3021,8 @@ Function LoadObject(file, complete,create)
 		ObjectEntity(Dest)=CreateIceBlockMesh()
 	Case "!IceFloat"
 		ObjectEntity(Dest)=CreateIceFloatMesh()
+	Case "!PlantFloat"
+		ObjectEntity(Dest)=CreatePlantFloatMesh()
 	Case "!Door"
 		ObjectEntity(Dest)=CopyEntity(door013ds)	
 	Case "!SpellBall"
@@ -3135,7 +3157,7 @@ Function LoadObject(file, complete,create)
 	NofObjects=NofObjects+1
 	Select ObjectModelName$(Dest)
 
-	Case "!StinkerWee","!Scritter","!BabyBoomer"
+	Case "!StinkerWee","!Scritter","!BabyBoomer","!RainbowBubble"
 		CreateShadow(Dest,.5)
 	Case "!Turtle","!Thwart","!Troll"
 		CreateShadow(Dest,.9)
@@ -3343,7 +3365,7 @@ Function AdjustLevelTileLogic(x,y,i)
 
 	If ObjectFrozen(i)>0 
 		Select ObjectType(i)
-		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400
+		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423,430,431,432,433
 			If (ObjectTileLogic(x,y) And 2^10) =0
 				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^10
 			EndIf
@@ -3473,12 +3495,12 @@ Function AdjustLevelTileLogic(x,y,i)
 	
 
 		
-	Case 230,310
+	Case 230,310,432
 		; FireFlower, Thwart, Zapbot
 		If (ObjectTileLogic(x,y) And 2^7) =0 And ObjectActive(i)>0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^7
 		EndIf
-	Case 290,380,390
+	Case 290,380,390,433
 		; thwart, Troll, Kaboom
 		If ObjectTalkable(i)>0
 			If (ObjectTileLogic(x,y) And 2^2) =0 And ObjectActive(i)>0
@@ -3514,7 +3536,7 @@ Function AdjustLevelTileLogic(x,y,i)
 
 
 
-	Case 250,260,420,422,423
+	Case 250,260,420,422,423,430,431,151
 		; Bowlers, Chompers, Zbots
 		If (ObjectTileLogic(x,y) And 2^8) =0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^8
@@ -3633,13 +3655,13 @@ Function ControlObjects()
 			If ObjectActive(i)>1001 ObjectActive(i)=1001
 			
 			If ObjectLastActive(i)=0 And ObjectActive(i)>0
-				If ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=60 Or ObjectType(i)=230 Or ObjectType(i)=380 Or ObjectType(i)=390
+				If ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=60 Or ObjectType(i)=330 Or ObjectType(i)=230 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=433
 					; turn on npc, thwart, iceblock, flower
 					OccupyObjectTile(i,ObjectTileX(i),ObjectTileY(i))
 				EndIf
 			EndIf
 			If ObjectLastActive(i)>0 And ObjectActive(i)=0
-				If ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=60 Or ObjectType(i)=230
+				If ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=60 Or ObjectType(i)=230 Or ObjectType(i)=330 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=433
 					; turn off npc, thwart, iceblock, flower
 					VacateObjectTile(i)
 					If ObjectMovementTimer(i)>0 And (ObjectTileX2(i)<>ObjectTileX(i) Or ObjectTIleY2(i)<>ObjectTIleY(i))
@@ -3688,6 +3710,20 @@ Function ControlObjects()
 			Case 12,13,14,15,16
 				; push up from -x.01 to -5.01 (used for stepping stones)
 				ObjectZ#(i)=-(ObjectActivationType(i)-6)-.01+(ObjectActivationType(i)-11)*Float(ObjectActive(i))/1001.0
+			Case 17 ; *** THESE ONLY WORK FOR AUTODOORS - OBJECTTILEX MUST BE PRE_SET
+				; push north
+				ObjectY#(i)=ObjectTileY(i)+0.5-ObjectYScale(i)*(0.99-Float(ObjectActive(i))/1001.0)
+			Case 18
+				; push East
+				ObjectX#(i)=ObjectTileX(i)+0.5+ObjectXScale(i)*(0.99-Float(ObjectActive(i))/1001.0)
+
+			Case 19
+				; push south
+				ObjectY#(i)=ObjectTileY(i)+0.5+ObjectYScale(i)*(0.99-Float(ObjectActive(i))/1001.0)
+
+			Case 20
+				; push west
+				ObjectX#(i)=ObjectTileX(i)+0.5-ObjectXScale(i)*(0.99-Float(ObjectActive(i))/1001.0)
 
 			
 			
@@ -3762,6 +3798,12 @@ Function ControlObjects()
 				; Stepping Stones
 				ControlSteppingStone(i)		
 				
+			Case 45
+				; Conveyor
+				ControlConveyor(i)
+			Case 46
+				; ConveyorTail
+				ControlConveyorTail(i)
 			Case 50
 				; SpellBall
 				ControlSpellBall(i)
@@ -3803,6 +3845,8 @@ Function ControlObjects()
 			Case 150 
 				; Scritter
 				ControlScritter(i)
+			Case 151
+				ControlRainbowBubble(i)
 			Case 160
 				; Obstacle
 				
@@ -3906,13 +3950,21 @@ Function ControlObjects()
 				ControlBowler(i)
 			Case 270
 				ControlButterfly(i)
+			Case 271
+				ControlZipper(i)
 			Case 280
 				ControlSpring(i)
+			Case 281
+				ControlSucTube(i)
+			Case 282
+				ControlSucTubeX(i)
 
 			Case 290 
 				ControlThwart(i)
 			Case 300
 				ControlIceFloat(i)
+			Case 301
+				ControlPlantFloat(i)
 			Case 310
 				ControlRubberducky(i)
 			Case 320
@@ -3942,12 +3994,26 @@ Function ControlObjects()
 			Case 421
 				ControlRetroScouge(i)
 				
-			Case 422,423
+			Case 422,423,430,431
 				ControlRetroZbotUfo(i)
 			Case 424
 				ControlRetroLaserGate(i)
 			Case 425
 				ControlRetroRainbowCoin(i)
+			Case 432
+				ControlPushbot(i)
+			Case 433
+				ControlZbotNPC(i)
+			Case 434
+				ControlMothership(i)
+			Case 450
+				ControlLurker(i)
+			Case 460
+				ControlBurstFlower(i)
+			Case 470
+				ControlGhost(i)
+			Case 471
+				ControlWraith(i)
 			End Select
 		
 			
@@ -3966,10 +4032,10 @@ Function ControlObjects()
 			
 				ScaleEntity ObjectENtity(i),ObjXScale,ObjZScale,ObjYScale
 			
-				If (ObjectTileX(i)<>0 Or ObjectTIleX2(i)<>0 Or ObjectTileY(i)<>0 Or ObjectTIleY2(i)<>0) And ObjectModelName$(i)<>"!SpellBall" And ObjectType(i)<>270
+				If (ObjectTileX(i)<>0 Or ObjectTIleX2(i)<>0 Or ObjectTileY(i)<>0 Or ObjectTIleY2(i)<>0) And ObjectModelName$(i)<>"!SpellBall" And ObjectType(i)<>270 And ObjectType(i)<>271 And ObjectType(i)<>434
 
 
-					If ObjectType(i)=10 And (ObjectSubType(i)=1 Or ObjectSubType(i)=2 Or ObjectSubType(i)=3 Or ObjectSubType(i)=4)
+					If ObjectType(i)=10 And (ObjectSubType(i)=1 Or ObjectSubType(i)=2 Or ObjectSubType(i)=3 Or ObjectSubType(i)=4 Or ObjectSubType(i)=9)
 						; house door or dungeon door or autodoor
 						; do nothing - done in activation
 					Else If ObjectLinked(i)>=0 
@@ -4138,8 +4204,14 @@ Function ActivateObject(i)
 	If objectactive(i)=0 And (objecttype(i)=330 Or objecttype(i)=110)
 		x=ObjectTileX(i)
 		y=ObjectTileY(i)
-		If (ObjectTileLogic(x,y) And 2^2) =0
-			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^2
+		If ObjectTalkable(i)>0
+			If (ObjectTileLogic(x,y) And 2^2) =0
+				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^2
+			EndIf
+		Else
+			If (ObjectTileLogic(x,y) And 2^7) =0
+				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^7
+			EndIf
 		EndIf
 		
 	EndIf
