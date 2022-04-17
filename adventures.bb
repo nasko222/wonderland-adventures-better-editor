@@ -17392,8 +17392,9 @@ Function ControlPushbot(i)
 	
 	
 	For j=0 To NofObjects-1
-			If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.3 And ObjectExists(j)=True And ObjectActive(j)>0 And ObjectData(i,5)>0
-				If ObjectType(j)=1 Or ObjectType(j)=120 Or ObjectType(j)=400 Then DestroyObject(j,0)
+			If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.3 And ObjectExists(j)=True And ObjectActive(j)>0 And ObjectSubType(i)>0
+				If ObjectType(j)=1 Or ObjectType(j)=110 Or ObjectType(j)=120 Or ObjectType(j)=330 Or ObjectType(j)=290  Or ObjectType(j)=380 Or ObjectType(j)=390 Or ObjectType(j)=400 Or ObjectType(j)=433 Then DestroyObject(j,0)
+				; kill player, npc, wee stinker, wysp, ice troll, kaboom, baby boomer, master zbot
 			EndIf
 		Next
 	
@@ -17408,7 +17409,11 @@ Function ControlPushbot(i)
 		ObjectTileX(i)=Floor(ObjectX(i))
 		ObjectTileY(i)=Floor(ObjectY(i))
 		
-		ObjectObjectTypeCollision(i)=2^6
+		If ObjectSubType(i)=0
+			ObjectObjectTypeCollision(i)=2^6
+		Else
+			ObjectObjectTypeCollision(i)=2^1+2^2+2^3+2^6+2^7
+		EndIf
 		
 		ObjectTileTypeCollision(i) =2^0+2^3+2^4+2^9+2^10+2^11+2^12+2^14
 		
