@@ -2878,6 +2878,13 @@ Function LoadObject(file, complete,create)
 	Case "!Tentacle"
 		ObjectEntity(Dest)=CopyEntity(TentacleMesh)
 		Animate GetChild(ObjectEntity(Dest),3),1,.1,1,0
+		If ObjectSubType(Dest)=1 Then
+			 EntityTexture ObjectEntity(Dest),TentacleTexture2
+			 For x=1 To CountChildren(ObjectEntity(Dest))
+				EntityTexture GetChild(ObjectEntity(Dest),x),TentacleTexture2
+			Next
+		EndIf
+		ObjectDestructionType(Dest)=2
 		
 
 	Case "!Busterfly"
@@ -2887,7 +2894,7 @@ Function LoadObject(file, complete,create)
 	Case "!Rubberducky"
 		ObjectEntity(Dest)=CopyEntity(RubberduckyMesh)
 
-	Case "!GlowWorm"
+	Case "!GlowWorm","!Zipper"
 		ObjectEntity(Dest)=CreateSphere(12)
 		ScaleMesh ObjectEntity(Dest),.1,.1,.1
 		EntityColor ObjectEntity(Dest),ObjectData(Dest,5),ObjectData(Dest,6),ObjectData(Dest,7)
@@ -3450,8 +3457,10 @@ Function AdjustLevelTileLogic(x,y,i)
 	
 	Case 150, 340
 		; Scritters, Tentacles
-		If (ObjectTileLogic(x,y) And 2^5) =0
-			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^5
+		logic=2^5
+		If ObjectSubType(i)=1 And ObjectType(i)=340 Then logic=logic+2^9
+		If (ObjectTileLogic(x,y) And logic) =0 And ObjectActive(i)>1
+			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+logic
 		EndIf
 		
 	Case 160 , 165
@@ -4497,6 +4506,8 @@ Function DestroyObject(i,k)
 		If (WAEpisode<>1 Or AdventureCurrentNumber<>70) ; unless in blue shard level or WA1
 			PlaySoundFX(15,-1,-1)
 		EndIf
+	;Case 340
+;		LevelTileLogic(Floor(ObjectX(i)),Floor(ObjectY(i)))=0
 	Case 370
 		NofCrabsInAdventure=NofCrabsInAdventure-1
 		
@@ -4600,6 +4611,14 @@ Function DestroyObject(i,k)
 		For j=0 To k
 			AddParticle(3,ObjectX(i),ObjectZ(i)+0.5,-ObjectY(i),0,.2,Rnd(-.05,.05),Rnd(0,0.05),Rnd(-.05,.05),1,0,0,0,0,Rand(50,150),3)
 		Next
+		
+	Case 2
+		;reverse tentacle explosion
+		For j=0 To 44
+				AddParticle(2,ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,.01*2*Cos(j*8),0,.01*2*Sin(j*8),0,.001,0,0,0,100,3)
+				AddParticle(2,ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,0,.01*2*Cos(j*8),.01*2*Sin(j*8),0,.001,0,0,0,100,3)
+				AddParticle(2,ObjectXAdjust(i)+ObjectTileX(i)+.5,ObjectZAdjust(i),-ObjectYAdjust(i)-ObjectTileY(i)-.5,0,.2,.01*2*Cos(j*8),.01*2*Sin(j*8),0,0,.001,0,0,0,100,3)
+			Next
 	
 	End Select
 	
@@ -13827,6 +13846,7 @@ Function ControlSpellBall(i)
 					If ObjectSubType(i)=4 ; ice
 						CreateIceBlock(ObjectX(j),ObjectY(j),j)
 					EndIf
+					destructoflag=True
 				Case 433
 					; zbot npc
 					If ObjectSubType(i)<2  And ObjectData(j,0)=0 ; fire 
@@ -13862,6 +13882,7 @@ Function ControlSpellBall(i)
 						CreateIceBlock(ObjectX(j),ObjectY(j),j)
 						
 					EndIf
+					destructoflag=True
 					
 				Case 151
 					;rainbwobubble
@@ -13895,6 +13916,7 @@ Function ControlSpellBall(i)
 					If ObjectSubType(i)=4 ; ice
 						CreateIceBlock(ObjectX(j),ObjectY(j),j)
 					EndIf
+					destructoflag=True
 				Case 460
 					; burstflower
 					If ObjectSubType(i)<2 ; fire 
@@ -14005,17 +14027,18 @@ Function ControlSpellBall(i)
 					EndIf
 					destructoflag=True
 					
+					
 				Case 350
 					; growflower (not if on ice)
 					If LevelTileLogic(Floor(ObjectX(j)),Floor(ObjectY(j)))<>13 And ObjectActive(j)>1 destructoflag=True
 	
 	
 	
-				Case 340,421
-					; tentacle  or retroscouge
+				Case 421
+					; retroscouge
 					
 					If LevelTileLogic(Floor(ObjectX(j)),Floor(ObjectY(j)))<>13 And ObjectActive(j)>1 destructoflag=True
-	
+
 				End Select
 			
 			If destructoflag=True	
@@ -14647,6 +14670,15 @@ Function ControlFlashBubble(i)
 				
 				DestroyObject(i,0)
 				PlaySoundFX(84,ObjectTileX(i),ObjectTileY(i))
+			Case 340
+				If ObjectActive(j)>1 And ObjectActive(j)<1001
+					; tentacles, only if theyre rised
+						ObjectTileX(i)=Floor(ObjectX(i))
+					ObjectTileY(i)=Floor(ObjectY(i))
+					
+					DestroyObject(i,0)
+					PlaySoundFX(84,ObjectTileX(i),ObjectTileY(i))
+				EndIf
 			Case 50
 				; freeze spell balls with exception of other FLASH
 				If Objectsubtype(j)=5
@@ -14854,6 +14886,24 @@ Function ControlTentacle(i)
 			EndIf
 		EndIf
 	Next
+	
+	logic=2^5
+	If ObjectSubType(i)=1
+		flag=Not flag
+		logic=logic+2^9
+	EndIf
+	
+				For j=0 To NofObjects-1
+					If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.3 And ObjectExists(j)=True And ObjectActive(j)>0
+						If ObjectType(j)=50 And ObjectSubType(j)<2 And ObjectSubType(i)=1 And ObjectActive(i)>1
+							ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-logic
+							DestroyObject(i,2)
+							DestroyObject(j,0)
+							
+						EndIf
+						If ObjectType(j)=50 And ObjectActive(i)>1 Then DestroyObject(j,0)
+					EndIf
+				Next
 
 	
 	If flag=True
@@ -14864,9 +14914,11 @@ Function ControlTentacle(i)
 			If ObjectActive(i)<1 Then ObjectActive(i)=1
 		
 			If ObjectActive(i)=1
-				If (ObjectTileLogic(x,y) And 2^5) >0
-					ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^5
+				If (ObjectTileLogic(x,y) And logic) >0
+					ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-logic
 				EndIf
+				
+				
 
 				
 			EndIf
@@ -14874,14 +14926,19 @@ Function ControlTentacle(i)
 	Else
 		;no
 		; (only start reappearing if empty tile)
+		
+		
+				
+				
 		If ObjectActive(i)<1001 And (ObjectActive(i)>1 Or ObjectTileLogic(Floor(ObjectX(i)),Floor(ObjectY(i)))=0)
 			If ObjectActive(i)=1 Then PlaySoundFX(111,Floor(ObjectX(i)),Floor(ObjectY(i)))
 			ObjectActive(i)=ObjectActive(i)+20
-		
-		
-			If (ObjectTileLogic(x,y) And 2^5) =0
-				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^5
+
+			If (ObjectTileLogic(x,y) And logic) =0
+				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+logic
 			EndIf
+			
+				
 
 			
 

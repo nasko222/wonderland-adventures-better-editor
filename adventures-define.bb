@@ -292,7 +292,7 @@ Global ThwartMesh
 Dim ThwartTexture(9)
 
 ; Tentacles
-Global TentacleMesh,TentacleTexture
+Global TentacleMesh,TentacleTexture,TentacleTexture2
 
 ; GrowFlowers, Floingbubbles
 Global GlobalGrowFlowerCounter

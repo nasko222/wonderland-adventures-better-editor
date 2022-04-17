@@ -302,6 +302,7 @@ Function PreLoadModels()
 	TentacleMesh=myLoadAnimMesh("data\models\trees\tentacle.b3d",0)
 	ExtractAnimSeq GetChild(Tentaclemesh,3),41,60
 	TentacleTexture = myLoadTexture ("data\models\trees\tentacle.jpg",1)
+	TentacleTexture2 = myLoadTexture ("data\models\trees\tentacle2.jpg",1)
 	For i=1 To CountChildren(tentaclemesh)
 		EntityTexture GetChild(tentaclemesh,i),tentacletexture
 	Next
