@@ -196,6 +196,7 @@ Function PreLoadModels()
 	; Turtles
 	TurtleMesh=myLoadMD2("data\models\turtle\dragonturtle.md2")
 	TurtleTexture=myLoadTexture("data\models\turtle\dragonturtle2.png",1)
+	TurtleTexture2=myLoadTexture("data\models\turtle\dragonturtle3.png",1)
 	EntityTexture TurtleMesh,TurtleTexture
 	ScaleEntity TurtleMesh,.03,.025,.03
 	HideEntity TurtleMesh
@@ -222,6 +223,11 @@ Function PreLoadModels()
 	Next
 	EntityTexture KaboomMesh,KaboomTexture(1)
 	KaboomTextureSquint=myLoadTexture("data\models\kaboom\kaboom00_squint.bmp",1)
+	
+	KaboomRTWMesh=myLoadMD2("data\models\bomb\bomb.md2")
+	KaboomRTWTexture=myLoadTexture("data\models\bomb\bomb.bmp",1)
+	EntityTexture KaboomRTWMesh,KaboomRTWTexture
+	HideEntity KaboomRTWMesh
 
 	HideEntity KaboomMesh
 	; FireFlowers
@@ -253,6 +259,7 @@ Function PreLoadModels()
 			ChomperMesh=myLoadMD2("data\models\chomper\chomper2.md2")
 		EndIf
 		ChomperTexture=myLoadTexture("Data\models\chomper\chomper.png",1)
+		ChomperTexture2=myLoadTexture("Data\models\chomper\mchomper.png",1)
 		EntityTexture ChomperMesh,ChomperTexture
 		HideEntity ChomperMesh
 		

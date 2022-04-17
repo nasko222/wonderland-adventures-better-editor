@@ -1757,7 +1757,7 @@ Function AnalyzeAdventure()
 					NofCrabsInAdventure=NofCrabsInAdventure+1
 				Case 400
 					NofBabyBoomersInAdventure=NofBabyBoomersInAdventure+1
-				Case 423,430,431,432,433
+				Case 423,430,431,433
 					NofZBotsInAdventure=NofZBotsInAdventure+1
 					If oType=433 And a3=0 Then NofZBotNPCsInAdventure=NofZBotNPCsInAdventure+1
 				
@@ -2833,7 +2833,8 @@ Function LoadObject(file, complete,create)
 		EntityFX ObjectEntity(Dest),1
 	Case "!Turtle"
 		ObjectEntity(Dest)=CopyEntity(TurtleMesh)
-		If ObjectStatus(Dest)=2 Then AnimateMD2 ObjectEntity(Dest),3,.2,31,49	
+		If ObjectStatus(Dest)=2 Then AnimateMD2 ObjectEntity(Dest),3,.2,31,49
+		If ObjectData(Dest,4)>0 Then EntityTexture ObjectEntity(Dest),TurtleTexture2
 		
 	Case "!Crab"
 		ObjectEntity(Dest)=CopyEntity(CrabMesh)
@@ -2853,6 +2854,11 @@ Function LoadObject(file, complete,create)
 		EntityTexture ObjectEntity(Dest),KaboomTexture(ObjectData(dest,0))
 		TurnEntity ObjectEntity(Dest),0,90,0
 		
+	Case "!KaboomRTW"
+		ObjectEntity(Dest)=CopyEntity(KaboomRTWMesh)
+		EntityTexture ObjectEntity(Dest),KaboomRTWTexture
+		TurnEntity ObjectEntity(Dest),0,90,0
+		
 	Case "!BabyBoomer"
 		ObjectEntity(Dest)=CopyEntity(KaboomMesh)
 		EntityTexture ObjectEntity(Dest),KaboomTexture(1)
@@ -2866,7 +2872,9 @@ Function LoadObject(file, complete,create)
 		ObjectEntity(Dest)=CopyEntity(BurstFlowerMesh)
 	Case "!Chomper"
 		ObjectEntity(Dest)=CopyEntity(ChomperMesh)
-		AnimateMD2 ObjectEntity(Dest),1,.6,1,29	
+		AnimateMD2 ObjectEntity(Dest),1,.6,1,29
+		If ObjectData(Dest,1)=3 Then EntityTexture ObjectEntity(Dest),ChomperTexture2
+
 
 	Case "!Thwart"
 		ObjectEntity(Dest)=CopyEntity(ThwartMesh)
@@ -3174,7 +3182,7 @@ Function LoadObject(file, complete,create)
 		CreateShadow(Dest,.5)
 	Case "!Turtle","!Thwart","!Troll"
 		CreateShadow(Dest,.9)
-	Case "!Chomper","!Bowler","!Kaboom"
+	Case "!Chomper","!Bowler","!Kaboom","!KaboomRTW"
 		CreateShadow(Dest,.6)
 	Case "!Crab"
 		If ObjectSubType(Dest)=0
@@ -4005,6 +4013,8 @@ Function ControlObjects()
 				ControlTroll(i)
 			Case 390
 				ControlKaboom(i)
+			Case 391
+				ControlRTWKaboom(i)
 			Case 400
 				ControlBabyBoomer(i)
 			Case 410
@@ -4353,7 +4363,7 @@ Function DestroyObject(i,k)
 	; Special cases
 	
 	
-	If ObjectType(i)=423 Or ObjectTYpe(i)>=430 And ObjectType(i)<=433
+	If ObjectType(i)=423 Or ObjectTYpe(i)>=430 And ObjectType(i)<=433 And ObjectType(i)<>432
 		NofZBotsInAdventure=NofZbotsInAdventure-1
 	EndIf
 	
@@ -4491,6 +4501,13 @@ Function DestroyObject(i,k)
 			CreateSpellBall	(ObjectX(i),ObjectY(i),.7,0.02*Sin(j*45),0.02*Cos(j*45),1,ObjectX(i)+2*Sin(j*45),ObjectY(i)+2*Cos(j*45),False,50)
 		Next	
 		CameraShakeTimer=4
+	Case 391
+		;RTWBoom
+		;Delay 1000
+		For j=0 To 7
+			CreateSpellBall	(ObjectX(i),ObjectY(i),.7,0.02*Sin(j*45),0.02*Cos(j*45),1,ObjectX(i)+2*Sin(j*45),ObjectY(i)+2*Cos(j*45),False,50)
+		Next	
+		CameraShakeTimer=4
 	Case 242
 		; Cuboid
 		CameraShakeTimer=4
@@ -4506,8 +4523,12 @@ Function DestroyObject(i,k)
 		If (WAEpisode<>1 Or AdventureCurrentNumber<>70) ; unless in blue shard level or WA1
 			PlaySoundFX(15,-1,-1)
 		EndIf
-	;Case 340
-;		LevelTileLogic(Floor(ObjectX(i)),Floor(ObjectY(i)))=0
+	Case 340
+	For j=0 To NofObjects-1
+		If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.3 And ObjectExists(j)=True And ObjectActive(j)>0
+			If ObjectType(j)=360 Then DestroyObject(j,0)
+		EndIf
+	Next
 	Case 370
 		NofCrabsInAdventure=NofCrabsInAdventure-1
 		
@@ -4736,6 +4757,18 @@ Function CanObjectMoveToTile(i,x,y,CheckDiagonal,FinalDestination)
 	If (ObjectType(i)=432 And ObjectData(i,4)>0)
 		;special case for tile moobots
 		If LevelTileTexture(x,y)+1<>ObjectData(i,4) Return False
+		
+	EndIf
+	
+	If (ObjectType(i)=250 And ObjectData(i,1)=3 And ObjectData(i,4)>0)
+		;special case for tile chomper
+		If LevelTileTexture(x,y)+1<>ObjectData(i,4) Return False
+		
+	EndIf
+	
+	If (ObjectType(i)=220 And ObjectData(i,4)>0)
+		;special case for tile turtle
+		If LevelTileTexture(x,y)+1<>ObjectData(i,4) And LevelTileLogic(x,y)<>2 Then Return False
 		
 	EndIf
 	
@@ -5708,7 +5741,7 @@ Function EndMoveTileCheck(i,oldx,oldy)
 	Case 1
 		; Solid Wall
 		; Check if Object can be in solid wall, if not - destroy
-		If ObjectType(i)=1  Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or ObjectType(i)=250 Or ObjectType(i)=260   Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400  Or ObjectType(i)=420  Or ObjectType(i)=422 Or ObjectType(i)=423 Or ObjectType(i)=430 Or ObjectType(i)=431 Or ObjectType(i)=432 Or ObjectType(i)=433
+		If ObjectType(i)=1  Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or ObjectType(i)=250 Or ObjectType(i)=260   Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400  Or ObjectType(i)=420  Or ObjectType(i)=422 Or ObjectType(i)=423 Or ObjectType(i)=430 Or ObjectType(i)=431 Or ObjectType(i)=432 Or ObjectType(i)=433 Or ObjectType(i)=470
 			; player - boom
 			DestroyObject(i,0)
 		EndIf
@@ -6645,7 +6678,7 @@ Function ControlPlayerInGame(i)
 				; Do Spells first
 				If SpellActive=True	
 					; allow spells  BLINK only on walkable, FLOING ALSO NOT ON ICE positions
-					If CurrentSpell=3 Or CurrentSpell=4 Or CurrentSpell=5 Or CanObjectMoveToTile(i,MX,MY,False,True)
+					If CurrentSpell=2 Or CurrentSpell=3 Or CurrentSpell=4 Or CurrentSpell=5 Or CanObjectMoveToTile(i,MX,MY,False,True)
 						PositionEntity 	LevelCursor,MX+.5,.05,-MY-.5
 						
 						EntityAlpha LevelCursor,.6
@@ -11488,6 +11521,11 @@ Function ControlGloveCharge(i)
 		If leveltimer Mod 2 = 0
 			AddParticle(myparticle,ObjectTileX(i)+.5+.3*Sin(j2*3),0,-ObjectTileY(i)-.5-.3*Cos(j2*3),0,.3,0,.04,0,4,0,0,0,0,50,3)
 		EndIf
+	Else If ObjectData(i,1)=3 ; uo charger
+		If leveltimer Mod 5 = 0
+			AddParticle(myparticle,ObjectTileX(i)+.5+.1*Sin(j2*3),0,-ObjectTileY(i)-.5-.1*Cos(j2*3),0,.2,0,.03,0,4,0,0,0,0,50,3)
+			;ObjectScaleAdjust(i)=0.5
+		EndIf
 	EndIf
 	
 	;	j2=(j2+180) Mod 360
@@ -11496,14 +11534,14 @@ Function ControlGloveCharge(i)
 	
 	; check if player standing on it
 	If ObjectTileX(PlayerObject)=ObjectTileX(i) And ObjectTileY(PlayerObject)=ObjectTileY(i)
-		If ObjectMovementTimer(PlayerObject)=0 And ObjectData(i,1)<2 And (CurrentSpell<>ObjectData(i,0) Or (CurrentSpell=ObjectData(i,0) And CurrentSpellPower<9))
+		If ObjectMovementTimer(PlayerObject)=0 And ObjectData(i,1)<>2 And (CurrentSpell<>ObjectData(i,0) Or (CurrentSpell=ObjectData(i,0) And CurrentSpellPower<9))
 			
 			; check inventory for gloves
 			For j=0 To 99
 				If InventoryItem(j)=1001
 					; recharge!
 					
-					
+					If ObjectData(i,1)<>3
 						If CurrentSpellPower<8 Or ObjectData(i,9)=0 Then PlaySoundFX(80,-1,-1)
 						ObjectData(i,9)=1
 						AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
@@ -11516,7 +11554,32 @@ Function ControlGloveCharge(i)
 						; activate glove icon
 						DeleteIcon(0)
 						CreateIcon(0,0,16+CurrentSpell,1002+CurrentSpell,"- 9 -","Activate")
-					
+					Else
+						If CurrentSpellPower<8 Or ObjectData(i,9)=0 Then PlaySoundFX(80,-1,-1)
+						ObjectData(i,9)=1
+						AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+						AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
+						AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
+						
+						AddParticle(myparticle+8,ObjectTileX(i)+.5+.3*Sin(j2*3),0,-ObjectTileY(i)-.5-.3*Cos(j2*3),0,.2,0,.03,0,4,0,0,0,0,50,3)
+						AddParticle(myparticle+8,ObjectTileX(i)+.5+.3*Sin(j2*3),0,-ObjectTileY(i)-.5-.3*Cos(j2*3),0,.2,0,.03,0,4,0,0,0,0,50,3)
+						
+						InventoryTexture(j)=16+ObjectData(i,0)
+						
+						
+						If CurrentSpellPower<9 And CurrentSpell=ObjectData(i,0)
+							CurrentSpellPower=CurrentSpellPower+1
+						Else
+							CurrentSpellPower=1
+						EndIf
+						CurrentSpell=ObjectData(i,0)
+						If ObjectData(i,1)=1 Then ObjectData(i,1)=2
+						If ObjectSubType(i)=1 Then destroyobject(i,0)
+						; activate glove icon
+						DeleteIcon(0)
+						CreateIcon(0,0,16+CurrentSpell,1002+CurrentSpell,"- "+Str$(currentspellpower)+" -","Activate")
+						DestroyObject(i,0)
+					EndIf
 				EndIf
 			Next
 			
@@ -12432,6 +12495,95 @@ Function RedoTransporterTexture(i)
 
 End Function
 
+Function ControlRTWKaboom(i)
+
+
+	If ObjectFrozen(i)=1
+		ObjectFrozen(i)=1000
+
+		ObjectPitch(i)=Rand(-30,30)
+		ObjectRoll(i)=Rand(-30,30)
+		ObjectZ(i)=.3
+		AnimateMD2 ObjectEntity(i),0,.01,1,2
+		ObjectCurrentAnim(i)=0
+
+	
+	EndIf
+	If ObjectFrozen(i)=2
+		; revert
+		ObjectFrozen(i)=0
+		ObjectPitch(i)=0
+		ObjectRoll(i)=0
+		ObjectZ(i)=0
+	EndIf
+	If ObjectFrozen(i)>2
+		; frozen
+		ObjectFrozen(i)=ObjectFrozen(i)-1
+		
+		Return
+	EndIf
+
+
+	
+	If ObjectTileTypeCollision(i)=0
+		ObjectYawAdjust(i)=0
+		ObjectMovementSpeed(i)=35
+		ObjectTileX(i)=Floor(ObjectX(i))
+		ObjectTileY(i)=Floor(ObjectY(i))
+		ObjectObjectTypeCollision(i)=2^1+2^3+2^6
+		ObjectTileTypeCollision(i) =2^0+2^3+2^4+2^5+2^9+2^10+2^11+2^12+2^14
+		ObjectMovementType(i)=41+ObjectData(i,0)*2+ObjectData(i,1)
+		CreateShadow(i,.9)
+	EndIf
+	For j=0 To NofObjects-1
+		If ObjectFrozen(j)<10000 And (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <1.4 And ObjectExists(j)=True And ObjectActive(j)>0
+			If ObjectType(j)=1 Or ObjectType(j)=110 Or ObjectType(j)=120 Or ObjectType(j)=390 Or ObjectType(j)=400 Or ObjectType(j)=241 Or ObjectType(j)=470
+				DestroyObject(i,0)
+				DestroyObject(j,1)
+			EndIf
+		EndIf
+	Next
+		
+	dx=0
+	dy=0
+	If ObjectMovementType(i)=41 Or ObjectMovementType(i)=42
+		dy=-1
+	Else If ObjectMovementType(i)=43 Or ObjectMovementType(i)=44
+		dx=1
+	Else If ObjectMovementType(i)=45 Or ObjectMovementType(i)=46
+		dy=1
+	Else If ObjectMovementType(i)=47 Or ObjectMovementType(i)=48
+		dx=-1
+	EndIf
+	TurnObjectTowardDirection(i,-dx,-dy,4,0)
+	
+	If ObjectStatus(i)=0
+		; walking
+		If ObjectZ(i)<>0 Then ObjectZ(i)=0
+		If ObjectMovementTImer(i)>0
+			ObjectData(i,9)=0
+			If objectcurrentanim(i)<>1
+				AnimateMD2 ObjectEntity(i),1,1,1,30
+				ObjectCurrentAnim(i)=1
+			EndIf
+		EndIf
+		If objectcurrentanim(i)=1 And Objectmovementtimer(i)=0
+			ObjectData(i,9)=ObjectData(i,9)+1
+			If ObjectData(i,9)=5
+				AnimateMD2 ObjectEntity(i),0,.01,1,2
+				ObjectCurrentAnim(i)=0
+				DestroyObject(i,0)
+
+			EndIf
+		EndIf
+		
+	EndIf
+
+	
+
+	
+End Function
+
 Function ControlTurtle(i)
 
 
@@ -12750,8 +12902,15 @@ Function ControlChomper(i)
 		TurnObjectTowardDirection(i,ObjectTileX(PlayerObject)-ObjectTileX(i),ObjectTileY(PlayerObject)-ObjectTileY(i),1,180)
 	EndIf
 	
-	If ObjectMovementTimer(i)>0 And ObjectData10(i)=0 Then PlaySoundFX(101,ObjectX(i),ObjectY(i))
+	If ObjectMovementTimer(i)>0 And ObjectData10(i)=0
+		If ObjectData(i,1)=3
+			PlaySoundFX(119,ObjectX(i),ObjectY(i))
 
+		Else
+			PlaySoundFX(101,ObjectX(i),ObjectY(i))
+		EndIf
+	EndIf
+	
 	ObjectData10(i)=ObjectMovementTimer(i)
 	
 
@@ -13794,7 +13953,7 @@ Function ControlSpellBall(i)
 	EndIf
 	
 	; do the trail
-	If LevelTimer Mod 2 =0 Then AddParticle(myparticle,ObjectX(i)+Rnd(-.1,.1),ObjectZ(i)+Rnd(-.1,.1),-ObjectY(i)+Rnd(-.1,.1),0,0.5,0,0.00,0,3,.01,0,0,0,75,3)
+	If LevelTimer Mod 2 =0 And ObjectData(i,8)<>-99 Then AddParticle(myparticle,ObjectX(i)+Rnd(-.1,.1),ObjectZ(i)+Rnd(-.1,.1),-ObjectY(i)+Rnd(-.1,.1),0,0.5,0,0.00,0,3,.01,0,0,0,75,3)
 	
 	; check corners for collision with tiles
 	k1#=0
@@ -13838,7 +13997,7 @@ Function ControlSpellBall(i)
 					EndIf
 	
 					destructoflag=True
-				Case 110,390,400
+				Case 110,390,391,400
 					; npc
 					If ObjectSubType(i)<2 ; fire 
 						destroyobject(j,1)
@@ -13925,7 +14084,11 @@ Function ControlSpellBall(i)
 					If ObjectSubType(i)=4 ; ice
 						CreateIceBlock(ObjectX(j),ObjectY(j),j)
 					EndIf
-					destructoflag=True
+					If ObjectSubType(i)=3 ; grow
+						destroyobject(j,1)
+					Else
+						destructoflag=True
+					EndIf
 				Case 240,241,242
 					; box
 					If ObjectSubType(i)<2 ; fire 
@@ -14646,6 +14809,8 @@ Function ControlFlashBubble(i)
 		destroyobject(i,0)
 		Return
 	EndIf
+	
+	ObjectYaw(i)=ObjectYaw(i)+ObjectData(i,7)/1000.0
 
 
 
@@ -14663,7 +14828,7 @@ Function ControlFlashBubble(i)
 		If ObjectFrozen(j)<10000 And (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.4 And ObjectExists(j)=True And ObjectActive(j)>0
 			Select ObjectType(j)
 			
-			Case 1,45,46,110,120,150,210,220,250,260,290,370,380,390,400,420,422,423,430,431,432,433,450,460,470,471
+			Case 1,45,46,110,120,150,210,220,250,260,290,370,380,390,391,400,420,422,423,430,431,432,433,450,460,470,471
 					; destroy
 				ObjectTileX(i)=Floor(ObjectX(i))
 				ObjectTileY(i)=Floor(ObjectY(i))
@@ -14693,10 +14858,25 @@ Function ControlFlashBubble(i)
 					PlaySoundFX(84,ObjectTileX(i),ObjectTileY(i))
 				Else
 					If ObjectSubType(j)=6 And PlayerControlMode=5 Then PlayerControlMode=6
+					
+					ObjectData(i,7)=ObjectData(i,7)+1
+					
 				EndIf
 				
 
 			End Select
+			
+			If ObjectData(i,7)>5000
+						ObjectTileX(i)=Floor(ObjectX(i))
+						ObjectTileY(i)=Floor(ObjectY(i))
+						
+						DestroyObject(i,0)
+						DestroyObject(j,0)
+						
+						PlaySoundFX(84,ObjectTileX(i),ObjectTileY(i))
+					EndIf
+					
+					
 		EndIf
 	Next
 
@@ -14893,17 +15073,7 @@ Function ControlTentacle(i)
 		logic=logic+2^9
 	EndIf
 	
-				For j=0 To NofObjects-1
-					If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.3 And ObjectExists(j)=True And ObjectActive(j)>0
-						If ObjectType(j)=50 And ObjectSubType(j)<2 And ObjectSubType(i)=1 And ObjectActive(i)>1
-							ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-logic
-							DestroyObject(i,2)
-							DestroyObject(j,0)
-							
-						EndIf
-						If ObjectType(j)=50 And ObjectActive(i)>1 Then DestroyObject(j,0)
-					EndIf
-				Next
+				
 
 	
 	If flag=True
@@ -14945,6 +15115,29 @@ Function ControlTentacle(i)
 		EndIf
 
 	EndIf
+	
+	For j=0 To NofObjects-1
+					If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.3 And ObjectExists(j)=True And ObjectActive(j)>0
+						If ObjectType(j)=50 And ObjectSubType(j)<2 And ObjectSubType(i)=1 And ObjectActive(i)>1
+							; if spellball and destructive and reverse tentacle and active
+							ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-logic
+							DestroyObject(i,2)
+							; if zapbot magic - continue shooting
+							If ObjectData(j,8)<>-99 Then DestroyObject(j,0)
+							
+						EndIf
+						If ObjectType(j)=50 And ObjectActive(i)>1
+							; if spellball and tentacle is active
+							If ObjectData(j,8)=-99 And ObjectSubType(i)=1
+							Else
+								; if not zapbot magic on reverse tentacle then destroy the spell
+								DestroyObject(j,0)
+							EndIf
+							If ObjectSubType(j)=6 And PlayerControlMode=5 Then PlayerControlMode=6
+						EndIf
+						
+					EndIf
+				Next
 
 End Function
 
@@ -17196,9 +17389,19 @@ Function ControlPushbot(i)
 		
 		Return
 	EndIf
+	
+	
+	For j=0 To NofObjects-1
+			If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.3 And ObjectExists(j)=True And ObjectActive(j)>0 And ObjectData(i,5)>0
+				If ObjectType(j)=1 Or ObjectType(j)=120 Or ObjectType(j)=400 Then DestroyObject(j,0)
+			EndIf
+		Next
+	
 
 	
 	If ObjectTileTypeCollision(i)=0
+	
+		
 	
 		ObjectMovementSpeed(i)=60
 		

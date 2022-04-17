@@ -247,7 +247,7 @@ Global NofGemsInAdventure
 Global GemPitch
 
 ; Turtles
-Global TurtleMesh, TurtleTexture
+Global TurtleMesh, TurtleTexture, TurtleTexture2
 
 ; Crabs
 Global CrabMesh, CrabTexture1, CrabTexture2, NofCrabsInAdventure
@@ -258,6 +258,7 @@ Global TrollMesh, TrollTexture
 Global KaboomMesh, KaboomTextureSquint
 Dim KaboomTexture(5)
 Global NofBabyBoomersInAdventure
+Global KaboomRTWMesh, KaboomRTWTexture
 
 ; FireFlowers
 Global FireFlowerMesh,FireFlowerTexture
@@ -271,7 +272,7 @@ Global BarrelMesh,BarrelTexture1,BarrelTexture2,BarrelTexture3
 Global NofBricksInAdventure
 
 ; Chompers
-Global ChomperMesh,ChomperTexture
+Global ChomperMesh,ChomperTexture,ChomperTexture2
 
 ; Bowlers
 Global BowlerMesh,BowlerTexture

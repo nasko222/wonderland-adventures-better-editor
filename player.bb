@@ -13,7 +13,6 @@ Include "level-define.bb"
 Include "menu-define.bb"
 Include "adventures-define.bb"
 Include "sound-define.bb"
-
 Global GlobalDirName$ = "User Data"
 Global WAEpisode=0
 	

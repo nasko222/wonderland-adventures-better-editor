@@ -701,6 +701,11 @@ Global KaboomTexture=myLoadTexture("data\models\kaboom\kaboom01.jpg",1)
 EntityTexture KaboomMesh,KaboomTexture
 HideEntity KaboomMesh
 
+Global KaboomRTWMesh=myLoadMD2("data\models\bomb\bomb.md2")
+Global KaboomRTWTexture=myLoadTexture("data\models\bomb\bomb.bmp",1)
+EntityTexture KaboomRTWMesh,KaboomRTWTexture
+HideEntity KaboomRTWMesh
+
 ; Tentacle
 Global TentacleMesh=myLoadMesh("data\models\trees\tentacle.b3d",0)
 Global TentacleTexture = myLoadTexture ("data\models\trees\tentacle.jpg",1)
@@ -6410,8 +6415,8 @@ Function AdjustObjectAdjuster(i)
 			EndIf
 		EndIf
 		If CurrentObjectModelName$="!Chomper"
-			If CurrentObjectData(1)>2 CurrentObjectData(1)=0
-			If CurrentObjectData(1)<0 CurrentObjectData(1)=2
+			If CurrentObjectData(1)>3 CurrentObjectData(1)=0
+			If CurrentObjectData(1)<0 CurrentObjectData(1)=3
 		EndIf
 		If CurrentObjectModelName$="!Turtle"
 			If CurrentObjectData(1)>1 CurrentObjectData(1)=0
@@ -7459,6 +7464,8 @@ Function BuildCurrentObjectModel()
 		CurrentObjectModel=CopyEntity(TrollMesh)
 	Else If CurrentObjectModelName$="!Kaboom"
 		CurrentObjectModel=CopyEntity(KaboomMesh)
+	Else If CurrentObjectModelName$="!KaboomRTW"
+		CurrentObjectModel=CopyEntity(KaboomRTWMesh)
 	Else If CurrentObjectModelName$="!BabyBoomer"
 		CurrentObjectModel=CopyEntity(KaboomMesh)
 	Else If CurrentObjectModelName$="!Retrolasergate"
@@ -8736,13 +8743,7 @@ Function LoadLevel(levelnumber)
 
 		Else If ObjectModelName$(Dest)="!Chomper"
 			ObjectEntity(Dest)=CopyEntity(ChomperMesh)
-			If ObjectSubtype(Dest)=1 
-				EntityTexture ObjectEntity(Dest),WaterChomperTexture
-			Else If ObjectData(Dest,1)=3
-				EntityTexture ObjectEntity(Dest),MechaChomperTexture
-			Else
-				EntityTexture ObjectEntity(Dest),ChomperTexture
-			EndIf
+			EntityTexture ObjectEntity(Dest),ChomperTexture
 		Else If ObjectModelName$(Dest)="!Bowler"
 			ObjectEntity(Dest)=CopyEntity(BowlerMesh)
 
@@ -8818,6 +8819,8 @@ Function LoadLevel(levelnumber)
 			
 		Else If ObjectModelName$(Dest)="!Kaboom"
 			ObjectEntity(Dest)=CopyEntity(KaboomMesh)
+		Else If ObjectModelName$(Dest)="!KaboomRTW"
+			ObjectEntity(Dest)=CopyEntity(KaboomRTWMesh)
 			
 
 		Else If ObjectModelName$(Dest)="!BabyBoomer"
