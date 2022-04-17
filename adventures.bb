@@ -12530,8 +12530,8 @@ Function ControlRTWKaboom(i)
 		ObjectMovementSpeed(i)=35
 		ObjectTileX(i)=Floor(ObjectX(i))
 		ObjectTileY(i)=Floor(ObjectY(i))
-		ObjectObjectTypeCollision(i)=2^1+2^3+2^6
-		ObjectTileTypeCollision(i) =2^0+2^3+2^4+2^5+2^9+2^10+2^11+2^12+2^14
+		ObjectObjectTypeCollision(i)=2^1+2^3
+		ObjectTileTypeCollision(i) =2^0+2^9+2^10+2^11+2^12
 		ObjectMovementType(i)=41+ObjectData(i,0)*2+ObjectData(i,1)
 		CreateShadow(i,.9)
 	EndIf
