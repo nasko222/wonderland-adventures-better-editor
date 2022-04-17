@@ -3386,7 +3386,7 @@ Function AdjustLevelTileLogic(x,y,i)
 
 	If ObjectFrozen(i)>0 
 		Select ObjectType(i)
-		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423,430,431,432,433
+		Case 1,110,120,150,220,230,250,260, 290,370,380,390,391,400,420,421,422,423,430,431,432,433
 			If (ObjectTileLogic(x,y) And 2^10) =0
 				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^10
 			EndIf
@@ -3559,7 +3559,7 @@ Function AdjustLevelTileLogic(x,y,i)
 
 
 
-	Case 250,260,420,422,423,430,431,151
+	Case 250,260,420,422,423,430,431,151,391
 		; Bowlers, Chompers, Zbots
 		If (ObjectTileLogic(x,y) And 2^8) =0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^8
@@ -5396,7 +5396,7 @@ Function OccupyObjectTile(i,x,y)
 	
 	If ObjectFrozen(i)>0
 		Select ObjectType(i)
-		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423,430,431,432,433,470,471
+		Case 1,110,120,150,220,230,250,260, 290,370,380,390,391,400,420,421,422,423,430,431,432,433,470,471
 			If (ObjectTileLogic(x,y) And 2^10) =0
 				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^10
 			EndIf
@@ -5484,7 +5484,7 @@ Function OccupyObjectTile(i,x,y)
 		If (ObjectTileLogic(x,y) And 2^7) =0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^7
 		EndIf
-	Case 250,260,420,422,423,430,431,151,470,471
+	Case 250,260,420,422,423,430,431,151,470,471,391
 		; Bowlers, Chompers , Retromonsters,Ghosts
 		If (ObjectTileLogic(x,y) And 2^8) =0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)+2^8
@@ -5626,7 +5626,7 @@ Function VacateObjectTile(i)
 	
 	If ObjectFrozen(i)>0
 		Select ObjectType(i)
-		Case 1,110,120,150,220,230,250,260, 290,370,380,390,400,420,421,422,423,430,431,432,433,470,471
+		Case 1,110,120,150,220,230,250,260, 290,370,380,390,391,400,420,421,422,423,430,431,432,433,470,471
 			If (ObjectTileLogic(x,y) And 2^10) >0
 				ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^10
 			EndIf
@@ -5713,7 +5713,7 @@ Function VacateObjectTile(i)
 		If (ObjectTileLogic(x,y) And 2^7) >0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^7
 		EndIf
-	Case 250,260,420,422,423,430,431,151,470,471
+	Case 250,260,420,422,423,430,431,151,470,471,391
 		; bolwers, chompers
 		If (ObjectTileLogic(x,y) And 2^8) >0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^8
@@ -5741,7 +5741,7 @@ Function EndMoveTileCheck(i,oldx,oldy)
 	Case 1
 		; Solid Wall
 		; Check if Object can be in solid wall, if not - destroy
-		If ObjectType(i)=1  Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or ObjectType(i)=250 Or ObjectType(i)=260   Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400  Or ObjectType(i)=420  Or ObjectType(i)=422 Or ObjectType(i)=423 Or ObjectType(i)=430 Or ObjectType(i)=431 Or ObjectType(i)=432 Or ObjectType(i)=433 Or ObjectType(i)=470
+		If ObjectType(i)=1  Or ObjectType(i)=110 Or ObjectType(i)=120 Or ObjectType(i)=150 Or ObjectType(i)=250 Or ObjectType(i)=260   Or ObjectType(i)=290 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=400  Or ObjectType(i)=420  Or ObjectType(i)=422 Or ObjectType(i)=423 Or ObjectType(i)=430 Or ObjectType(i)=431 Or ObjectType(i)=432 Or ObjectType(i)=433 Or ObjectType(i)=470 Or ObjectType(i)=391
 			; player - boom
 			DestroyObject(i,0)
 		EndIf
@@ -8651,7 +8651,7 @@ Function ControlGate(i)
 			;If ObjectData(i,k)<>0
 				For j=0 To nofobjects-1
 				ot=ObjectType(j)
-					If (ObjectData(i,k)>0 And ObjectData(i,k)=ObjectID(j)) Or (ObjectData(i,k)<0 And ObjectData(i,k)=-ObjectType(j)) Or (ObjectData(i,k)=0 And (ot=1 Or ot=110 Or ot=120 Or ot=150 Or ot=220 Or ot=250 Or ot=260 Or ot=290 Or ot=330 Or ot=370 Or ot=380 Or ot=390 Or ot=400 Or ot=420 Or ot=422 Or ot=423 Or ot=430 Or ot=431 Or ot=432 Or ot=433))
+					If (ObjectData(i,k)>0 And ObjectData(i,k)=ObjectID(j)) Or (ObjectData(i,k)<0 And ObjectData(i,k)=-ObjectType(j)) Or (ObjectData(i,k)=0 And (ot=1 Or ot=110 Or ot=120 Or ot=150 Or ot=220 Or ot=250 Or ot=260 Or ot=290 Or ot=330 Or ot=370 Or ot=380 Or ot=390 Or ot=391 Or ot=400 Or ot=420 Or ot=422 Or ot=423 Or ot=430 Or ot=431 Or ot=432 Or ot=433))
 						
 						; got one
 						
