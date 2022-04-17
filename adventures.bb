@@ -5324,8 +5324,13 @@ Function ControlMoveObject(i)
 			MoveObjectToTile(i,	ObjectTileX(i)+dx,ObjectTileY(i)+dy)
 			
 		Else 
-			SoundPitch (SoundFX(99),Rand(19000,25000))
-			PlaySoundFX(99,ObjectTileX(i),ObjectTileY(i))
+			If ObjectSubType(i)=0
+				SoundPitch (SoundFX(99),Rand(19000,25000))
+				PlaySoundFX(99,ObjectTileX(i),ObjectTileY(i))
+			Else
+				SoundPitch (SoundFX(99),Rand(9000,15000))
+				PlaySoundFX(99,ObjectTileX(i),ObjectTileY(i))
+			EndIf
 			
 			; or turn left/right and stop
 			If ObjectMovementType(i) Mod 2 = 1 ;left
@@ -9864,8 +9869,13 @@ Function ActivateButton(i)
 								Else If ObjectType(k)=46
 									; do nothing!
 								Else If ObjectType(k)=432
-									SoundPitch (SoundFX(98),Rand(19000,25000))
-									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									If ObjectSubType(k)=0
+										SoundPitch (SoundFX(98),Rand(19000,25000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									Else
+										SoundPitch (SoundFX(98),Rand(9000,15000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									EndIf
 
 									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
 								Else
@@ -9924,8 +9934,13 @@ Function ActivateButton(i)
 								Else If ObjectType(k)=46
 									; do nothing!
 								Else If ObjectType(k)=432
-									SoundPitch (SoundFX(98),Rand(19000,25000))
-									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									If ObjectSubType(k)=0
+										SoundPitch (SoundFX(98),Rand(19000,25000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									Else
+										SoundPitch (SoundFX(98),Rand(9000,15000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									EndIf
 
 									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
 
@@ -9967,8 +9982,13 @@ Function ActivateButton(i)
 								If ObjectType(k)=210
 									ActivateTransporter(k)
 								Else If ObjectType(k)=432
-									SoundPitch (SoundFX(98),Rand(19000,25000))
-									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									If ObjectSubType(k)=0
+										SoundPitch (SoundFX(98),Rand(19000,25000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									Else
+										SoundPitch (SoundFX(98),Rand(9000,15000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									EndIf
 
 									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
 								Else If ObjectType(k)=45
@@ -10021,9 +10041,13 @@ Function ActivateButton(i)
 								If ObjectType(k)=210
 									ActivateTransporter(k)
 								Else If ObjectType(k)=432
-									SoundPitch (SoundFX(98),Rand(19000,25000))
-									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
-
+									If ObjectSubType(k)=0
+										SoundPitch (SoundFX(98),Rand(19000,25000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									Else
+										SoundPitch (SoundFX(98),Rand(9000,15000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									EndIf
 									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
 								
 								Else If ObjectType(k)=45
@@ -10076,8 +10100,13 @@ Function ActivateButton(i)
 
 									DeActivateObject(k)
 								Else If ObjectType(k)=432
-									SoundPitch (SoundFX(98),Rand(19000,25000))
-									PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									If ObjectSubType(k)=0
+										SoundPitch (SoundFX(98),Rand(19000,25000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									Else
+										SoundPitch (SoundFX(98),Rand(9000,15000))
+										PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+									EndIf
 
 									ObjectMovementType(k)=81+2*ObjectData(k,2)+(ObjectData(k,3) Mod 2)
 								Else If ObjectType(k)=45
@@ -14169,8 +14198,13 @@ Function ControlSpellBall(i)
 					; pushbot (not harmed by fire, activated by pop)
 					
 					If ObjectSubtype(i)=2; pop
-						SoundPitch (SoundFX(98),Rand(19000,25000))
-						PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+						If ObjectSubType(j)=0
+							SoundPitch (SoundFX(98),Rand(19000,25000))
+							PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+						Else
+							SoundPitch (SoundFX(98),Rand(9000,15000))
+							PlaySoundFX(98,ObjectTileX(i),ObjectTileY(i))
+						EndIf
 
 						ObjectMovementType(j)=81+2*ObjectData(j,2)+(ObjectData(j,3) Mod 2)
 						
