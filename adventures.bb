@@ -2809,6 +2809,15 @@ Function LoadObject(file, complete,create)
 		ScaleMesh ObjectEntity(Dest),.5,.5,.5
 		
 		EntityTexture ObjectEntity(Dest),Rainbowtexture2
+		
+		
+	Case "!Autodoor"
+		ObjectEntity(Dest)=CopyEntity(AutodoorMesh)
+		If ObjectTileX(Dest)=0
+			ObjectTileX(Dest)=Floor(ObjectX(Dest))
+			ObjectTileY(Dest)=Floor(ObjectY(Dest))
+		EndIf
+		
 
 		
 	Case "!Lurker"
@@ -4231,7 +4240,7 @@ Function ActivateObject(i)
 		If ObjectActive(i)>1001 Then ObjectActive(i)=1001
 		
 	EndIf
-	If ObjectType(i)=281 		Redosuctubemesh(i)
+	If ObjectType(i)=281 Then Redosuctubemesh(i)
 End Function
 Function DeActivateObject(i)
 	; turns object toward deactivation (unless it's already deactive)
@@ -4249,7 +4258,7 @@ Function DeActivateObject(i)
 		EndIf
 	EndIf
 	If ObjectActive(i)<0 Then ObjectActive(i)=0
-		If ObjectType(i)=281 		Redosuctubemesh(i)
+	If ObjectType(i)=281 Then Redosuctubemesh(i)
 
 End Function
 
@@ -4262,6 +4271,7 @@ Function ToggleObject(i)
 			ObjectActive(i)=ObjectActive(i)+ObjectActivationSpeed(i)+1
 			
 		EndIf
+		If ObjectActive(i)>1001 Then ObjectActive(i)=1001
 	Else If ObjectActive(i)>0 And ObjectActive(i) Mod 2 =1
 		If ObjectType(i)=410
 			DeActivateFlipBridge(i)
@@ -4270,7 +4280,7 @@ Function ToggleObject(i)
 			
 		EndIf
 	EndIf
-	If ObjectType(i)=281 		Redosuctubemesh(i)
+	If ObjectType(i)=281 Then Redosuctubemesh(i)
 	
 End Function
 
@@ -4703,6 +4713,13 @@ Function CanObjectMoveToTile(i,x,y,CheckDiagonal,FinalDestination)
 	If (ObjectType(i)=430 And ObjectData(i,4)=1) Or (ObjectType(i)=431 And ObjectData(i,4)=1)  Or (ObjectType(i)=422 And ObjectData(i,4)=1)
 		If LevelTileTexture(x,y)<>ObjectData(i,9) Return False
 	EndIf
+	
+	If (ObjectType(i)=432 And ObjectData(i,4)>0)
+		;special case for tile moobots
+		If LevelTileTexture(x,y)+1<>ObjectData(i,4) Return False
+		
+	EndIf
+	
 	; All Clear - phew!
 	Return True
 	
@@ -8620,17 +8637,21 @@ Function ControlGate(i)
 		EndIf
 	EndIf
 	; Sound Effect Controls
-
+	;If ObjectActive(i)<4*ObjectActivationSpeed(i) And ObjectActive(i)>1001-4*ObjectActivationSpeed(i)
 		If (ObjectLastActive(i) Mod 2 =0 And ObjectLastActive(i)>0) And ObjectActive(i) Mod 2 =1
 			If ObjectSubType(i)=0
 				PlaySoundFX(36,	ObjectTileX(i),ObjectTileY(i))	
-			Else If ObjectSubType(i)=9
-				PlaySoundFX(39,	ObjectTileX(i),ObjectTileY(i))
+			;Else If ObjectSubType(i)=9
+			;	PlaySoundFX(39,	ObjectTileX(i),ObjectTileY(i))
 			Else
 				
 				PlaySoundFX(37,	ObjectTileX(i),ObjectTileY(i))	
 			EndIf
 		EndIf
+		If ObjectLastActive(i) Mod 2 =0 And ObjectActive(i) Mod 2 =1 And ObjectSubType(i)=9 And LevelTimer>10; autodoor closing
+			PlaySoundFX(39,	ObjectTileX(i),ObjectTileY(i))
+		EndIf
+
 		If ObjectLastActive(i) Mod 2 =1 And ObjectActive(i) Mod 2 =0
 			If ObjectSubType(i)=0
 				PlaySoundFX(35,	ObjectTileX(i),ObjectTileY(i))
@@ -8641,8 +8662,7 @@ Function ControlGate(i)
 			EndIf
 	
 		EndIf
-	
-
+	;EndIf
 		
 End Function
 
@@ -9637,7 +9657,8 @@ Function ControlButton(i)
 									Else If ObjectType(k)=281
 										; suctube
 										ObjectID(k)=500+ObjectData(i,j+0)*5+ObjectData(i,j+2)
-
+										ObjectData(k,0)=ObjectData(i,j)
+										ObjectData(k,1)=ObjectData(i,j+2)
 										Redosuctubemesh(k)
 	
 	
@@ -10095,7 +10116,8 @@ Function ActivateButton(i)
 									RedoPushbotTexture(k)
 								Else If ObjectType(k)=281 ; suctube
 									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
-							
+									ObjectData(k,0)=ObjectData(i,j+1)
+									ObjectData(k,1)=ObjectData(i,j+3)
 									Redosuctubemesh(k)
 
 
@@ -10174,6 +10196,8 @@ Function ActivateButton(i)
 								Else If ObjectType(k)=281
 									; suctube
 									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
+									ObjectData(k,0)=ObjectData(i,j+1)
+									ObjectData(k,1)=ObjectData(i,j+3)
 									Redosuctubemesh(k)
 
 
@@ -10219,7 +10243,8 @@ Function ActivateButton(i)
 								Else If ObjectType(k)=281
 									; suctube
 									ObjectID(k)=500+ObjectData(i,j)*5+ObjectData(i,j+2)
-
+									ObjectData(k,0)=ObjectData(i,j)
+									ObjectData(k,1)=ObjectData(i,j+2)
 									Redosuctubemesh(k)
 
 
@@ -10297,7 +10322,8 @@ Function ActivateButton(i)
 								Else If ObjectType(k)=281
 									; suctube
 									ObjectID(k)=500+ObjectData(i,j+1)*5+ObjectData(i,j+3)
-									
+									ObjectData(k,0)=ObjectData(i,j+1)
+									ObjectData(k,1)=ObjectData(i,j+3)
 									Redosuctubemesh(k)
 
 
@@ -13267,7 +13293,7 @@ Function ControlSuctube(i)
 
 
 	For j=0 To NofObjects-1
-		If ObjectButtonPush(j)=True And ObjectMovementTimer(j)=0 And ObjectFrozen(j)<10000
+		If ObjectButtonPush(j)=True And ObjectMovementTimer(j)=0
 		
 			; special case for submerged waterchomps
 			If ObjectType(j)=250 And ObjectSubType(j)=1 And ObjectData(j,5)=1
@@ -16471,6 +16497,12 @@ Function ControlRetroZbotUfo(i)
 				EndIf
 			EndIf
 	Next
+	
+	; ojbectdata 8/9 reserved
+	; Weebot/Zapbot - tiletype
+	If ObjectData(i,9)=-1
+		ObjectData(i,9)=LevelTileTexture(Floor(ObjectX(i)),Floor(ObjectY(i)))
+	EndIf
 
 	If ObjectFrozen(i)=1
 		; freeze
@@ -16528,7 +16560,16 @@ Function ControlRetroZbotUfo(i)
 		ObjectTileY(i)=Floor(ObjectY(i))
 		
 		ObjectTileTypeCollision(i) =2^0+2^2+2^3+2^4+2^5+2^9+2^10+2^11+2^12+2^14
-		ObjectObjectTypeCollision(i)=2^1+2^3+2^6
+		
+		If ObjectType(i)=431 Or ObjectType(i)=422 ; no player collision for ufo or zapbot (shoots anyhow)
+			ObjectObjectTypeCollision(i)=2^3+2^6
+		Else If ObjectTYpe(i)=430 ; no water for zipbots
+			ObjectObjectTypeCollision(i)=2^1+2^3+2^6
+			ObjectTileTypeCollision(i) =2^0+2^3+2^4+2^5+2^9+2^10+2^11+2^12+2^14
+
+		Else
+			ObjectObjectTypeCollision(i)=2^1+2^3+2^6
+		EndIf
 		
 		
 		ObjectMovementType(i)=41+2*ObjectData(i,0)+ObjectData(i,1)
@@ -16601,7 +16642,7 @@ Function ControlRetroZbotUfo(i)
 		EndIf
 	EndIf
 	flag=True
-	If ObjectType(i)=431 And (LevelTimer<1000001000); zapbot
+	If ObjectType(i)=431 
 	
 		If LevelTimer Mod 50 =0 PlaySoundFX(91,ObjectX(i),ObjectY(i))
 		
@@ -16617,8 +16658,8 @@ Function ControlRetroZbotUfo(i)
 			EndIf
 		EndIf
 		
-		If ObjectData(i,3)>0
-			ObjectData(i,3)=ObjectData(i,3)-1
+		If ObjectData(i,8)>0
+			ObjectData(i,8)=ObjectData(i,8)-1
 		Else
 			;shoot
 			If ObjectTileX(i)=ObjectTileX(PlayerObject) Or ObjectTileX(i)=ObjectTileX2(PlayerObject)
@@ -16635,7 +16676,7 @@ Function ControlRetroZbotUfo(i)
 					If flag=True 
 						CreateSpellBall(ObjectX(i),ObjectY(i)+.2,0.5,0,1.0,1,-1,-1,-99,300)
 						ObjectYaw(i)=0
-						ObjectData(i,3)=1;60
+						ObjectData(i,8)=1;60
 					EndIf
 				Else 
 					If ObjectTileY(i)-ObjectTileY(PlayerObject)>ObjectData(i,3)
@@ -16651,7 +16692,7 @@ Function ControlRetroZbotUfo(i)
 					If flag=True 
 						CreateSpellBall(ObjectX(i),ObjectY(i)-.2,0.5,0,-1.0,1,-1,-1,-99,300)
 						ObjectYaw(i)=0
-						ObjectData(i,3)=1;60
+						ObjectData(i,8)=1;60
 					EndIf
 
 					
@@ -16673,7 +16714,7 @@ Function ControlRetroZbotUfo(i)
 						CreateSpellBall(ObjectX(i)+.2,ObjectY(i),0.5,1.0,0,1,-1,-1,-99,300)
 						ObjectYaw(i)=0
 
-						ObjectData(i,3)=1;60
+						ObjectData(i,8)=1;60
 					EndIf
 
 				
@@ -16692,13 +16733,14 @@ Function ControlRetroZbotUfo(i)
 						CreateSpellBall(ObjectX(i)-.2,ObjectY(i),0.5,-1.0,0,1,-1,-1,-99,300)
 						ObjectYaw(i)=0
 
-						ObjectData(i,3)=1;60
+						ObjectData(i,8)=1;60
 					EndIf
 
 				EndIf	
 			EndIf
 
 			
+		
 		EndIf
 	EndIf
 	
@@ -17064,7 +17106,6 @@ End Function
 
 
 Function ControlPushbot(i)
-
 
 
 	
@@ -18239,7 +18280,7 @@ Function ActivateCommand(command,data1,data2,data3,data4)
 		; Move NPC with ID data1 to point (data2,data3) - ALSO WORKS FOR THWARTS/WISP
 		
 		For i=0 To NofObjects-1
-			If ObjectExists(i)=True And (ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=330 Or ObjectType(i)=380 Or ObjectType(i)=390)
+			If ObjectExists(i)=True And (ObjectType(i)=110 Or ObjectType(i)=290 Or ObjectType(i)=330 Or ObjectType(i)=380 Or ObjectType(i)=390 Or ObjectType(i)=433)
 				If ObjectID(i)=data1 And (ObjectMovementTimer(i)>0 Or (data2<>ObjectTileX(i) Or data3<>ObjectTileY(i)))
 					
 					If i=dialogObject1 And gamemode=8

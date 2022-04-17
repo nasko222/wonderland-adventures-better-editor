@@ -584,6 +584,16 @@ CageTexture=MyLoadTexture("data/models/cage/cage.jpg",1)
 EntityTexture CageMesh,CageTexture
 HideEntity CageMesh
 
+
+; AutoDoor
+Global AutodoorMesh=CreateCube()
+ScaleMesh autodoormesh,.5,.5,.5
+PositionMesh Autodoormesh,0,.5,0
+Global Autodoortexture=MyLoadTexture("data/models/autodoor/autodoor.jpg",1)
+EntityTexture Autodoormesh,autodoortexture
+HideEntity autodoormesh
+
+
 ; StarGate
 Global StarGateMesh=MyLoadMesh("data/models/gate/gate.3ds",0)
 RotateMesh StarGateMesh,-90,0,0
@@ -772,6 +782,13 @@ RotateMesh FireFlowerMesh,0,90,0
 Global FireFlowerTexture=MyLoadTexture("data\models\fireflower\fireflower04.png",1)
 EntityTexture FireFlowerMesh,FireFlowerTexture
 HideEntity FireFlowerMesh
+
+; BurstFlowers
+Global BurstFlowerMesh=MyLoadMesh("data\models\burstflower\burstflower.b3d",0)
+Global BurstFlowerTexture=MyLoadTexture("data\models\burstflower\burstflower.png",1)
+EntityTexture BurstFlowerMesh,BurstFlowerTexture
+HideEntity BurstFlowerMesh
+
 
 
 ; Boxes etc
@@ -7382,6 +7399,8 @@ Function BuildCurrentObjectModel()
 		CurrentObjectModel=CreateKeyMesh(CurrentObjectData(0))
 	Else If CurrentObjectModelName$="!KeyCard" 
 		CurrentObjectModel=CreateKeyCardMesh(CurrentObjectData(0))
+	Else If CurrentObjectModelName$="!Autodoor"
+		CurrentObjectModel=CopyEntity(AutodoorMesh)
 	Else If CurrentObjectModelName$="!StinkerWee"
 		CurrentObjectModel=CopyEntity(StinkerWeeMesh)
 	Else If CurrentObjectModelName$="!Cage"
@@ -7454,6 +7473,9 @@ Function BuildCurrentObjectModel()
 		
 	Else If CurrentObjectModelName$="!Busterfly"
 		CurrentObjectModel=CopyEntity(BusterflyMesh)
+		
+	Else If CurrentObjectModelName$="!BurstFlower"
+		CurrentObjectModel=CopyEntity(BurstFlowerMesh)
 		
 		
 	Else If CurrentObjectModelName$="!GlowWorm"  Or CurrentObjectModelName$="!Zipper"
@@ -8787,6 +8809,10 @@ Function LoadLevel(levelnumber)
 		Else If ObjectModelName$(Dest)="!Busterfly"
 			ObjectEntity(Dest)=CopyEntity(busterflyMesh)
 			
+		Else If ObjectModelName$(Dest)="!BurstFlower"
+			ObjectEntity(Dest)=CopyEntity(BurstFlowerMesh)
+			
+			
 		Else If ObjectModelName$(Dest)="!Rubberducky"
 			ObjectEntity(Dest)=CopyEntity(rubberduckymesh)
 			
@@ -8916,6 +8942,11 @@ Function LoadLevel(levelnumber)
 			ObjectEntity(Dest)=CreateKeyMesh(ObjectData(Dest,0))
 		Else If ObjectModelName$(Dest)="!KeyCard"
 			ObjectEntity(Dest)=CreateKeyCardMesh(ObjectData(Dest,0))
+			
+		Else If ObjectModelName$(Dest)="!Autodoor"
+			ObjectEntity(Dest)=CopyEntity(Autodoormesh)
+			
+			
 
 
 		Else If ObjectModelName$(Dest)="!SteppingStone"
