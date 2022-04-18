@@ -4750,7 +4750,7 @@ Function CanObjectMoveToTile(i,x,y,CheckDiagonal,FinalDestination)
 	EndIf
 	
 	; check for Weebots - stay on same texture
-	If (ObjectType(i)=430 And ObjectData(i,4)=1) Or (ObjectType(i)=431 And ObjectData(i,4)=1)  Or (ObjectType(i)=422 And ObjectData(i,4)=1)
+	If (ObjectType(i)=430 And ObjectData(i,4)=1) Or (ObjectType(i)=431 And ObjectData(i,4)=1)  Or (ObjectType(i)=422 And ObjectData(i,4)=1);; Or (ObjectType(i)=391 And ObjectData(i,4)=1)
 		If LevelTileTexture(x,y)<>ObjectData(i,9) Return False
 	EndIf
 	
@@ -4768,6 +4768,12 @@ Function CanObjectMoveToTile(i,x,y,CheckDiagonal,FinalDestination)
 	
 	If (ObjectType(i)=220 And ObjectData(i,4)>0)
 		;special case for tile turtle
+		If LevelTileTexture(x,y)+1<>ObjectData(i,4) And LevelTileLogic(x,y)<>2 Then Return False
+		
+	EndIf
+	
+	If (ObjectType(i)=391 And ObjectData(i,4)>0)
+		;special case for tile rtw kaboom
 		If LevelTileTexture(x,y)+1<>ObjectData(i,4) And LevelTileLogic(x,y)<>2 Then Return False
 		
 	EndIf
