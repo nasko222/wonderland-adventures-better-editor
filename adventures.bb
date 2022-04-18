@@ -6214,7 +6214,7 @@ Function CreatePlayer(x3#,y3#)
 	LevelTilePlayerPathScore(x,y)=0
 	
 		
-	ObjectTileTypeCollision(i)=24089
+	ObjectTileTypeCollision(i)=2^0+2^3+2^4+2^9+2^10+2^11+2^12+2^14
 	ObjectObjectTypeCollision(i)=2^3+2^4+2^5+2^6+2^8
 	OccupyObjectTile(i,x,y)
 	
@@ -12995,7 +12995,7 @@ Function ControlBowler(i)
 		ObjectMovementSpeed(i)=25+5*ObjectData(i,2)
 		ObjectTileX(i)=Floor(ObjectX(i))
 		ObjectTileY(i)=Floor(ObjectY(i))
-		ObjectTileTypeCollision(i)=24093
+		ObjectTileTypeCollision(i)=2^0+2^2+2^3+2^4+2^9+2^10+2^11+2^12+2^14
 		ObjectObjectTypeCollision(i)=2^1+2^2+2^3+2^6+2^9
 		If ObjectData(i,1)=0 Or ObjectData(i,1)=1
 			; zbot movement
@@ -15185,7 +15185,7 @@ Function ControlRainbowBubble(i)
 
 	If ObjectTileTypeCollision(i)=0
 		; First time (should later be put into object creation at level editor)
-		ObjectTileTypeCollision(i)=2^0+2^2+2^3+2^4+2^5+2^9+2^10+2^11+2^12+2^14
+		ObjectTileTypeCollision(i)=2^0+2^2+2^3+2^4+2^9+2^10+2^11+2^12+2^14
 		ObjectTileX(i)=Floor(ObjectX(i))
 		ObjectTileY(i)=Floor(ObjectY(i))
 		ObjectTileX2(i)=Floor(ObjectX(i))
@@ -16843,13 +16843,13 @@ Function ControlRetroZbotUfo(i)
 		ObjectTileX(i)=Floor(ObjectX(i))
 		ObjectTileY(i)=Floor(ObjectY(i))
 		
-		ObjectTileTypeCollision(i) =2^0+2^2+2^3+2^4+2^5+2^9+2^10+2^11+2^12+2^14
+		ObjectTileTypeCollision(i) =2^0+2^2+2^3+2^4+2^9+2^10+2^11+2^12+2^14
 		
 		If ObjectType(i)=431 Or ObjectType(i)=422 ; no player collision for ufo or zapbot (shoots anyhow)
 			ObjectObjectTypeCollision(i)=2^3+2^6
 		Else If ObjectTYpe(i)=430 ; no water for zipbots
 			ObjectObjectTypeCollision(i)=2^1+2^3+2^6
-			ObjectTileTypeCollision(i) =2^0+2^3+2^4+2^5+2^9+2^10+2^11+2^12+2^14
+			ObjectTileTypeCollision(i) =2^0+2^3+2^4+2^9+2^10+2^11+2^12+2^14
 
 		Else
 			ObjectObjectTypeCollision(i)=2^1+2^3+2^6
