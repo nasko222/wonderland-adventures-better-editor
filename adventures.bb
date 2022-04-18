@@ -5713,7 +5713,7 @@ Function VacateObjectTile(i)
 			
 		EndIf
 		
-	Case 230,290,310
+	Case 230,290,310,460
 		; fireflower and ducky
 		If (ObjectTileLogic(x,y) And 2^7) >0
 			ObjectTileLogic(x,y)=ObjectTileLogic(x,y)-2^7
@@ -17754,7 +17754,7 @@ Function ControlLurker(i)
 		
 		For j=0 To NofObjects-1
 			If ObjectFlying(j)=0 And ObjectDead(j)=0 
-				If ObjectType(j)=1 Or ObjectType(j)=110 Or ObjectType(j)=120 Or ObjectType(j)=150 Or ObjectType(j)=220 Or ObjectType(j)=230 Or ObjectType(j)=240 Or ObjectType(j)=241 Or ObjectType(j)=242 Or ObjectType(j)=250 Or ObjectType(j)=260 Or ObjectType(j)=290 Or ObjectType(j)=230 Or ObjectType(j)=340 Or ObjectType(j)=370 Or ObjectType(j)=380 Or ObjectType(j)=390 Or ObjectType(j)=400 Or ObjectType(j)=420 Or ObjectType(j)=421 Or ObjectType(j)=422 Or ObjectType(j)=423 Or ObjectType(j)=430 Or ObjectType(j)=431 Or ObjectType(j)=432 Or ObjectType(j)=433 Or ObjectType(j)=460 
+				If ObjectType(j)=1 Or ObjectType(j)=110 Or ObjectType(j)=120 Or ObjectType(j)=150 Or ObjectType(j)=220 Or ObjectType(j)=230 Or ObjectType(j)=240 Or ObjectType(j)=241 Or ObjectType(j)=242 Or ObjectType(j)=250 Or ObjectType(j)=260 Or ObjectType(j)=290 Or ObjectType(j)=230 Or ObjectType(j)=340 Or ObjectType(j)=370 Or ObjectType(j)=380 Or ObjectType(j)=390 Or ObjectType(j)=391 Or ObjectType(j)=400 Or ObjectType(j)=420 Or ObjectType(j)=421 Or ObjectType(j)=422 Or ObjectType(j)=423 Or ObjectType(j)=430 Or ObjectType(j)=431 Or ObjectType(j)=432 Or ObjectType(j)=433 Or ObjectType(j)=460 
 					If (ObjectTileX(j)=x And Abs(objecttileY(j)-y)<=1) Or (ObjectTileY(j)=y And Abs(objecttileX(j)-x)<=1)
 						; gotcha
 						PlaySoundFX(97,x,y)
@@ -17788,7 +17788,7 @@ Function ControlLurker(i)
 				; replaced with
 				For j=0 To NofObjects-1
 					If ObjectFlying(i)=0 And ObjectDead(i)=0
-						If ObjectType(j)=1 Or ObjectType(j)=110 Or ObjectType(j)=120 Or ObjectType(j)=150 Or ObjectType(j)=220 Or ObjectType(j)=230 Or ObjectType(j)=240 Or ObjectType(j)=241 Or ObjectType(j)=242 Or ObjectType(j)=250 Or ObjectType(j)=260 Or ObjectType(j)=290 Or ObjectType(j)=330 Or ObjectType(j)=340 Or ObjectType(j)=370 Or ObjectType(j)=380 Or ObjectType(j)=390 Or ObjectType(j)=400 Or ObjectType(j)=420 Or ObjectType(j)=421 Or ObjectType(j)=422 Or ObjectType(j)=423 Or ObjectType(j)=430 Or ObjectType(j)=431 Or ObjectType(j)=432 Or ObjectType(j)=433 Or ObjectType(j)=460 
+						If ObjectType(j)=1 Or ObjectType(j)=110 Or ObjectType(j)=120 Or ObjectType(j)=150 Or ObjectType(j)=220 Or ObjectType(j)=230 Or ObjectType(j)=240 Or ObjectType(j)=241 Or ObjectType(j)=242 Or ObjectType(j)=250 Or ObjectType(j)=260 Or ObjectType(j)=290 Or ObjectType(j)=330 Or ObjectType(j)=340 Or ObjectType(j)=370 Or ObjectType(j)=380 Or ObjectType(j)=390 Or ObjectType(j)=391 Or ObjectType(j)=400 Or ObjectType(j)=420 Or ObjectType(j)=421 Or ObjectType(j)=422 Or ObjectType(j)=423 Or ObjectType(j)=430 Or ObjectType(j)=431 Or ObjectType(j)=432 Or ObjectType(j)=433 Or ObjectType(j)=460 
 							If ((Abs(objecttileY(j)-y)<=1) And (Abs(objecttileX(j)-x)<=1)) Or ((Abs(objecttileY2(j)-y)<=1) And (Abs(objecttileX2(j)-x)<=1))
 								; gotcha
 								HideEntity ObjectEntity(j)
@@ -18190,16 +18190,30 @@ Function ControlWraith(i)
 			
 			If ObjectTileX(i)+dx>=0 And ObjectTileY(i)+dy>=0 And ObjectTileX(i)+dx<levelwidth And ObjectTileY(i)+dy<levelheight
 				If LevelTileLogic(ObjectTileX(i)+dx,ObjectTileY(i)+dy)<>1
-					If ObjectData(i,2)=0
+					If ObjectData(i,3)=0
+						If ObjectData(i,2)=0
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,1,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+						Else If ObjectData(i,2)=1
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,4,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+						Else If ObjectData(i,2)=2
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,3,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+						Else If ObjectData(i,2)=3
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,2,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+						Else If ObjectData(i,2)=4
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,6,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+						EndIf
+					Else
+						If ObjectData(i,2)=0
 						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,1,-1,-1,False,300)
-					Else If ObjectData(i,2)=1
-						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,4,-1,-1,False,300)
-					Else If ObjectData(i,2)=2
-						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,3,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
-					Else If ObjectData(i,2)=3
-						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,2,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
-					Else If ObjectData(i,2)=4
-						CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,6,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+						Else If ObjectData(i,2)=1
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,4,-1,-1,False,300)
+						Else If ObjectData(i,2)=2
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,3,-1,-1,False,300)
+						Else If ObjectData(i,2)=3
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,2,-1,-1,False,300)
+						Else If ObjectData(i,2)=4
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,6,-1,-1,False,300)
+						EndIf
 					EndIf
 				EndIf
 			EndIf
@@ -18417,6 +18431,16 @@ Function ActivateCommand(command,data1,data2,data3,data4)
 		; Earthquake with time Data1
 		CameraShakeTimer=Data1
 		PlaySoundFX(122,-1,-1)
+		
+		
+	Case 10
+		; Play Global Sound FX
+		PlaySoundFX(Data1,-1,-1)
+		
+	Case 13
+		; change weather
+		levelweather=data1	
+		If data1=8 Then playsoundfxnow(98)
 		
 	; *******
 	; DIALOG COMMANDS
