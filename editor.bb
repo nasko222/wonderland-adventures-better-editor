@@ -4801,8 +4801,10 @@ Function DisplayObjectAdjuster(i)
 			tex2$="Type"
 			If CurrentObjectData(1)=0 
 				tex$="Star"
-			Else
+			ElseIf CurrentObjectData(1)=1 
 				tex$="Coin"
+			ElseIf CurrentObjectData(1)=2
+				tex$="Score"
 			EndIf
 			
 		EndIf
@@ -6392,8 +6394,8 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(1)<1 CurrentObjectData(1)=3
 		EndIf
 		If CurrentObjectModelName$="!StarGate"
-			If CurrentObjectData(1)>1 CurrentObjectData(1)=0
-			If CurrentObjectData(1)<0 CurrentObjectData(1)=1
+			If CurrentObjectData(1)>2 CurrentObjectData(1)=0
+			If CurrentObjectData(1)<0 CurrentObjectData(1)=2
 
 		EndIf
 

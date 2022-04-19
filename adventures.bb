@@ -8743,20 +8743,7 @@ Function ControlStarGate(i)
 	EndIf
 	If ObjectActive(i)=1001 And ObjectType(i)<>426
 		If Abs(ObjectTileX(i)-ObjectTileX(PlayerObject))<=1 And Abs(ObjectTileY(i)-ObjectTileY(PlayerObject))<=1
-			If ObjectData(i,1)=0
-				; stargate
-				If PlayerStars>=ObjectData(i,0)
-					DeActivateObject(i)
-					PlaySoundFX(1,-1,-1)
-		
-				Else
-				;	If MessageLineTimer<=0
-						MessageLineTimer=30
-						MessageLineText1$="This StarGate will open once you"
-						MessageLineText2$="have earned "+ObjectData(i,0)+" stars."
-				;	EndIf
-				EndIf
-			Else
+			If ObjectData(i,1)=1
 				; coingate
 				If PlayerCoins>=ObjectData(i,0)
 					DeActivateObject(i)
@@ -8768,6 +8755,32 @@ Function ControlStarGate(i)
 						MessageLineTimer=30
 						MessageLineText1$="This TollGate will open at the"
 						MessageLineText2$="cost of "+ObjectData(i,0)+" coins."
+				;	EndIf
+				EndIf
+			ElseIf ObjectData(i,1)=2
+				; scoregate
+				If PlayerScore>=ObjectData(i,0)
+					DeActivateObject(i)
+					PlaySoundFX(1,-1,-1)
+		
+				Else
+				;	If MessageLineTimer<=0
+						MessageLineTimer=30
+						MessageLineText1$="This ScoreGate will open once you"
+						MessageLineText2$="have earned "+ObjectData(i,0)+" score."
+				;	EndIf
+				EndIf
+			Else
+				; stargate
+				If PlayerStars>=ObjectData(i,0)
+					DeActivateObject(i)
+					PlaySoundFX(1,-1,-1)
+		
+				Else
+				;	If MessageLineTimer<=0
+						MessageLineTimer=30
+						MessageLineText1$="This StarGate will open once you"
+						MessageLineText2$="have earned "+ObjectData(i,0)+" stars."
 				;	EndIf
 				EndIf
 			EndIf
@@ -11548,6 +11561,25 @@ Function ControlGloveCharge(i)
 				blue=7
 	
 			End Select
+			
+			If ObjectSubType(i)>0
+				If ObjectData(i,0)=9 Or ObjectData(i,0)=10
+					red=red-64
+					green=green-64
+					blue=blue-64
+					If red<0 Then red=0
+					If green<0 Then green=0
+					If blue<0 Then blue=0
+				Else
+					red=red-128
+					green=green-128
+					blue=blue-128
+					If red<0 Then red=0
+					If green<0 Then green=0
+					If blue<0 Then blue=0
+					If ObjectData(i,0)=0 Then red=red-16
+				EndIf
+			EndIf
 		
 			VertexColor GetSurface(ObjectENtity(i),1),ii,red,green,blue
 		Next
@@ -11578,72 +11610,145 @@ Function ControlGloveCharge(i)
 	
 	; check if player standing on it
 	If ObjectTileX(PlayerObject)=ObjectTileX(i) And ObjectTileY(PlayerObject)=ObjectTileY(i)
-		If ObjectMovementTimer(PlayerObject)=0 And ObjectData(i,1)<>2 And (CurrentSpell<>ObjectData(i,0) Or (CurrentSpell=ObjectData(i,0) And CurrentSpellPower<9))
+		If ObjectMovementTimer(PlayerObject)=0 And ObjectData(i,1)<>2 And (CurrentSpell<>ObjectData(i,0) Or (CurrentSpell=ObjectData(i,0) And (CurrentSpellPower<9 Or ObjectSubType(i)=1)))
 			
-			; check inventory for gloves
-			For j=0 To 99
-				If InventoryItem(j)=1001
-					; recharge!
-					
-					If ObjectData(i,1)<>3
-						If CurrentSpellPower<8 Or ObjectData(i,9)=0 Then PlaySoundFX(80,-1,-1)
-						ObjectData(i,9)=1
-						If ObjectData(i,0)=8
-							For k=0 To 7
-								AddParticle(32+k,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5+k/10.0,0,.9,0,.04,0,0,0,0,0,0,75,4)
-							Next
-						ElseIf ObjectData(i,0)=9
-							AddParticle(1,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
-						ElseIf ObjectData(i,0)=10
-							AddParticle(2,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
-						Else
-							AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
-							AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
-							AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
-						EndIf
-						InventoryTexture(j)=16+ObjectData(i,0)
-						CurrentSpell=ObjectData(i,0)
-						CurrentSpellPower=9
-						If ObjectData(i,1)=1 Then ObjectData(i,1)=2
-						; activate glove icon
-						DeleteIcon(0)
-						CreateIcon(0,0,16+CurrentSpell,1002+CurrentSpell,"- 9 -","Activate")
-					Else
-						If CurrentSpellPower<8 Or ObjectData(i,9)=0 Then PlaySoundFX(80,-1,-1)
-						ObjectData(i,9)=1
-						If ObjectData(i,0)=8
-							For k=0 To 7
-								AddParticle(32+k,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5+k/10.0,0,.9,0,.04,0,0,0,0,0,0,75,4)
-							Next
-						ElseIf ObjectData(i,0)=9
-							AddParticle(1,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
-						ElseIf ObjectData(i,0)=10
-							AddParticle(2,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
-						Else
-							AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
-							AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
-							AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
-						EndIf
+			If ObjectSubType(i)=0 Then
+				; check inventory for gloves
+				For j=0 To 99
+					If InventoryItem(j)=1001
+						; recharge!
 						
-						InventoryTexture(j)=16+ObjectData(i,0)
-						
-						
-						If CurrentSpellPower<9 And CurrentSpell=ObjectData(i,0)
-							CurrentSpellPower=CurrentSpellPower+1
+						If ObjectData(i,1)<>3
+							If CurrentSpellPower<8 Or ObjectData(i,9)=0 Then PlaySoundFX(80,-1,-1)
+							ObjectData(i,9)=1
+							If ObjectData(i,0)=8
+								For k=0 To 7
+									AddParticle(32+k,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5+k/10.0,0,.9,0,.04,0,0,0,0,0,0,75,4)
+								Next
+							ElseIf ObjectData(i,0)=9
+								AddParticle(1,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+							ElseIf ObjectData(i,0)=10
+								AddParticle(2,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+							Else
+								AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+								AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
+								AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
+							EndIf
+							InventoryTexture(j)=16+ObjectData(i,0)
+							CurrentSpell=ObjectData(i,0)
+							CurrentSpellPower=9
+							If ObjectData(i,1)=1 Then ObjectData(i,1)=2
+							; activate glove icon
+							DeleteIcon(0)
+							CreateIcon(0,0,16+CurrentSpell,1002+CurrentSpell,"- 9 -","Activate")
 						Else
-							CurrentSpellPower=1
+							If CurrentSpellPower<8 Or ObjectData(i,9)=0 Then PlaySoundFX(80,-1,-1)
+							ObjectData(i,9)=1
+							If ObjectData(i,0)=8
+								For k=0 To 7
+									AddParticle(32+k,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5+k/10.0,0,.9,0,.04,0,0,0,0,0,0,75,4)
+								Next
+							ElseIf ObjectData(i,0)=9
+								AddParticle(1,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+							ElseIf ObjectData(i,0)=10
+								AddParticle(2,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+							Else
+								AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+								AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
+								AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
+							EndIf
+							
+							InventoryTexture(j)=16+ObjectData(i,0)
+							
+							
+							If CurrentSpellPower<9 And CurrentSpell=ObjectData(i,0)
+								CurrentSpellPower=CurrentSpellPower+1
+							Else
+								CurrentSpellPower=1
+							EndIf
+							CurrentSpell=ObjectData(i,0)
+							If ObjectData(i,1)=1 Then ObjectData(i,1)=2
+							; activate glove icon
+							DeleteIcon(0)
+							CreateIcon(0,0,16+CurrentSpell,1002+CurrentSpell,"- "+Str$(currentspellpower)+" -","Activate")
+							DestroyObject(i,0)
 						EndIf
-						CurrentSpell=ObjectData(i,0)
-						If ObjectData(i,1)=1 Then ObjectData(i,1)=2
-						If ObjectSubType(i)=1 Then destroyobject(i,0)
-						; activate glove icon
-						DeleteIcon(0)
-						CreateIcon(0,0,16+CurrentSpell,1002+CurrentSpell,"- "+Str$(currentspellpower)+" -","Activate")
-						DestroyObject(i,0)
 					EndIf
-				EndIf
-			Next
-			
+				Next
+			Else
+				; check inventory for gloves
+				For j=0 To 99
+					If InventoryItem(j)=1001
+						; discharge!
+						
+						If ObjectData(i,1)<>3
+							If CurrentSpell=ObjectData(i,0)
+								If CurrentSpellPower>0 Or ObjectData(i,9)=0 Then PlaySoundFX(91,-1,-1)
+								ObjectData(i,9)=1
+								If ObjectData(i,0)=8
+									For k=0 To 7
+										AddParticle(32+k,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5+k/10.0,0,.9,0,.04,0,0,0,0,0,0,75,4)
+									Next
+								ElseIf ObjectData(i,0)=9
+									AddParticle(1,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+								ElseIf ObjectData(i,0)=10
+									AddParticle(2,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+								Else
+									AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+									AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
+									AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
+								EndIf
+								InventoryTexture(j)=23
+								CurrentSpell=-1
+								CurrentSpellPower=0
+								If ObjectData(i,1)=1 Then ObjectData(i,1)=2
+								; activate glove icon
+								DeleteIcon(0)
+								SpellActive=false
+							EndIf
+						Else
+							If CurrentSpell=ObjectData(i,0)
+								If CurrentSpellPower>0 Or ObjectData(i,9)=0 Then PlaySoundFX(91,-1,-1)
+								ObjectData(i,9)=1
+								If ObjectData(i,0)=8
+									For k=0 To 7
+										AddParticle(32+k,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5+k/10.0,0,.9,0,.04,0,0,0,0,0,0,75,4)
+									Next
+								ElseIf ObjectData(i,0)=9
+									AddParticle(1,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+								ElseIf ObjectData(i,0)=10
+									AddParticle(2,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+								Else
+									AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+									AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
+									AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
+								EndIf
+								
+								
+								
+								
+								
+								
+								If CurrentSpellPower>0 And CurrentSpell=ObjectData(i,0) Then CurrentSpellPower=CurrentSpellPower-1
+								If ObjectData(i,1)=1 Then ObjectData(i,1)=2
+								If CurrentSpellPower=0
+								; deactivate glove icon
+									InventoryTexture(j)=16+ObjectData(i,0)
+									CurrentSpell=-1
+									SpellActive=false
+									DeleteIcon(0)
+								Else
+									DeleteIcon(0)
+									CreateIcon(0,0,16+CurrentSpell,1002+CurrentSpell,"- "+Str$(currentspellpower)+" -","Activate")
+								EndIf
+								
+								
+								DestroyObject(i,0)
+							EndIf
+						EndIf
+					EndIf
+				Next
+			EndIf
 
 		EndIf
 	Else
