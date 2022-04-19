@@ -11504,6 +11504,7 @@ Function ControlGloveCharge(i)
 	ObjectTileX(i)=Floor(ObjectX(i))
 	ObjectTileY(i)=Floor(ObjectY(i))
 	myparticle=16+ObjectData(i,0)
+	If (ObjectData(i,0)=9 Or ObjectData(i,0)=10) Then myparticle=26-ObjectData(i,0)
 ;	If ObjectData(i,3)=0 Or ObjectData(i,0)=8
 		EntityFX ObjectEntity(i),2
 		red=0
@@ -11537,6 +11538,14 @@ Function ControlGloveCharge(i)
 				red=128+120*Sin(Leveltimer Mod 360)
 				green=128+120*Cos(Leveltimer Mod 360)
 				blue=128-120*Sin(Leveltimer Mod 360)
+			Case 9
+				red=145
+				green=109
+				blue=35
+			Case 10
+				red=93
+				green=2
+				blue=7
 	
 			End Select
 		
@@ -11579,9 +11588,19 @@ Function ControlGloveCharge(i)
 					If ObjectData(i,1)<>3
 						If CurrentSpellPower<8 Or ObjectData(i,9)=0 Then PlaySoundFX(80,-1,-1)
 						ObjectData(i,9)=1
-						AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
-						AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
-						AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
+						If ObjectData(i,0)=8
+							For k=0 To 7
+								AddParticle(32+k,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5+k/10.0,0,.9,0,.04,0,0,0,0,0,0,75,4)
+							Next
+						ElseIf ObjectData(i,0)=9
+							AddParticle(1,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+						ElseIf ObjectData(i,0)=10
+							AddParticle(2,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+						Else
+							AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+							AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
+							AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
+						EndIf
 						InventoryTexture(j)=16+ObjectData(i,0)
 						CurrentSpell=ObjectData(i,0)
 						CurrentSpellPower=9
@@ -11592,12 +11611,19 @@ Function ControlGloveCharge(i)
 					Else
 						If CurrentSpellPower<8 Or ObjectData(i,9)=0 Then PlaySoundFX(80,-1,-1)
 						ObjectData(i,9)=1
-						AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
-						AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
-						AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
-						
-						AddParticle(myparticle+8,ObjectTileX(i)+.5+.3*Sin(j2*3),0,-ObjectTileY(i)-.5-.3*Cos(j2*3),0,.2,0,.03,0,4,0,0,0,0,50,3)
-						AddParticle(myparticle+8,ObjectTileX(i)+.5+.3*Sin(j2*3),0,-ObjectTileY(i)-.5-.3*Cos(j2*3),0,.2,0,.03,0,4,0,0,0,0,50,3)
+						If ObjectData(i,0)=8
+							For k=0 To 7
+								AddParticle(32+k,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5+k/10.0,0,.9,0,.04,0,0,0,0,0,0,75,4)
+							Next
+						ElseIf ObjectData(i,0)=9
+							AddParticle(1,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+						ElseIf ObjectData(i,0)=10
+							AddParticle(2,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+						Else
+							AddParticle(myparticle+16,ObjectTileX(i)+.5,0,-ObjectTileY(i)-.5,0,.9,0,.04,0,0,0,0,0,0,75,4)
+							AddParticle(myparticle+16,ObjectTileX(i)+.5,2,-ObjectTileY(i)-.5,0,.9,0,-.03,0,0,0,0,0,0,75,4)
+							AddParticle(myparticle+16,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,.9,0,.02,0,0,0,0,0,0,75,4)
+						EndIf
 						
 						InventoryTexture(j)=16+ObjectData(i,0)
 						
@@ -13891,6 +13917,10 @@ End Function
 Function CreateSpellBallMesh(subtype)
 	entity=CreateSphere(4)
 	Select subtype
+	Case 9
+		EntityColor Entity,145,109,35
+	Case 10
+		EntityColor Entity,93,2,7
 	Case 7,8
 		EntityColor Entity,255,255,255
 	Case 0
@@ -13983,6 +14013,10 @@ Function ControlSpellBall(i)
 	
 	If ObjectSubType(i)<8
 		myparticle=24+ObjectSubType(i)
+	ElseIf ObjectSubType(i)=9
+		myparticle=7
+	ElseIf ObjectSubType(i)=10
+		myparticle=8
 	Else
 		myparticle=Rand(24,31)
 	EndIf
@@ -14386,6 +14420,15 @@ Function ControlSpellBall(i)
 				ObjectCurrentAnim(playerobject)=10
 			EndIf
 		
+		Case 9
+			; barrel spell
+			ObjectData(i,6)=100
+			CreateOMGBarrel(ObjectTileX(i),ObjectTileY(i),False)
+			
+		Case 10
+			; barrel tnt spell
+			ObjectData(i,6)=100
+			CreateOMGBarrel(ObjectTileX(i),ObjectTileY(i),True)
 			
 		End Select
 		
@@ -14623,6 +14666,42 @@ Function ControlIceFloat(i)
 	
 
 End Function
+
+Function CreateOMGBarrel(x,y,explosive)
+	If ObjectTileLogic(x,y)<>512 And (LevelTileLogic(x,y)=0 Or LevelTileLogic(x,y)=4 Or LevelTileLogic(x,y)=9 Or LevelTileLogic(x,y)=11 Or LevelTileLogic(x,y)=12)
+		i=CreateNewObject()
+		ObjectEntity(i)=CopyEntity(BarrelMesh)
+		ObjectExists(i)=True
+		ObjectButtonPush(i)=True
+		If explosive>0 Then
+			ObjectModelName$(i)="!Barrel2"
+			ObjectType(i)=241
+			EntityTexture ObjectEntity(i),BarrelTexture2
+		Else
+			ObjectModelName$(i)="!Barrel1"
+			ObjectType(i)=240
+			EntityTexture ObjectEntity(i),BarrelTexture1
+		EndIf
+		ObjectX(i)=x+0.5
+		ObjectY(i)=y+0.5
+		ObjectTileX(i)=Floor(ObjectX(i))
+		ObjectTileY(i)=Floor(ObjectY(i))
+		ObjectActive(i)=1
+		ObjectActivationSpeed(i)=60
+		ObjectActivationType(i)=2
+		ObjectDX(i)=0
+		ObjectDY(i)=0
+		PositionEntity ObjectEntity(i),ObjectX(i)+.5,0,-ObjectY(i)-.5,1
+		ObjectDestructionType(i)=1
+		OccupyObjectTile(i,x,y)
+		AddParticle(22+16-1-1-1-1-explosive,ObjectTileX(i)+.5, 0,-ObjectTileY(i)-.5,0,1.1,0, .04,0,0,0,0,0,0,75,4)
+		AddParticle(22+16-1-1-1-1-explosive,ObjectTileX(i)+.5, 2,-ObjectTileY(i)-.5,0,1.1,0,-.03,0,0,0,0,0,0,75,4)
+		AddParticle(22+16-1-1-1-1-explosive,ObjectTileX(i)+.5,.3,-ObjectTileY(i)-.5,0,1.1,0, .02,0,0,0,0,0,0,75,4)
+		EntityAlpha ObjectEntity(i),1
+		PlaySoundFX(94,-1,-1)
+	EndIf
+End Function
+
 
 Function CreateGrowFlower(x,y)
 	
@@ -14906,12 +14985,12 @@ Function ControlFlashBubble(i)
 
 			End Select
 			
-			If ObjectData(i,7)>5000
+					If ObjectData(i,7)>5000
 						ObjectTileX(i)=Floor(ObjectX(i))
 						ObjectTileY(i)=Floor(ObjectY(i))
 						
 						DestroyObject(i,0)
-						DestroyObject(j,0)
+						;DestroyObject(j,0)
 						
 						PlaySoundFX(84,ObjectTileX(i),ObjectTileY(i))
 					EndIf

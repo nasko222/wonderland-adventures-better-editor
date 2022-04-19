@@ -509,6 +509,16 @@ Function ActivateIcon(i,MouseButton)
 				messagelinetext1="These gloves are charged"
 				messagelinetext2="with 'Null' Magic!"
 				messagelinetimer=100
+			Case 8
+				playsoundfx(176,-1,-1)
+				messagelinetext1="These gloves are charged"
+				messagelinetext2="with 'Rainbow' Magic!"
+				messagelinetimer=100
+			Case 9,10
+				playsoundfx(176,-1,-1)
+				messagelinetext1="These gloves are charged"
+				messagelinetext2="with 'Barrel' Magic!"
+				messagelinetimer=100
 			Default
 				playsoundfx(176,-1,-1)
 				messagelinetext1="These gloves are charged"

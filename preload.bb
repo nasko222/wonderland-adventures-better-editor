@@ -1054,7 +1054,7 @@ Data "weewoo","weethanks","weebye","weeyeay","kaboom1","kaboom2","kaboom3","kabo
 ;80
 Data "magiccharge","magicblink2","magiccast","freeze","freezebreak","freezestinker","freezechomper","freezethwart","spellballbounce","---"
 ;90
-Data "magicon","magicoff","grow","floingbubble","---","saucerfly","saucerdie","lurker","moobot1","moobot2"
+Data "magicon","magicoff","grow","floingbubble","inflate","saucerfly","saucerdie","lurker","moobot1","moobot2"
 ;100
 Data "scritterhop","chomper","flowergrow","flowerfire","flowerhit","flowerdie","thwart","thwartpickup","splosh","spikeyball"
 ;110
