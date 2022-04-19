@@ -12948,9 +12948,9 @@ Function CompileAdventure()
 	Print "Writing WA2 File to Downloads Inbox..."
 	Print ""
 	Print ""
-	file1=WriteFile(globaldirname$+"\Adventures\downloads inbox\"+EditorUserName$+"#"+AdventureFileName$+".wa2")
+	file1=WriteFile(globaldirname$+"\Adventures\downloads inbox\"+EditorUserName$+"#"+AdventureFileName$+".wabe")
 	If file1=0
-		Print "ERROR: Cannot Write "+globaldirname$+"\Adventures\downloads inbox\"+EditorUserName$+"#"+AdventureFileName$+".wa2"
+		Print "ERROR: Cannot Write "+globaldirname$+"\Adventures\downloads inbox\"+EditorUserName$+"#"+AdventureFileName$+".wabe"
 		Print "Aborting..."
 		Delay 3000
 		Return False
@@ -12978,11 +12978,11 @@ Function CompileAdventure()
 	Print ""
 	Print ""
 	Print "Copying File to Downloads Outbox..."
-	CopyFile globaldirname$+"\Adventures\downloads inbox\"+EditorUserName$+"#"+AdventureFileName$+".wa2",globaldirname$+"\Adventures\downloads outbox\"+EditorUserName$+"#"+AdventureFileName$+".wa2"
+	CopyFile globaldirname$+"\Adventures\downloads inbox\"+EditorUserName$+"#"+AdventureFileName$+".wabe",globaldirname$+"\Adventures\downloads outbox\"+EditorUserName$+"#"+AdventureFileName$+".wabe"
 	Print ""
 	Print ""
 	Delay 1000
-	Print "Compile Completed... Filename: "+EditorUserName$+"#"+AdventureFileName$+".wa2"
+	Print "Compile Completed... Filename: "+EditorUserName$+"#"+AdventureFileName$+".wabe"
 	Print "You can now play/test your level."
 	
 	Delay 500

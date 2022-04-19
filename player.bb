@@ -1267,6 +1267,40 @@ Function CheckForNewCompiledLevels(silent)
 			Next
 			CloseFile(file2)
 			DeleteFile globaldirname$+"\adventures\downloads inbox\"+ex$+".wa2"
+		
+		
+		ElseIf Upper$(Right$(ex$,5))=".WABE"
+		
+			ex$=Left$(ex$,Len(ex$)-5)
+
+			; got one - unpack it 
+			If silent=False Print "Found: "+ex$
+			
+			CreateDir Globaldirname$ + "\adventures\current\" + ex$
+			dir=ReadDir(globaldirname$+"\adventures\current\"+ex$)
+			Repeat
+				file$=NextFile(dir)
+				If (file$<>"" And (FileType(Globaldirname$+"\adventures\current\"+ex$+"\"+file$)=1))
+					DeleteFile globaldirname$+"\adventures\current\"+ex$+"\"+file$
+				EndIf
+			Until file$=""
+			CloseDir dir
+			
+			file2 = ReadFile(globaldirname$+"\adventures\downloads inbox\"+ex$+".wabe")
+			int2 = ReadInt(file2)
+			For int3 = 0 To int2-1
+				string1$ = ReadString(file2)
+				int4 = ReadInt(file2)
+				file3 = WriteFile(globaldirname$+"\adventures\current\"+ex$+"\"+string1$)
+				For int5=0 To int4-1
+					byte1 = ReadByte(file2)
+					WriteByte(file3,byte1)
+				Next
+				CloseFile(file3)
+			Next
+			CloseFile(file2)
+			DeleteFile globaldirname$+"\adventures\downloads inbox\"+ex$+".wabe"
+			
 			
 		EndIf
 		
