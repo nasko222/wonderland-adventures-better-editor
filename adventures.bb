@@ -2190,7 +2190,7 @@ Function AdventureLost()
 	
 	flag=False
 	For i=0 To nofobjects-1
-		If (ObjectType(i)=433 And ObjectActive(i)>0) Or ObjectType(i)=431
+		If (ObjectType(i)=433 And ObjectActive(i)>0) Or ObjectType(i)=431 Or ObjectType(i)=432 And ObjectSubType(i)>0
 			flag=True
 		EndIf
 	Next
@@ -2985,6 +2985,17 @@ Function LoadObject(file, complete,create)
 	Case "!Barrel1"
 			ObjectEntity(Dest)=CopyEntity(BarrelMesh)
 			EntityTexture ObjectEntity(Dest),BarrelTexture1
+			If ObjectSubType(Dest)=1
+				If ObjectData(Dest,0)=0 Then EntityTexture ObjectEntity(Dest),BarrelTexture00
+				If ObjectData(Dest,0)=1 Then EntityTexture ObjectEntity(Dest),BarrelTexture01
+				If ObjectData(Dest,0)=2 Then EntityTexture ObjectEntity(Dest),BarrelTexture02
+				If ObjectData(Dest,0)=3 Then EntityTexture ObjectEntity(Dest),BarrelTexture03
+				If ObjectData(Dest,0)=4 Then EntityTexture ObjectEntity(Dest),BarrelTexture04
+				If ObjectData(Dest,0)=5 Then EntityTexture ObjectEntity(Dest),BarrelTexture05
+				If ObjectData(Dest,0)=6 Then EntityTexture ObjectEntity(Dest),BarrelTexture06
+				If ObjectData(Dest,0)=7 Then EntityTexture ObjectEntity(Dest),BarrelTexture07
+				If ObjectData(Dest,0)=8 Then EntityTexture ObjectEntity(Dest),BarrelTexture08
+			EndIf
 	Case "!Barrel2"
 			ObjectEntity(Dest)=CopyEntity(BarrelMesh)
 			EntityTexture ObjectEntity(Dest),BarrelTexture2
@@ -4523,6 +4534,8 @@ Function DestroyObject(i,k)
 		If (WAEpisode<>1 Or AdventureCurrentNumber<>70) ; unless in blue shard level or WA1
 			PlaySoundFX(15,-1,-1)
 		EndIf
+	Case 240
+		If ObjectSubType(i)=1 Then PlaySoundFX(15,-1,-1)
 	Case 340
 	For j=0 To NofObjects-1
 		If (ObjectX(i)-ObjectX(j))^2+(ObjectY(i)-ObjectY(j))^2 <.3 And ObjectExists(j)=True And ObjectActive(j)>0
@@ -4750,8 +4763,14 @@ Function CanObjectMoveToTile(i,x,y,CheckDiagonal,FinalDestination)
 	EndIf
 	
 	; check for Weebots - stay on same texture
-	If (ObjectType(i)=430 And ObjectData(i,4)=1) Or (ObjectType(i)=431 And ObjectData(i,4)=1)  Or (ObjectType(i)=422 And ObjectData(i,4)=1);; Or (ObjectType(i)=391 And ObjectData(i,4)=1)
+	If (ObjectType(i)=430 And ObjectData(i,4)=1) Or (ObjectType(i)=431 And ObjectData(i,4)=1)  Or (ObjectType(i)=422 And ObjectData(i,4)=1) ;;Or (ObjectType(i)=423 And ObjectData(i,4)=1) Or (ObjectType(i)=391 And ObjectData(i,4)=1)
 		If LevelTileTexture(x,y)<>ObjectData(i,9) Return False
+	EndIf
+	
+	If (ObjectType(i)=423 And ObjectData(i,4)>0)
+		;special case for tile zbots
+		If LevelTileTexture(x,y)+1<>ObjectData(i,4) Return False
+		
 	EndIf
 	
 	If (ObjectType(i)=432 And ObjectData(i,4)>0)
@@ -14267,6 +14286,14 @@ Function ControlSpellBall(i)
 					; box
 					If ObjectSubType(i)<2 ; fire 
 						destroyobject(j,1)
+						; linked barrel only
+						If ObjectType(j)=240 And ObjectSubtype(j)>0
+							For k=0 To nofobjects-1
+								If ObjectType(k)=240 And ObjectData(j,0)=ObjectData(k,0) And ObjectData(j,1)=ObjectData(k,1) And ObjectExists(k)=True And ObjectActive(k)>0
+									DestroyObject(k,1)
+								EndIf
+							Next
+						EndIf
 					EndIf
 					destructoflag=True
 					

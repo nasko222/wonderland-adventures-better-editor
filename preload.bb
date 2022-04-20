@@ -248,6 +248,16 @@ Function PreLoadModels()
 	BarrelMesh=myLoadMesh("data\models\barrels\barrel.b3d",0)
 	BarrelTexture1=myLoadTexture("Data\models\barrels\barrel1.jpg",1)
 	BarrelTexture2=myLoadTexture("Data\models\barrels\barrel2.jpg",1)
+	
+	BarrelTexture00=myLoadTexture("Data\models\barrels\barrel00.jpg",1)
+	BarrelTexture01=myLoadTexture("Data\models\barrels\barrel01.jpg",1)
+	BarrelTexture02=myLoadTexture("Data\models\barrels\barrel02.jpg",1)
+	BarrelTexture03=myLoadTexture("Data\models\barrels\barrel03.jpg",1)
+	BarrelTexture04=myLoadTexture("Data\models\barrels\barrel04.jpg",1)
+	BarrelTexture05=myLoadTexture("Data\models\barrels\barrel05.jpg",1)
+	BarrelTexture06=myLoadTexture("Data\models\barrels\barrel06.jpg",1)
+	BarrelTexture07=myLoadTexture("Data\models\barrels\barrel07.jpg",1)
+	BarrelTexture08=myLoadTexture("Data\models\barrels\barrel08.jpg",1)
 ;	BarrelTexture3=myLoadTexture("Data\models\barrels\barrel3.jpg",2)
 	HideEntity BarrelMesh
 	

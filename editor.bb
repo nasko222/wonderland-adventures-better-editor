@@ -12947,7 +12947,7 @@ Function CompileAdventure()
 	; and now make the master file
 	Print ""
 	Print ""
-	Print "Writing WA2 File to Downloads Inbox..."
+	Print "Writing WABE File to Downloads Inbox..."
 	Print ""
 	Print ""
 	file1=WriteFile(globaldirname$+"\Adventures\downloads inbox\"+EditorUserName$+"#"+AdventureFileName$+".wabe")

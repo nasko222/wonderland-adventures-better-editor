@@ -268,7 +268,8 @@ Global NofFireFlowersInAdventure
 Global BurstFlowerMesh
 Global BurstFlowerTexture
 ; Boxes etc
-Global BarrelMesh,BarrelTexture1,BarrelTexture2,BarrelTexture3
+Global BarrelMesh,BarrelTexture1,BarrelTexture2
+Global BarrelTexture00,BarrelTexture01,BarrelTexture02,BarrelTexture03,BarrelTexture04,BarrelTexture05,BarrelTexture06,BarrelTexture07,BarrelTexture08
 Global NofBricksInAdventure
 
 ; Chompers
