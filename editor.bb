@@ -854,7 +854,7 @@ RotateMesh LurkerMesh,-90,0,0
 HideEntity LurkerMesh
 
 ; Ghosts
-Dim WraithTexture(6)
+Dim WraithTexture(8)
 Global GhostMesh=MyLoadMesh ("data\models\ghost\ghost.3ds",0)
 Global GhostTexture=MyLoadTexture ("data\models\ghost\ghost.jpg",1)
 RotateMesh ghostmesh,-90,0,0
@@ -872,6 +872,8 @@ WraithTexture(2)=MyLoadTexture ("data\models\ghost\wraith2.jpg",1)
 WraithTexture(3)=MyLoadTexture ("data\models\ghost\wraith3.jpg",1)
 WraithTexture(4)=MyLoadTexture ("data\models\ghost\wraith4.jpg",1)
 WraithTexture(5)=MyLoadTexture ("data\models\ghost\wraith5.jpg",1)
+WraithTexture(6)=MyLoadTexture ("data\models\ghost\wraith00.jpg",1)
+WraithTexture(7)=MyLoadTexture ("data\models\ghost\wraith00.jpg",1)
 EntityTexture WraithMesh,WraithTexture(0)
 HideEntity WraithMesh
 
@@ -4782,7 +4784,7 @@ Function DisplayObjectAdjuster(i)
 	Case "Data1"
 		tex$=Str$(CurrentObjectData(1))
 		
-		If CurrentObjectModelName$="!Square"
+		If CurrentObjectModelName$="!Square" And CurrentObjectTextureName$="!GloveTex"
 			tex2$="Charge"
 			Select CurrentObjectData(1)
 			Case 0
@@ -4793,6 +4795,8 @@ Function DisplayObjectAdjuster(i)
 				tex$="Disabled"
 			Case 3
 				tex$="Uo"
+			Default
+				tex$="Out of Bounds"
 			End Select
 			
 		EndIf
@@ -4846,15 +4850,13 @@ Function DisplayObjectAdjuster(i)
 		If CurrentObjectModelName$="!FireFlower"
 			tex2$="Type"
 			
+			num=1-CurrentObjectData(1)
 			Select CurrentObjectData(1)
+			
 			Case 0
 				tex$="Fire"
-			Case 1
-				tex$="Ice"
-			Case 2
-				tex$="Null"
-			Case 3
-				tex$="Bounce"
+			Default
+				tex$="Magic ID of " + num
 			End Select
 		EndIf
 
@@ -5253,6 +5255,16 @@ Function DisplayObjectAdjuster(i)
 				tex$="Ice"
 			Case 2
 				tex$="Grow"
+			Case 3
+				tex$="Pop"
+			Case 4
+				tex$="Blink"
+			Case 5
+				tex$="Flash"
+			Case 6
+				tex$="Barrel Reg"
+			Case 7
+				tex$="Barrel TNT"
 			End Select
 		EndIf
 
@@ -6229,7 +6241,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectSubType>3 Then CurrentObjectSubType=0
 		EndIf
 		
-		If CurrentObjectModelName$="!Crab"
+		If CurrentObjectModelName$="!Crab" Or CurrentObjectModelName$="!Retroscouge" Or CurrentObjectModelName$="!Tentacle"
 			If CurrentObjectSubType<0 Then CUrrentObjectSubType=1
 			If CurrentObjectSubType>1 Then CurrentObjectSubType=0
 		EndIf
@@ -6328,16 +6340,24 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(0)>=32767 Then CurrentObjectData(0)=-32768
 
 		Else If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or (CurrentObjectModelName$="!Button" And ((CurrentObjectSubType Mod 32)<10 Or (CurrentObjectSubType Mod 32)=16 Or (CurrentObjectSubType Mod 32)=17)) Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!FlipBridge"
-
 			; colours [2^16-1; 2^16-1)
 			If CurrentObjectData(0)<=-32768 Then CurrentObjectData(0)=32767
 			If CurrentObjectData(0)>=32767 Then CurrentObjectData(0)=-32768
+			
+		Else If CurrentObjectModelName$="!Button" And CurrentObjectSubType=13 Then
+			If CurrentObjectData(0)>1 CurrentObjectData(0)=0
+			If CurrentObjectData(0)<0 CurrentObjectData(0)=1
 
 		Else If CurrentObjectModelName$="!Teleport" 
 			; colours 0-8
 			If CurrentObjectData(0)>8 CurrentObjectData(0)=0
 			If CurrentObjectData(0)<0 CurrentObjectData(0)=8
 
+		Else If CurrentObjectModelName$="!Sign" 
+			If CurrentObjectData(0)>3 CurrentObjectData(0)=0
+			If CurrentObjectData(0)<0 CurrentObjectData(0)=3
+
+		
 		EndIf
 		
 		If CurrentObjectModelName$="!Obstacle48" ; (wysp ship)
@@ -6382,7 +6402,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(0)>7 CurrentObjectData(0)=0
 			If CurrentObjectData(0)<0 CurrentObjectData(0)=7
 		EndIf
-		If CurrentObjectModelName$="!Turtle"  Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectType<>424)
+		If CurrentObjectModelName$="!Turtle"  Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectType<>424) Or CurrentObjectModelName$="!KaboomRTW" Or CurrentObjectModelName$="!Weebot" Or CurrentObjectModelName$="!Zapbot"
 			If CurrentObjectData(0)>3 CurrentObjectData(0)=0
 			If CurrentObjectData(0)<0 CurrentObjectData(0)=3
 		EndIf
@@ -6408,8 +6428,8 @@ Function AdjustObjectAdjuster(i)
 		EndIf
 		
 		If CurrentObjectType=51
-			If CurrentObjectData(0)>6 CurrentObjectData(0)=0
-			If CurrentObjectData(0)<0 CurrentObjectData(0)=6
+			If CurrentObjectData(0)>127 CurrentObjectData(0)=-128
+			If CurrentObjectData(0)<-128 CurrentObjectData(0)=127
 		EndIf
 		
 		If CurrentObjectModelName$="!WaterFall"
@@ -6455,6 +6475,12 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(1)<0 CurrentObjectData(1)=2
 
 		EndIf
+		
+		If CurrentObjectModelName$="!Cuboid"
+			If CurrentObjectData(1)>1 CurrentObjectData(1)=0
+			If CurrentObjectData(1)<0 CurrentObjectData(1)=1
+
+		EndIf
 
 		If CurrentObjectModelName$="!Gem"
 			If CurrentObjectData(1)>7 CurrentObjectData(1)=0
@@ -6477,7 +6503,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(1)>3 CurrentObjectData(1)=0
 			If CurrentObjectData(1)<0 CurrentObjectData(1)=3
 		EndIf
-		If CurrentObjectModelName$="!Turtle"
+		If CurrentObjectModelName$="!Turtle" Or CurrentObjectModelName$="!Weebot" Or CurrentObjectModelName$="!Zapbot"
 			If CurrentObjectData(1)>1 CurrentObjectData(1)=0
 			If CurrentObjectData(1)<0 CurrentObjectData(1)=1
 		EndIf
@@ -6567,6 +6593,11 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(2)<0 CurrentObjectData(2)=3
 		EndIf
 		
+		If  CurrentObjectModelName$="!Wraith"
+			If CurrentObjectData(2)>7 CurrentObjectData(2)=0
+			If CurrentObjectData(2)<0 CurrentObjectData(2)=7
+		EndIf
+		
 		If CurrentObjectModelName$="!Gem"
 			If CurrentObjectData(0)>2 CurrentObjectData(0)=-2
 			If CurrentObjectData(0)<-2 CurrentObjectData(0)=2
@@ -6611,6 +6642,11 @@ Function AdjustObjectAdjuster(i)
 			Case 5
 				If CurrentObjectData(3)>6 Then CurrentObjectData(3)=0
 			End Select
+		EndIf
+		
+		If CurrentObjectModelName$="!Wraith"
+			If CurrentObjectData(3)>1 CurrentObjectData(3)=0
+			If CurrentObjectData(3)<0 CurrentObjectData(3)=1
 		EndIf
 
 		If CurrentObjectModelName$="!SteppingStone"
@@ -6721,6 +6757,14 @@ Function AdjustObjectAdjuster(i)
 			If CurrentobjectData(4)<0 CurrentObjectData(4)=1
 			If CurrentobjectData(4)>1 CurrentObjectData(4)=0
 		EndIf
+		
+		If  CurrentObjectModelName$="!Zapbot" Or CurrentObjectModelName$="!Retroufo" Or CurrentObjectModelName$="!Weebot"
+			; autotrack
+			If CurrentobjectData(4)<0 CurrentObjectData(4)=1
+			If CurrentobjectData(4)>1 CurrentObjectData(4)=0
+		EndIf
+		
+		
 		If  CurrentObjectModelName$="!Button" And CurrentObjectSubType=11 And CurrentObjectData(0)=1
 			; yaw
 			If CurrentobjectData(4)<-1 CurrentObjectData(4)=359
@@ -6745,6 +6789,12 @@ Function AdjustObjectAdjuster(i)
 		If CurrentObjectModelName$="!Ufo"
 			If CurrentobjectData(4)<0 CurrentObjectData(4)=0
 			If CurrentobjectData(4)>1 CurrentObjectData(4)=1
+		EndIf
+		
+		If  CurrentObjectModelName$="!Suctube"
+			If CurrentObjectData(4)>1 CurrentObjectData(4)=0
+			If CurrentObjectData(4)<0 CurrentObjectData(4)=1
+
 		EndIf
 
 
@@ -6778,6 +6828,18 @@ Function AdjustObjectAdjuster(i)
 		EndIf
 		If  CurrentObjectModelName$="!Button" And CurrentObjectSubType=10
 			; levelexit flyover
+			If CurrentObjectData(5)>1 CurrentObjectData(5)=0
+			If CurrentObjectData(5)<0 CurrentObjectData(5)=1
+
+		EndIf
+		
+		If  CurrentObjectModelName$="!Conveyor"
+			If CurrentObjectData(5)>1 CurrentObjectData(5)=0
+			If CurrentObjectData(5)<0 CurrentObjectData(5)=1
+
+		EndIf
+		
+		If  CurrentObjectModelName$="!Suctube"
 			If CurrentObjectData(5)>1 CurrentObjectData(5)=0
 			If CurrentObjectData(5)<0 CurrentObjectData(5)=1
 
@@ -6912,7 +6974,7 @@ Function AdjustObjectAdjuster(i)
 
 		EndIf
 		
-		If CurrentObjectModelName$="!BabyBoomer"
+		If CurrentObjectModelName$="!BabyBoomer" Or  CurrentObjectModelName$="!ZbotNPC"
 
 			If CurrentObjectData(8)>1 CurrentObjectData(8)=0
 			If CurrentObjectData(8)<0 CurrentObjectData(8)=1
@@ -7395,6 +7457,10 @@ Function GetMagicName$(id)
 			Return "Null"
 		Case 8
 			Return "Rainbow"
+		Case 9
+			Return "Barrel Reg"
+		Case 10
+			Return "Barrel TNT"
 		Default
 			Return "Black"
 	End Select

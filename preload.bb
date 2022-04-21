@@ -411,6 +411,8 @@ Function PreLoadModels()
 	WraithTexture(3)=MyLoadTexture ("data\models\ghost\wraith3.jpg",1)
 	WraithTexture(4)=MyLoadTexture ("data\models\ghost\wraith4.jpg",1)
 	WraithTexture(5)=MyLoadTexture ("data\models\ghost\wraith5.jpg",1)
+	WraithTexture(6)=MyLoadTexture ("data\models\ghost\wraith00.jpg",1)
+	WraithTexture(7)=MyLoadTexture ("data\models\ghost\wraith00.jpg",1)
 	EntityTexture WraithMesh,WraithTexture(0)
 	HideEntity WraithMesh
 	

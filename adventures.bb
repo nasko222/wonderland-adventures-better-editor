@@ -18477,6 +18477,10 @@ Function ControlWraith(i)
 							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,6,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
 						Else If ObjectData(i,2)=5
 							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,5,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+						Else If ObjectData(i,2)=6
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,9,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+						Else If ObjectData(i,2)=7
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,10,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
 						EndIf
 					Else
 						If ObjectData(i,2)=0
@@ -18491,6 +18495,10 @@ Function ControlWraith(i)
 							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,6,-1,-1,False,300)
 						Else If ObjectData(i,2)=5
 							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,5,-1,-1,False,300)
+						Else If ObjectData(i,2)=6
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.9*dy,1.1,.1*dx,.1*dy,5,-1,-1,False,300)
+						Else If ObjectData(i,2)=7
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.10*dy,1.1,.1*dx,.1*dy,5,-1,-1,False,300)
 						EndIf
 					EndIf
 				EndIf

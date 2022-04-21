@@ -319,7 +319,7 @@ Global LurkerMesh,LurkerTexture
 
 ; Ghosts
 Global GhostMesh,WraithMesh,GhostTexture
-Dim WraithTexture(6)
+Dim WraithTexture(8)
 ; Obstacles
 Dim ObstacleMesh(50),ObstacleTexture(50)
 
