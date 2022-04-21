@@ -2778,7 +2778,7 @@ Function LoadObject(file, complete,create)
 			Else
 				 ObjectTextureName$(Dest)=ObjectTextureName$(Dest)+""+Str$(ObjectData(Dest,4))
 			EndIf
-			ObjectTextureName$(Dest)=ObjectTextureName$(Dest)+Chr$(64+ObjectData(dest,5))+"0"
+			ObjectTextureName$(Dest)=ObjectTextureName$(Dest)+Chr$(65+ObjectData(dest,5))+"0"
 		EndIf
 
 		
@@ -3098,6 +3098,7 @@ Function LoadObject(file, complete,create)
 	Case "!Retroscouge"
 		ObjectEntity(Dest)=CopyEntity(RetroScougeMesh)
 		ObjectYawAdjust(Dest)=(-90*ObjectData(Dest,0) +3600) Mod 360
+		If ObjectSubType(Dest)=1 Then EntityTexture ObjectEntity(Dest),GreenScouge
 	
 	Case "!Retrozbot"
 		ObjectEntity(Dest)=CopyEntity(RetroZbotMesh)
@@ -3486,7 +3487,7 @@ Function AdjustLevelTileLogic(x,y,i)
 		If ObjectModelName$(i)="!Obstacle46"
 			If (ObjectZAdjust(i)>-1 And ObjectZAdjust(i)<1) Then LevelTileLogic(x,y)=0
 		
-		ElseIf ObjectTextureName$(i)<>"!Cottage" And ObjectTextureName$(i)<>"!Townhouse"
+		ElseIf ObjectTextureName$(i)<>"!Cottage" And ObjectTextureName$(i)<>"!Townhouse" And ObjectModelName$(i)<>"!Obstacle50"
 
 			; Obstacle
 			; 160 - just the main tile
@@ -3889,7 +3890,47 @@ Function ControlObjects()
 				ControlRainbowBubble(i)
 			Case 160
 				; Obstacle
+				; (no control, but used to adjust leveltilelogic)
+				If ObjectModelName$(i)="!Obstacle03" ; volcano
+					If Rand(0,40)=0
+						AddParticle(Rand(24,26),ObjectX(i)+Rnd(-.7,.7),1.8+ObjectZAdjust(i),-ObjectY(i)+Rnd(-.9,.7),0,.2,0,Rnd(0.01,0.03),0,0,.03,0,0,0,100,3)
+					EndIf
+					If Rand(0,10)=0
+						If Rand(0,5)=0
+							part22=1
+						Else
+							part22=0
+						EndIf
+						AddParticle(part22,ObjectX(i)+Rnd(-.3,.3),1.5+ObjectZAdjust(i),-ObjectY(i)+Rnd(-.5,.3),0,.6,0,Rnd(0.01,0.03),0,0,.01,0,0,0,100,3)
+					EndIf
+				Else If ObjectModelName$(i)="!Obstacle04" ; acid pool
+					If Rand(0,100)=0
+						AddParticle(27,ObjectX(i)+Rnd(-.5,.5),1+ObjectZAdjust(i),-ObjectY(i)+Rnd(-.7,.5),0,.11,0,Rnd(0.01,0.03),0,0,.01,0,0,0,100,3)
+					EndIf
+					If Rand(0,100)=0
+						AddParticle(35,ObjectX(i)+Rnd(-.3,.6),2.0+ObjectZAdjust(i),-ObjectY(i)+Rnd(-.6,.3),0,.04,0,0,0,0,.001,0,0,0,100,4)
+					EndIf
+					
+				Else If ObjectModelName$(i)="!Obstacle45" ; waterwheel
+					If ObjectYawAdjust(i)=0
+						ObjectRoll(i)=ObjectRoll(i)+2
+					EndIf
+					If ObjectYawAdjust(i)=180
+						ObjectRoll(i)=ObjectRoll(i)-2
+					EndIf
+					If ObjectYawAdjust(i)=90
+						ObjectPitch(i)=ObjectPitch(i)+2
+					EndIf
+					If ObjectYawAdjust(i)=270
+						ObjectPitch(i)=ObjectPitch(i)-2
+					EndIf
 				
+				Else If ObjectModelName$(i)="!Obstacle48" ; UFO - by mistake in here
+					If ObjectData(i,0)=0 Then ObjectYaw(i)=ObjectYaw(i)+1
+				Else If ObjectModelName$(i)="!Crystal" ; UFO - by mistake in here
+					ObjectYaw(i)=ObjectYaw(i)+1
+
+				EndIf					
 			Case 161
 				; waterfall sprinkles
 				If leveltimer Mod 60=0
@@ -3983,6 +4024,8 @@ Function ControlObjects()
 				ObjectXScale(i)=.9+.1*Sin((LevelTimer*2) Mod 360)
 				ObjectYScale(i)=.9+.1*Sin((LevelTimer*2) Mod 360)
 				ObjectZScale(i)=.9+.1*Sin((LevelTimer*2) Mod 360)
+				
+				If ObjectData(i,1)<>0 ObjectYaw(i)=ObjectYaw(i)+1
 
 			Case 250
 				ControlChomper(i)
@@ -10498,6 +10541,20 @@ Function ActivateButton(i)
 
 							
 							EndIf
+							
+							
+							;	rotatable scouge
+							If ObjectType(k)=421 And ObjectSubType(k)=1
+								If ObjectData(i,2)=0 ; left
+									ObjectData(k,0)=(ObjectData(k,0)+3) Mod 4
+									ObjectYaw(k)=ObjectYaw(k)+90 Mod 360
+								Else ; right
+									ObjectData(k,0)=(ObjectData(k,0)+1) Mod 4
+									ObjectYaw(k)=ObjectYaw(k)+270 Mod 360
+								EndIf
+								ObjectTimer(k)=ObjectTimerMax1(k)
+							EndIf
+							
 							If ObjectType(k)=410
 								TurnFlipBridge(k,ObjectData(i,2))
 							EndIf
@@ -18418,6 +18475,8 @@ Function ControlWraith(i)
 							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,2,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
 						Else If ObjectData(i,2)=4
 							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,6,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
+						Else If ObjectData(i,2)=5
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,5,ObjectData(i,6)/100,ObjectData(i,7)/100,False,300)
 						EndIf
 					Else
 						If ObjectData(i,2)=0
@@ -18430,6 +18489,8 @@ Function ControlWraith(i)
 							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,2,-1,-1,False,300)
 						Else If ObjectData(i,2)=4
 							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,6,-1,-1,False,300)
+						Else If ObjectData(i,2)=5
+							CreateSpellBall(ObjectX(i)+.6*dx,ObjectY(i)+.6*dy,1.1,.1*dx,.1*dy,5,-1,-1,False,300)
 						EndIf
 					EndIf
 				EndIf

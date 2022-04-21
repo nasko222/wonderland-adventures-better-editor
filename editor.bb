@@ -854,7 +854,7 @@ RotateMesh LurkerMesh,-90,0,0
 HideEntity LurkerMesh
 
 ; Ghosts
-Dim WraithTexture(5)
+Dim WraithTexture(6)
 Global GhostMesh=MyLoadMesh ("data\models\ghost\ghost.3ds",0)
 Global GhostTexture=MyLoadTexture ("data\models\ghost\ghost.jpg",1)
 RotateMesh ghostmesh,-90,0,0
@@ -871,6 +871,7 @@ WraithTexture(1)=MyLoadTexture ("data\models\ghost\wraith1.jpg",1)
 WraithTexture(2)=MyLoadTexture ("data\models\ghost\wraith2.jpg",1)
 WraithTexture(3)=MyLoadTexture ("data\models\ghost\wraith3.jpg",1)
 WraithTexture(4)=MyLoadTexture ("data\models\ghost\wraith4.jpg",1)
+WraithTexture(5)=MyLoadTexture ("data\models\ghost\wraith5.jpg",1)
 EntityTexture WraithMesh,WraithTexture(0)
 HideEntity WraithMesh
 
@@ -889,6 +890,15 @@ ObstacleTexture(2)=myLoadTexture("data\models\Trees\rocks2.jpg",1)
 EntityTexture ObstacleMesh(2),ObstacleTexture(2)
 HideEntity ObstacleMesh(2)
 
+ObstacleMesh(3)=myLoadMesh("data\models\Other\volcano01.b3d",0)
+ObstacleTexture(3)=myLoadTexture("data\models\Other\volcano01.bmp",1)
+EntityTexture ObstacleMesh(3),ObstacleTexture(3)
+HideEntity ObstacleMesh(3)
+
+ObstacleMesh(4)=myLoadMesh("data\models\Other\volcano01.b3d",0)
+ObstacleTexture(4)=myLoadTexture("data\models\other\volcano02.jpg",1)
+EntityTexture ObstacleMesh(4),ObstacleTexture(4)
+HideEntity ObstacleMesh(4)
 ObstacleMesh(5)=myLoadMesh("data\models\Trees\flower.3ds",0)
 ObstacleTexture(5)=myLoadTexture("data\models\Trees\flower1.jpg",1)
 EntityTexture ObstacleMesh(5),ObstacleTexture(5)
@@ -900,11 +910,42 @@ EntityTexture ObstacleMesh(6),ObstacleTexture(6)
 UpdateNormals obstaclemesh(6)
 HideEntity ObstacleMesh(6)
 
+ObstacleMesh(7)=myLoadMesh("data\models\Trees\watervine.b3d",0)
+ObstacleTexture(7)=myLoadTexture("data\models\Trees\watervine.jpg",1)
+EntityTexture ObstacleMesh(7),ObstacleTexture(7)
+UpdateNormals obstaclemesh(7)
+HideEntity ObstacleMesh(7)
+
+ObstacleMesh(8)=myLoadMesh("data\models\Trees\fern.b3d",0)
+ObstacleTexture(8)=myLoadTexture("data\models\Trees\fern.bmp",4)
+EntityTexture ObstacleMesh(8),ObstacleTexture(8)
+HideEntity ObstacleMesh(8)
+
+ObstacleMesh(9)=myLoadMesh("data\models\Trees\fern02.b3d",0)
+ObstacleTexture(9)=myLoadTexture("data\models\Trees\fern.bmp",4)
+EntityTexture ObstacleMesh(9),ObstacleTexture(9)
+HideEntity ObstacleMesh(9)
 ObstacleMesh(10)=myLoadMesh("data\models\Trees\mushroom.3ds",0)
 MushroomTex=myLoadTexture("data\models\Trees\mushroom.jpg",1)
 EntityTexture ObstacleMesh(10), MushroomTex
 HideEntity ObstacleMesh(10)
 
+ObstacleMesh(11)=myLoadMesh("data\models\Trees\fern3.3ds",0)
+ObstacleTexture(11)=myLoadTexture("data\models\Trees\fern3.png",4)
+EntityTexture ObstacleMesh(11),ObstacleTexture(11)
+HideEntity ObstacleMesh(11)
+
+
+ObstacleMesh(12)=myLoadMesh("data\models\Trees\plant1.3ds",0)
+ObstacleTexture(12)=myLoadTexture("data\models\Trees\plant1.png",4)
+EntityTexture ObstacleMesh(12),ObstacleTexture(12)
+HideEntity ObstacleMesh(12)
+
+
+ObstacleMesh(13)=myLoadMesh("data\models\Trees\plant2.b3d",0)
+ObstacleTexture(13)=myLoadTexture("data\models\Trees\plant2.png",4)
+EntityTexture ObstacleMesh(13),ObstacleTexture(13)
+HideEntity ObstacleMesh(13)
 ObstacleMesh(15)=myLoadMesh("data\models\Trees\leaftree01.b3d",0)
 ObstacleTexture(15)=myLoadTexture("data\models\Trees\leaftree01_03.png",4)
 EntityTexture ObstacleMesh(15),ObstacleTexture(15)
@@ -940,6 +981,20 @@ ObstacleTexture(21)=myLoadTexture("data\models\Trees\leaftree02_02.png",4)
 EntityTexture ObstacleMesh(21),ObstacleTexture(21)
 HideEntity ObstacleMesh(21)
 
+ObstacleMesh(22)=myLoadMesh("data\models\Trees\tree_jungle_typeA.b3d",0)
+ObstacleTexture(22)=myLoadTexture("data\models\Trees\tree_jungle_typeA.bmp",4)
+EntityTexture ObstacleMesh(22),ObstacleTexture(22)
+HideEntity ObstacleMesh(22)
+
+ObstacleMesh(23)=myLoadMesh("data\models\Trees\tree_jungle_typeB.b3d",0)
+ObstacleTexture(23)=myLoadTexture("data\models\Trees\tree_jungle_typeB.bmp",4)
+EntityTexture ObstacleMesh(23),ObstacleTexture(23)
+HideEntity ObstacleMesh(23)
+
+ObstacleMesh(24)=myLoadMesh("data\models\Trees\tree_palm.b3d",0)
+ObstacleTexture(24)=myLoadTexture("data\models\Trees\palmtree01.bmp",4)
+EntityTexture ObstacleMesh(24),ObstacleTexture(24)
+HideEntity ObstacleMesh(24)
 ObstacleMesh(25)=myLoadMesh("data\models\Bridges\bridgeend.3ds",0)
 ObstacleTexture(25)=myLoadTexture("data\models\Bridges\bridgebrick.png",1)
 EntityTexture ObstacleMesh(25),ObstacleTexture(25)
@@ -1017,11 +1072,40 @@ HideEntity ObstacleMesh(41)
 ObstacleMesh(42)=myLoadMesh("data\models\houses\windmill_rotor.b3d",0)
 HideEntity ObstacleMesh(42)
 	
+ObstacleMesh(43)=myLoadMesh("data\models\houses\hut01.b3d",0)
+ObstacleTexture(43)=myLoadTexture("data\models\houses\hut01.jpg",1)
+EntityTexture ObstacleMesh(43),ObstacleTexture(43)
+HideEntity ObstacleMesh(43)
+
+ObstacleMesh(44)=myLoadMesh("data\models\other\ship01.b3d",0)
+ObstacleTexture(44)=myLoadTexture("data\models\other\ship01.bmp",1)
+EntityTexture ObstacleMesh(44),ObstacleTexture(44)
+HideEntity ObstacleMesh(44)
+
+ObstacleMesh(45)=myLoadMesh("data\models\houses\waterwheel.3ds",0)
+ObstacleTexture(45)=myLoadTexture("data\models\cage\cage.jpg",1)
+EntityTexture ObstacleMesh(45),ObstacleTexture(45)
+HideEntity ObstacleMesh(45)
+
 ObstacleMesh(46)=myLoadMesh("data\models\houses\bridge.3ds",0)
 ObstacleTexture(46)=myLoadTexture("data\models\cage\cage.jpg",1)
 EntityTexture ObstacleMesh(46),ObstacleTexture(46)
 HideEntity ObstacleMesh(46)
 
+ObstacleMesh(47)=myLoadMesh("data\models\houses\machine.3ds",0)
+ObstacleTexture(47)=myLoadTexture("data\models\houses\machine.jpg",1)
+EntityTexture ObstacleMesh(47),ObstacleTexture(47)
+HideEntity ObstacleMesh(47)
+
+ObstacleMesh(48)=myLoadMesh("data\models\other\starship.3ds",0)
+ObstacleTexture(48)=myLoadTexture("data\models\other\starship.jpg",1)
+EntityTexture ObstacleMesh(48),ObstacleTexture(48)
+HideEntity ObstacleMesh(48)
+
+ObstacleMesh(49)=myLoadMesh("data\models\other\tv.3ds",0)
+ObstacleTexture(49)=myLoadTexture("data\models\other\tv.jpg",1)
+EntityTexture ObstacleMesh(49),ObstacleTexture(49)
+HideEntity ObstacleMesh(49)
 Global Fence1=MyLoadmesh("data\models\houses\fence.3ds",0)
 HideEntity Fence1
 Global Fence2=MyLoadmesh("data\models\houses\fenceb.b3d",0)
@@ -2016,6 +2100,8 @@ Function EditorControls()
 		Text 719,115,"DesertCave"
 	Case 20
 		Text 719,115,"Star World"
+	Case 21
+		Text 719,115,"  30,000  "
 	Default
 		Text 719-5,115,"Custom:" + LevelMusic
 
@@ -4300,64 +4386,6 @@ Function DisplayObjectAdjuster(i)
 		tex$=Str$(CurrentObjectYScale)
 	Case "ZScale"
 		tex$=Str$(CurrentObjectZScale)
-		
-	Case "DefensePower"
-		tex$=Str$(CurrentObjectDefensePower)
-		tex2$="Greeting"
-		Select CurrentObjectDefensePower
-		Case 0
-			tex$="Stinky1"
-		Case 1
-			tex$="Stinky2"
-		Case 2
-			tex$="Loof1"
-		Case 3
-			tex$="Loof2"
-		Case 4
-			tex$="Qookie1"
-		Case 5
-			tex$="Qookie2"
-		Case 6
-			tex$="Peegue1"
-		Case 7
-			tex$="Peegue2"
-		Case 8
-			tex$="Qookie3"
-		Case 9
-			tex$="Qookie4"
-
-		Case 10,11,12,13,14,15,16,17,18
-			tex$="Wee "+Str$(CurrentObjectDefensePower-9)
-		Case 19,20,21
-			tex$="Kaboom "+Str$(CurrentObjectDefensePower-18)
-
-		Case 22,23,24
-			tex$="ZBot "+Str$(CurrentObjectDefensePower-21)
-
-		Case 25
-			tex$="Chomper"
-		Case 26
-			tex$="Thwart 1"
-		Case 27
-			tex$="Thwart 2"
-		Case 28
-			tex$="Troll 1"
-		Case 29
-			tex$="Troll 2"
-		Case 30
-			tex$="Monster"
-		Case 31
-			tex$="Stinky 3"
-		Case 32
-			tex$="Stinky 4"
-		Case 33
-			tex$="Stinky 5"
-
-		End Select
-		
-		
-
-
 
 	Case "YawAdjust"
 		tex$=Str$(CurrentObjectYawAdjust)
@@ -4407,18 +4435,26 @@ Function DisplayObjectAdjuster(i)
 				tex$="GlowGem"
 			Else If CurrentObjectSubType=-4
 				tex$="Spy-Eye"
-			Else If CurrentObjectSubType=-5
-				tex$="Glyph"
-			Else If CurrentObjectSubType=-6
-				tex$="MapPiece"
+			Else If CurrentObjectSubType=-99
+				tex$="Whistle"
 
 			EndIf
-			
-
-
-
-			
-		
+		EndIf
+		If CurrentObjectModelName$="!MooBot"
+			tex2="Deadly"
+			If CurrentObjectSubType=1
+				tex$="Yes"
+			Else
+				tex$="No"
+			EndIf
+		EndIf
+		If CurrentObjectModelName$="!Tentacle"
+			tex2="Reversed"
+			If CurrentObjectSubType=1
+				tex$="Yes"
+			Else
+				tex$="No"
+			EndIf
 		EndIf
 		If CurrentObjectModelName$="!FireFlower"
 			tex2$="Turning"
@@ -4438,6 +4474,24 @@ Function DisplayObjectAdjuster(i)
 				tex$="Green"
 			Else If CurrentObjectSubType=1
 				tex$="Red"
+			
+			EndIf
+		EndIf
+		If CurrentObjectModelName$="!Retroscouge"
+			tex2$="Type"
+			If CurrentObjectSubType=0
+				tex$="Not Rotatable"
+			Else If CurrentObjectSubType=1
+				tex$="Rotatable"
+			
+			EndIf
+		EndIf
+		If CurrentObjectModelName$="Barrel1"
+			tex2$="Linked"
+			If CurrentObjectSubType=0
+				tex$="No"
+			Else If CurrentObjectSubType=1
+				tex$="Yes"
 			
 			EndIf
 		EndIf
@@ -4517,26 +4571,18 @@ Function DisplayObjectAdjuster(i)
 	
 	Case "Data0"
 		tex$=Str$(CurrentObjectData(0))
-		
-		If CurrentObjectModelName$="!CustomModel"
-			tex2$="YawAnim"
-		EndIf
-		If CurrentObjectModelName$="!Scritter" Or CurrentObjectModelName$="!Cuboid" Or CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key" Or CurrentObjectModelName$="!KeyCard" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage"  Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge" Or CurrentObjectType=424 Or CurrentObjectModelName$="!Pushbot" Or CurrentObjectModelName$="!Autodoor" Or CurrentObjectModelName$="!Suctube" Or CurrentObjectModelName$="!Conveyor"
-			tex2$="Colour"
-		EndIf
-		
-		If CurrentObjectModelName$="!Obstacle51" Or CurrentObjectModelName$="!Obstacle55" Or CurrentObjectModelName$="!Obstacle59"
-			tex2$="Shape"
-		EndIf
-		
 		If CurrentObjectModelName$="!Obstacle48" ; (wysp ship)
-			tex$="Turning"
+			tex2$="Turning"
 			Select CurrentObjectData(0)
 				Case 0
-					tex2$="Yes"
+					tex$="Yes"
 				Default
-					tex2$="No"
+					tex$="No"
 			End Select
+		EndIf
+		
+		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key"  Or CurrentObjectModelName$="!KeyCard" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge" Or CurrentObjectModelName$="!Retrolasergate" Or CurrentObjectModelName$="!Pushbot" Or CurrentObjectModelname$="!Autodoor" Or  CurrentObjectModelname$="!Cuboid" Or CurrentObjectModelname$="!Suctube" Or CurrentObjectModelName$="!Conveyor" Or CurrentObjectModelName$="!Barrel1"
+			tex2$="Colour"
 		EndIf
 				
 
@@ -4549,24 +4595,19 @@ Function DisplayObjectAdjuster(i)
 				tex2$="Col From"
 			Else If (CurrentObjectSubType Mod 32)=15
 				tex2$="Command"
+			Else If (CurrentObjectSubType Mod 32)=13
+				tex2$="ReplayDeactivate"
+				Select CurrentObjectData(0)
+				Case 0
+					tex$="Yes"
+				Default
+					tex$="No"
+				End Select
 			Else If (CurrentObjectSubType Mod 32)=16 Or (CurrentObjectSubType Mod 32)=17
 				tex2$="Colour"
 
 
 			EndIf
-		EndIf
-		If CurrentObjectModelName$="!WaterFall"
-			tex2$="Type"
-			Select CurrentObjectData(0)
-				Case 0
-					tex$="Water"
-				Case 1
-					tex$="Lava"
-				Case 2
-					tex$="Green"
-			End Select
-			
-		
 		EndIf
 
 		If CurrentObjectType=190 Or CurrentObjectType=164
@@ -4587,16 +4628,6 @@ Function DisplayObjectAdjuster(i)
 		EndIf
 		If CurrentObjectModelName$="!Gem"
 			tex2$="Shape"
-		EndIf
-		If CurrentObjectModelName$="!Crystal"
-			tex2$="Type"
-			Select CurrentObjectData(0)
-			Case 0
-				tex$="Rainbow"
-			Case 1
-				tex$="Void"
-			End Select
-
 		EndIf
 
 		If CurrentObjectModelName$="!Bowler"
@@ -4638,9 +4669,12 @@ Function DisplayObjectAdjuster(i)
 		If CurrentObjectModelName$="!Chomper"
 			tex2$="Speed"
 			tex$="+"+Str$(CurrentObjectData(0))
-			
-			
 		EndIf
+			
+		If CurrentObjectModelName$="!Obstacle34"
+			tex2$="IDToActivate"
+		EndIf
+		
 		If CurrentObjectModelName$="!FireFlower"
 			tex2$="Direction"
 			
@@ -4663,7 +4697,7 @@ Function DisplayObjectAdjuster(i)
 				tex$="NorthWest"
 			End Select
 		EndIf
-		If CurrentObjectModelName$="!Turtle" Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectType<>424) Or CurrentObjectModelName$="!Weebot"  Or CurrentObjectModelName$="!Zapbot"
+		If CurrentObjectModelName$="!Turtle" Or (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectType<>424) Or CurrentObjectModelName$="!Weebot"  Or CurrentObjectModelName$="!Zapbot" Or CurrentObjectModelName$="!KaboomRTW"   
 			tex2$="Direction"
 			
 			Select CurrentObjectData(0)
@@ -4693,12 +4727,6 @@ Function DisplayObjectAdjuster(i)
 				tex$="Dark"
 			Case 5
 				tex$="Shadow"
-			Case 6
-				tex$="Fire"
-			Case 7
-				tex$="Green"
-			Case 8
-				tex$="White"
 			End Select
 				
 			
@@ -4744,26 +4772,33 @@ Function DisplayObjectAdjuster(i)
 		EndIf	
 		If CurrentObjectModelName$="!Ghost" Or CurrentObjectModelName$="!Wraith"
 			tex2$="Radius"
-		EndIf		
-
-
-
-
+		EndIf	
+		
+		If CurrentObjectModelName$="!Sign"
+			tex2$="Type"
+		EndIf	
 
 
 	Case "Data1"
 		tex$=Str$(CurrentObjectData(1))
-		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key"  Or CurrentObjectModelName$="!KeyCard" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge" Or CurrentObjectModelName$="!Retrolasergate" Or CurrentObjectModelName$="!Pushbot" Or CurrentObjectModelname$="!Autodoor" Or CurrentObjectModelname$="!Suctube" Or CurrentObjectModelName$="!Conveyor"
+		
+		If CurrentObjectModelName$="!Square"
+			tex2$="Charge"
+			Select CurrentObjectData(1)
+			Case 0
+				tex$="Always"
+			Case 1
+				tex$="Once"
+			Case 2
+				tex$="Disabled"
+			Case 3
+				tex$="Uo"
+			End Select
+			
+		EndIf
+		
+		If CurrentObjectModelName$="!Spring" Or CurrentObjectModelName$="!SteppingStone" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectModelName$="!ColourGate" Or CurrentObjectModelName$="!Door" Or CurrentObjectModelName$="!Key"  Or CurrentObjectModelName$="!KeyCard" Or CurrentObjectModelName$="!Teleport" Or CurrentObjectModelName$="!Cage" Or CurrentObjectTextureName$="!FireTrap" Or CurrentObjectModelName$="!FlipBridge" Or CurrentObjectModelName$="!Retrolasergate" Or CurrentObjectModelName$="!Pushbot" Or CurrentObjectModelname$="!Autodoor" Or CurrentObjectModelname$="!Suctube" Or CurrentObjectModelName$="!Conveyor" Or CurrentObjectModelName$="!Barrel1"
 			tex2$="SubColour"
-		EndIf
-		
-		If CurrentObjectModelName$="!CustomModel"
-			tex2$="PitchAnim"
-		EndIf
-
-		
-		If CurrentObjectModelName$="!Obstacle51" Or CurrentObjectModelName$="!Obstacle55" Or CurrentObjectModelName$="!Obstacle59"
-			tex2$="Texture"
 		EndIf
 		
 		If CurrentObjectModelName$="!Cuboid"
@@ -4865,11 +4900,11 @@ Function DisplayObjectAdjuster(i)
 		EndIf
 		
 		If CurrentObjectModelName$="!Crab"
-			tex2$="Status"
+			tex2$="Behaviour"
 			If CurrentObjectData(1)=0
 				tex$="Awake"
 			Else If CurrentObjectData(1)=1
-				tex$="Curious"
+				tex$="Reversed"
 			Else If CurrentObjectData(1)=2
 				tex$="Asleep"
 			Else If CurrentObjectData(1)=3
@@ -4922,7 +4957,7 @@ Function DisplayObjectAdjuster(i)
 			tex2$="Goal X"
 		EndIf
 
-		If  (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectModelName$<>"!Retrolasergate") Or CurrentObjectModelName$="!Weebot"  Or CurrentObjectModelName$="!Zapbot"
+		If  (Left$(CurrentObjectModelName$,6)="!Retro" And CurrentObjectModelName$<>"!Retrolasergate") Or CurrentObjectModelName$="!Weebot"  Or CurrentObjectModelName$="!Zapbot" Or CurrentObjectModelName$="!KaboomRTW"
 
 			tex2$="Turning"
 			If CurrentObjectData(1)=0
@@ -5199,6 +5234,8 @@ Function DisplayObjectAdjuster(i)
 			tex2$="Speed"
 		EndIf
 		
+		
+		
 		If  CurrentObjectModelName$="!Cuboid"
 			tex2$="Explo Command"
 		EndIf
@@ -5228,8 +5265,14 @@ Function DisplayObjectAdjuster(i)
 			tex2$="Style"
 			
 		EndIf
-		If CurrentObjectModelName$="!CustomModel"
-			tex2$="XAnim"
+		If  CurrentObjectModelName$="!Wraith"
+			tex2$="Target"
+			Select CurrentObjectData(3)
+			Case 0
+				tex$="LastPlayerLoc"
+			Case 1
+				tex$="Indefinite"
+			End Select
 		EndIf
 
 		If CurrentObjectModelName$="!Pushbot" Or CurrentObjectModelName$="!Transporter" Or CurrentObjectType=45
@@ -5239,8 +5282,11 @@ Function DisplayObjectAdjuster(i)
 			Else If CurrentObjectData(3)=1
 
 				tex$="Right"
-			Else ; only for pushbots
+			Else If CurrentObjectData(3)=2
+				; only for pushbots
 				tex$="180"
+			Else
+				tex$="Out of Bounds"
 			EndIf
 		EndIf
 		If currentObjectType=46
@@ -5559,9 +5605,24 @@ Function DisplayObjectAdjuster(i)
 			End Select
 		EndIf
 		
-		If  CurrentObjectModelName$="!Zapbot" Or CurrentObjectModelName$="!Ufo"
+		If  CurrentObjectModelName$="!Zapbot" Or CurrentObjectModelName$="!Retroufo" Or CurrentObjectModelName$="!Weebot"
+
+			tex2$="AutoTrack"
+			Select CurrentObjectData(4)
+			Case 0
+				tex$="No"
+			Case 1
+				tex$="Yes"
+			End Select
+		EndIf
+		
+		If  CurrentObjectModelName$="!Chomper" Or CurrentObjectModelName$="!Turtle"  Or CurrentObjectModelName$="!KaboomRTW" Or CurrentObjectModelName$="!Pushbot"  Or CurrentObjectModelName$="!Retrozbot"
 
 			tex2$="Track"
+			Select CurrentObjectData(4)
+			Case 0
+				tex$="No"
+			End Select
 		EndIf
 		
 		If CurrentObjectModelName$="!Autodoor"
@@ -5591,10 +5652,6 @@ Function DisplayObjectAdjuster(i)
 				tex$="No"
 			EndIf
 			
-		EndIf
-		
-		If CurrentObjectModelName$="!CustomModel"
-			tex2$="ZAnim"
 		EndIf
 
 		

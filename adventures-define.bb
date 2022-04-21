@@ -301,7 +301,7 @@ Global GlobalGrowFlowerCounter
 Global PlasmaTexture, FlashTexture
 
 ; Retrostuff
-Global RetroBoxMesh,RetroBoxTexture,RetroCoilyMesh,RetroCoilyTexture,RetroScougeMesh,RetroScougeTexture
+Global RetroBoxMesh,RetroBoxTexture,RetroCoilyMesh,RetroCoilyTexture,RetroScougeMesh,RetroScougeTexture,GreenScouge
 Global RetroUfoMesh,RetroUfoTexture,RetroZbotMesh,RetroZbotTexture,RetroRainbowCoinTexture
 
 ;ZBots
@@ -319,7 +319,7 @@ Global LurkerMesh,LurkerTexture
 
 ; Ghosts
 Global GhostMesh,WraithMesh,GhostTexture
-Dim WraithTexture(5)
+Dim WraithTexture(6)
 ; Obstacles
 Dim ObstacleMesh(50),ObstacleTexture(50)
 

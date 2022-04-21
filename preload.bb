@@ -336,6 +336,7 @@ Function PreLoadModels()
 	HideEntity RetroCoilyMesh
 	RetroScougeMesh=myLoadMesh("data\models\retro\scouge.3ds",0)
 	RetroScougeTexture=myLoadTexture("data\models\retro\scouge3.bmp",1)
+	GreenScouge=myLoadTexture("data\models\retro\scouge4.bmp",1)
 	EntityTexture Retroscougemesh,retroscougetexture
 	RotateMesh RetroScougeMesh,-90,0,0
 	RotateMesh RetroScougeMesh,0,-90,0
@@ -409,6 +410,7 @@ Function PreLoadModels()
 	WraithTexture(2)=MyLoadTexture ("data\models\ghost\wraith2.jpg",1)
 	WraithTexture(3)=MyLoadTexture ("data\models\ghost\wraith3.jpg",1)
 	WraithTexture(4)=MyLoadTexture ("data\models\ghost\wraith4.jpg",1)
+	WraithTexture(5)=MyLoadTexture ("data\models\ghost\wraith5.jpg",1)
 	EntityTexture WraithMesh,WraithTexture(0)
 	HideEntity WraithMesh
 	
@@ -423,6 +425,15 @@ Function PreLoadModels()
 	EntityTexture ObstacleMesh(2),ObstacleTexture(2)
 	HideEntity ObstacleMesh(2)
 	
+	ObstacleMesh(3)=myLoadMesh("data\models\Other\volcano01.b3d",0)
+	ObstacleTexture(3)=myLoadTexture("data\models\Other\volcano01.bmp",1)
+	EntityTexture ObstacleMesh(3),ObstacleTexture(3)
+	HideEntity ObstacleMesh(3)
+	
+	ObstacleMesh(4)=myLoadMesh("data\models\Other\volcano01.b3d",0)
+	ObstacleTexture(4)=myLoadTexture("data\models\other\volcano02.jpg",1)
+	EntityTexture ObstacleMesh(4),ObstacleTexture(4)
+	HideEntity ObstacleMesh(4)
 	ObstacleMesh(5)=myLoadMesh("data\models\Trees\flower.3ds",0)
 	ObstacleTexture(5)=myLoadTexture("data\models\Trees\flower1.jpg",1)
 	EntityTexture ObstacleMesh(5),ObstacleTexture(5)
@@ -439,12 +450,37 @@ Function PreLoadModels()
 	EntityTexture ObstacleMesh(7),ObstacleTexture(7)
 	UpdateNormals obstaclemesh(7)
 	HideEntity ObstacleMesh(7)
+	ObstacleMesh(8)=myLoadMesh("data\models\Trees\fern.b3d",0)
+	ObstacleTexture(8)=myLoadTexture("data\models\Trees\fern.bmp",4)
+	EntityTexture ObstacleMesh(8),ObstacleTexture(8)
+	HideEntity ObstacleMesh(8)
+	
+	ObstacleMesh(9)=myLoadMesh("data\models\Trees\fern02.b3d",0)
+	ObstacleTexture(9)=myLoadTexture("data\models\Trees\fern.bmp",4)
+	EntityTexture ObstacleMesh(9),ObstacleTexture(9)
+	HideEntity ObstacleMesh(9)
 
 	ObstacleMesh(10)=myLoadMesh("data\models\Trees\mushroom.3ds",0)
 	ObstacleTexture(10)=myLoadTexture("data\models\Trees\mushroom.jpg",1)
 	EntityTexture ObstacleMesh(10),ObstacleTexture(10)
 	HideEntity ObstacleMesh(10)
 	
+	ObstacleMesh(11)=myLoadMesh("data\models\Trees\fern3.3ds",0)
+	ObstacleTexture(11)=myLoadTexture("data\models\Trees\fern3.png",4)
+	EntityTexture ObstacleMesh(11),ObstacleTexture(11)
+	HideEntity ObstacleMesh(11)
+	
+	
+	ObstacleMesh(12)=myLoadMesh("data\models\Trees\plant1.3ds",0)
+	ObstacleTexture(12)=myLoadTexture("data\models\Trees\plant1.png",4)
+	EntityTexture ObstacleMesh(12),ObstacleTexture(12)
+	HideEntity ObstacleMesh(12)
+	
+	
+	ObstacleMesh(13)=myLoadMesh("data\models\Trees\plant2.b3d",0)
+	ObstacleTexture(13)=myLoadTexture("data\models\Trees\plant2.png",4)
+	EntityTexture ObstacleMesh(13),ObstacleTexture(13)
+	HideEntity ObstacleMesh(13)
 	ObstacleMesh(15)=myLoadMesh("data\models\Trees\leaftree01.b3d",0)
 	ObstacleTexture(15)=myLoadTexture("data\models\Trees\leaftree01_03.png",4)
 	EntityTexture ObstacleMesh(15),ObstacleTexture(15)
@@ -480,6 +516,20 @@ Function PreLoadModels()
 	EntityTexture ObstacleMesh(21),ObstacleTexture(21)
 	HideEntity ObstacleMesh(21)
 	
+	ObstacleMesh(22)=myLoadMesh("data\models\Trees\tree_jungle_typeA.b3d",0)
+	ObstacleTexture(22)=myLoadTexture("data\models\Trees\tree_jungle_typeA.bmp",4)
+	EntityTexture ObstacleMesh(22),ObstacleTexture(22)
+	HideEntity ObstacleMesh(22)
+	
+	ObstacleMesh(23)=myLoadMesh("data\models\Trees\tree_jungle_typeB.b3d",0)
+	ObstacleTexture(23)=myLoadTexture("data\models\Trees\tree_jungle_typeB.bmp",4)
+	EntityTexture ObstacleMesh(23),ObstacleTexture(23)
+	HideEntity ObstacleMesh(23)
+	
+	ObstacleMesh(24)=myLoadMesh("data\models\Trees\tree_palm.b3d",0)
+	ObstacleTexture(24)=myLoadTexture("data\models\Trees\palmtree01.bmp",4)
+	EntityTexture ObstacleMesh(24),ObstacleTexture(24)
+	HideEntity ObstacleMesh(24)
 	ObstacleMesh(25)=myLoadMesh("data\models\Bridges\bridgeend.3ds",0)
 	ObstacleTexture(25)=myLoadTexture("data\models\Bridges\bridgebrick.png",1)
 	EntityTexture ObstacleMesh(25),ObstacleTexture(25)
@@ -556,6 +606,42 @@ Function PreLoadModels()
 	
 	ObstacleMesh(42)=myLoadMesh("data\models\houses\windmill_rotor.b3d",0)
 	HideEntity ObstacleMesh(42)
+	
+	ObstacleMesh(43)=myLoadMesh("data\models\houses\hut01.b3d",0)
+	ObstacleTexture(43)=myLoadTexture("data\models\houses\hut01.jpg",4)
+	EntityTexture ObstacleMesh(43),ObstacleTexture(43)
+	HideEntity ObstacleMesh(43)
+	
+	ObstacleMesh(44)=myLoadMesh("data\models\other\ship01.b3d",0)
+	ObstacleTexture(44)=myLoadTexture("data\models\other\ship01.bmp",1)
+	EntityTexture ObstacleMesh(44),ObstacleTexture(44)
+	HideEntity ObstacleMesh(44)
+	
+	
+	ObstacleMesh(45)=myLoadMesh("data\models\houses\waterwheel.3ds",0)
+	ObstacleTexture(45)=myLoadTexture("data\models\cage\cage.jpg",1)
+	EntityTexture ObstacleMesh(45),ObstacleTexture(45)
+	HideEntity ObstacleMesh(45)
+	
+	ObstacleMesh(46)=myLoadMesh("data\models\houses\bridge.3ds",0)
+	ObstacleTexture(46)=myLoadTexture("data\models\cage\cage.jpg",1)
+	EntityTexture ObstacleMesh(46),ObstacleTexture(46)
+	HideEntity ObstacleMesh(46)
+	
+	ObstacleMesh(47)=myLoadMesh("data\models\houses\machine.3ds",0)
+	ObstacleTexture(47)=myLoadTexture("data\models\houses\machine.jpg",1)
+	EntityTexture ObstacleMesh(47),ObstacleTexture(47)
+	HideEntity ObstacleMesh(47)
+	
+	ObstacleMesh(48)=myLoadMesh("data\models\other\starship.3ds",0)
+	ObstacleTexture(48)=myLoadTexture("data\models\other\starship.jpg",1)
+	EntityTexture ObstacleMesh(48),ObstacleTexture(48)
+	HideEntity ObstacleMesh(48)
+	
+	ObstacleMesh(49)=myLoadMesh("data\models\other\tv.3ds",0)
+	ObstacleTexture(49)=myLoadTexture("data\models\other\tv.jpg",1)
+	EntityTexture ObstacleMesh(49),ObstacleTexture(49)
+	HideEntity ObstacleMesh(49)
 
 
 	ButtonTexture=myLoadTexture("data/graphics/buttons1.bmp",4)
