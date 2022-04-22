@@ -6592,7 +6592,7 @@ Function AdjustObjectAdjuster(i)
 			If CurrentObjectData(2)<=-32768 Then CurrentObjectData(2)=32767
 			If CurrentObjectData(2)>=32767 Then CurrentObjectData(2)=-32768
 		EndIf
-		If  (CurrentObjectModelName$="!Button" And ((CurrentObjectSubType Mod 32)=16 Or (CurrentObjectSubType Mod 32)=17))
+		If  ((CurrentObjectModelName$="!Button" And ((CurrentObjectSubType Mod 32)=16 Or (CurrentObjectSubType Mod 32)=17))) Or CurrentObjectModelName$="!ZbotNPC"
 			; direction 0-1
 			If CurrentObjectData(2)>1 CurrentObjectData(2)=0
 			If CurrentObjectData(2)<0 CurrentObjectData(2)=1
