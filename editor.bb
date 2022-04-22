@@ -11,7 +11,7 @@
 
 Include "particles-define.bb"
 
-Global VersionText$="WA 0.96 Editor (BetterEditor Mod)"
+Global VersionText$="WA BetterEditor v4.00"
 
 Global MASTERUSER=False
 Global LeftMouse,LeftMouseReleased,RightMouse,RightMouseReleased
@@ -23,7 +23,7 @@ Global EditorMode=0		;0-level, 1-textures, 2-sidetextures, 3-objects
 						;8-master edit screen
 						;9-dialog edit screen
 						
-AppTitle "WA 0.96 Editor"
+AppTitle "Wonderland Adventures Better Editor"
 ; EDITOR DIALOG DATA
 
 Global CurrentDialog
@@ -2149,11 +2149,11 @@ Function EditorControls()
 		EndIf
 		If my>=115 And my<130 And leftmouse=True And leftmousereleased=True
 			leftmousereleased=False
-			If Fast levelmusic=levelmusic+100 Else levelmusic=levelmusic+1
+			If Fast levelmusic=levelmusic+10 Else levelmusic=levelmusic+1
 		EndIf
 		If my>=115 And my<130 And rightmouse=True And rightmousereleased=True
 			rightmousereleased=False
-			If Fast levelmusic=levelmusic-100 Else levelmusic=levelmusic-1
+			If Fast levelmusic=levelmusic-10 Else levelmusic=levelmusic-1
 			If levelmusic=-2 Then levelmusic=-1
 		EndIf
 
@@ -2952,6 +2952,13 @@ Function EditorControls()
 
 End Function
 
+Function AddAdjuster(Name$)
+
+	ObjectAdjuster$(NofObjectAdjusters)=Name$
+	NofObjectAdjusters=NofObjectAdjusters+1
+
+End Function
+
 Function ReBuildLevelModel()
 
 	For i=0 To 99
@@ -3495,6 +3502,29 @@ Function LoadObjectPreset()
 		EndIf
 	Next
 	CloseFile file
+	If NofObjectAdjusters<=9
+		Repeat
+			AddAdjuster("")
+		Until NofObjectAdjusters>=9
+		AddAdjuster("TextureName")
+		
+		AddAdjuster("XAdjust")
+		AddAdjuster("YAdjust")
+		AddAdjuster("ZAdjust")
+		
+		AddAdjuster("XScale")
+		AddAdjuster("YScale")
+		AddAdjuster("ZScale")
+		
+		AddAdjuster("")
+		AddAdjuster("")
+		
+		AddAdjuster("YawAdjust")
+		AddAdjuster("RollAdjust")
+		AddAdjuster("PitchAdjust")
+		AddAdjuster("ScaleAdjust")
+	EndIf
+	
 	
 	
 	BuildCurrentObjectModel()
