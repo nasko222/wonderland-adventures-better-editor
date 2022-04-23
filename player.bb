@@ -662,6 +662,11 @@ Function UpdateGame()
 			If NofBabyBoomersInAdventure=0
 				Flag=True
 			EndIf
+			
+		Case 9
+			If NofZBotsInAdventure=0
+				Flag=True
+			EndIf
 
 		End Select
 		If (Flag=True Or ((((KeyDown(88) And ((KeyDown(29) Or (KeyDown(157))))) And (AdventureCurrentStatus>0)) And (MidnightVault>0))))

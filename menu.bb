@@ -2771,7 +2771,7 @@ Function UpdateOldMenu()
 	
 	Else If currentmenu=11
 	
-	displaytext("BetterEditor v4.01",0,38,0.6,1,255,255,0)
+	displaytext("BetterEditor v4.02",0,38,0.6,1,255,255,0)
 	
 	ex$ = "Player: " + playername
 	DisplayText(ex$, (66.5-Len(ex$))/2,28.595001,0.75,1,255,255,0)
